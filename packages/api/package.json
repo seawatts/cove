@@ -1,0 +1,47 @@
+{
+  "dependencies": {
+    "@acme/db": "workspace:*",
+    "@acme/validators": "workspace:*",
+    "@tanstack/react-query": "5.66.0",
+    "@trpc/client": "next",
+    "@trpc/react-query": "next",
+    "@trpc/server": "next",
+    "next": "15.1.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "superjson": "2.2.2",
+    "zod": "3.24.1",
+    "zod-to-json-schema": "3.24.1"
+  },
+  "devDependencies": {
+    "@acme/tsconfig": "workspace:*",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
+    "typescript": "5.7.3"
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.ts",
+      "types": "./dist/index.d.ts"
+    },
+    "./client": {
+      "default": "./src/react/client-exports.ts",
+      "types": "./dist/react/client-exports.d.ts"
+    },
+    "./server": {
+      "default": "./src/react/server-exports.ts",
+      "types": "./dist/react/server-exports.d.ts"
+    }
+  },
+  "license": "MIT",
+  "name": "@acme/api",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo node_modules dist",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

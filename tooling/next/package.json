@@ -1,0 +1,22 @@
+{
+  "name": "@acme/next-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.mjs"
+  },
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@next/bundle-analyzer": "15.1.6",
+    "next": "15.1.6"
+  },
+  "devDependencies": {
+    "@acme/tsconfig": "workspace:*",
+    "typescript": "5.7.3"
+  }
+}
