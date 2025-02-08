@@ -6,7 +6,7 @@ Code Style and Structure
 - Use functional and declarative programming patterns; avoid classes.
 - Prefer iteration and modularization over code duplication.
 - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
-- Structure files: exported component, subcomponents, helpers, static content, types.
+- Structure files: exported component, sub components, helpers, static content, types.
 
 Naming Conventions
 

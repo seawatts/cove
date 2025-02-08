@@ -1,0 +1,46 @@
+[package]
+name = "test"
+version = "0.1.0"
+edition = "2021"
+description = "Test - A lightweight, type-safe home automation system"
+
+[dependencies]
+# Async Runtime and Utilities
+tokio = { version = "1.36.0", features = ["full"] }  # Async runtime and utilities
+tokio-stream = "0.1.14"    # Async stream utilities
+futures = "0.3.30"         # Async utilities and combinators
+
+# Serialization
+serde = { version = "1.0.197", features = ["derive"] }  # Serialization framework
+serde_json = "1.0.114"     # JSON serialization
+serde_yaml = "0.9.32"      # YAML serialization for config files
+quick-xml = { version = "0.31.0", features = ["serialize"] }  # XML parsing for SSDP/UPnP
+schemars = "0.8.16"
+jsonschema = { version = "0.17.1", features = ["draft202012"] }
+
+# Error Handling and Logging
+thiserror = "1.0.56"       # Error type derivation
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "time"] }  # Logging configuration
+tracing-error = "0.2.1"
+tracing-appender = "0.2.3"  # File appender for tracing
+strip-ansi-escapes = "0.1"  # Strip ANSI escape sequences from strings
+miette = { version = "5.10.0", features = ["fancy"] }
+
+# Utilities
+chrono = { version = "0.4.30", features = ["serde"] }  # Date and time utilities
+async-trait = "0.1.77"     # Async trait support
+strum = "0.26.3"          # Enum utilities and string conversion
+strum_macros = "0.26.3"   # Enum derive macros
+
+# Protocol Support
+rumqttc = "0.24.0"        # MQTT client for IoT communication
+reqwest = { version = "0.11.24", features = ["json"] }  # HTTP client
+
+# Device Discovery
+mdns-sd = "0.10.1"        # mDNS/DNS-SD discovery (Apple HomeKit, Google Cast)
+ssdp-client = "2.0.0"     # SSDP/UPnP discovery (Philips Hue, Smart TVs)
+btleplug = "0.11.5"       # Bluetooth LE scanning (Smart locks, sensors)
+zeroconf = "0.13.1"       # ZeroConf/Bonjour services (Network device discovery)
+
+
