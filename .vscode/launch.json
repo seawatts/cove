@@ -20,6 +20,25 @@
       "command": "pnpm dev",
       "cwd": "${workspaceFolder}/apps/nextjs/",
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library",
+      "cargo": {
+        "args": ["test", "--no-run", "--lib"]
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}/packages/backend"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug specific test",
+      "cargo": {
+        "args": ["test", "--no-run", "--test=integration_test"]
+      },
+      "args": []
     }
   ]
 }

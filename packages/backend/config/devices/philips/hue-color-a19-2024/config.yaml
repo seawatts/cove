@@ -1,0 +1,64 @@
+extends: "../../base-devices/hue-color-light.yaml"
+
+id: "hue-color-a19-2024"
+name: "Philips Hue White and Color A19 E26 1100lm"
+model: "929003017101"
+description: "2024 model of the Philips Hue White and Color Ambiance A19 E26 bulb"
+
+specifications:
+  lumens: 1100
+  wattage: 10.5
+  voltage: 120
+  base_type: "E26"
+  lifetime_hours: 25000
+  dimensions:
+    height: 110  # mm
+    diameter: 62 # mm
+  weight: 76     # grams
+
+# Override specific capabilities from base
+capabilities:
+  brightness:
+    range: [0, 100]
+    step: 1
+    state:
+      type: "number"
+      default: 100
+      unit: "%"
+      conversion:
+        to_device: "value * 2.54"    # Convert 0-100% to 0-254
+        from_device: "value / 2.54"  # Convert 0-254 to 0-100%
+
+  color_temperature:
+    range: [2000, 6500]
+    state:
+      type: "number"
+      default: 2700
+      unit: "K"
+      conversion:
+        to_device: "1000000 / value"  # Convert Kelvin to Mired
+        from_device: "1000000 / value" # Convert Mired to Kelvin
+
+# Device-specific validation
+validation:
+  modelid: "LCA009"
+  swversion:
+    min: "1.0.0"
+    recommended: "1.93.3"
+
+# Energy consumption tracking
+energy:
+  measurement: true
+  standby_watts: 0.5
+  max_watts: 10.5
+  energy_class: "A+"
+
+# Additional metadata
+metadata:
+  release_date: "2024-01"
+  warranty_years: 2
+  indoor_only: true
+  certification:
+    - "CE"
+    - "RoHS"
+    - "FCC"

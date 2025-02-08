@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=./schemas/cove.schema.json
+
+system:
+  name: Cove
+
+logging:
+  level: INFO
+
+discovery:
+  protocols:
+    - "wifi":
+      enabled: true
+      discovery_timeout: 10
+      discovery_interval: 10
+      discovery_retries: 3
+      discovery_retry_delay: 1

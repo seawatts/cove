@@ -1,0 +1,395 @@
+use crate::{
+    config::{Config, Device},
+    discovery::{
+        DeviceCapabilities, DeviceControl, DeviceDiscovery, DeviceStateUpdate, DiscoveredDevice,
+        ProtocolHandler, ProtocolType,
+    },
+    error::Error,
+};
+use async_trait::async_trait;
+use rumqttc::{AsyncClient, Event, EventLoop, MqttOptions, Packet, QoS};
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, time::Duration};
+use tokio::sync::broadcast;
+use tracing::{error, info, warn};
+
+/// Standard message format for device state updates
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeviceState {
+    pub device_id: String,
+    pub state: serde_json::Value,
+    pub timestamp: u64,
+}
+
+/// MQTT client wrapper for handling device communication
+pub struct MqttHandler {
+    client: AsyncClient,
+    event_loop: EventLoop,
+    devices: Vec<Device>,
+    state_tx: broadcast::Sender<DeviceStateUpdate>,
+}
+
+unsafe impl Send for MqttHandler {}
+unsafe impl Sync for MqttHandler {}
+
+impl MqttHandler {
+    /// Create a new MQTT handler from configuration
+    pub fn new(config: &Config) -> Result<Self, Error> {
+        let mut mqtt_options =
+            MqttOptions::new(&config.mqtt.client_id, &config.mqtt.host, config.mqtt.port);
+
+        mqtt_options
+            .set_keep_alive(Duration::from_secs(30))
+            .set_clean_session(true);
+
+        if let (Some(username), Some(password)) = (&config.mqtt.username, &config.mqtt.password) {
+            mqtt_options.set_credentials(username, password);
+        }
+
+        let (client, event_loop) = AsyncClient::new(mqtt_options, 10);
+        let (state_tx, _) = broadcast::channel(100);
+
+        Ok(Self {
+            client,
+            event_loop,
+            devices: config.devices.clone(),
+            state_tx,
+        })
+    }
+
+    /// Start the MQTT event loop
+    async fn run_event_loop(&mut self) -> Result<(), Error> {
+        loop {
+            match self.event_loop.poll().await {
+                Ok(Event::Incoming(Packet::Publish(publish))) => {
+                    let payload = String::from_utf8_lossy(&publish.payload);
+                    info!("Received message on topic {}: {}", publish.topic, payload);
+
+                    if let Some(device) = self.find_device_by_topic(&publish.topic) {
+                        if let Ok(state) = serde_json::from_str(&payload) {
+                            let update = DeviceStateUpdate {
+                                device_id: device.id.clone(),
+                                state,
+                                timestamp: std::time::SystemTime::now()
+                                    .duration_since(std::time::UNIX_EPOCH)
+                                    .unwrap()
+                                    .as_secs(),
+                            };
+                            let _ = self.state_tx.send(update);
+                        }
+                    }
+                }
+                Ok(Event::Incoming(Packet::Disconnect)) => {
+                    warn!("Disconnected from MQTT broker");
+                    break;
+                }
+                Err(e) => {
+                    error!("MQTT error: {}", e);
+                    break;
+                }
+                _ => {}
+            }
+        }
+        Ok(())
+    }
+
+    /// Find a device by its MQTT topic
+    fn find_device_by_topic(&self, topic: &str) -> Option<&Device> {
+        self.devices.iter().find(|d| d.mqtt_topic == topic)
+    }
+
+    /// Publish a message to a device
+    pub async fn publish_to_device(
+        &self,
+        device_id: &str,
+        state: serde_json::Value,
+    ) -> Result<(), Error> {
+        if let Some(device) = self.devices.iter().find(|d| d.id == device_id) {
+            let message = DeviceState {
+                device_id: device_id.to_string(),
+                state,
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+            };
+
+            let payload = serde_json::to_string(&message)
+                .map_err(|e| Error::MessageParse(format!("Failed to serialize message: {}", e)))?;
+
+            self.client
+                .publish(&device.mqtt_topic, QoS::AtLeastOnce, false, payload)
+                .await
+                .map_err(|e| Error::Mqtt(format!("Failed to publish: {}", e)))?;
+
+            info!("Published message to device: {}", device_id);
+            Ok(())
+        } else {
+            Err(Error::DeviceNotFound(device_id.to_string()))
+        }
+    }
+}
+
+#[async_trait]
+impl DeviceDiscovery for MqttHandler {
+    async fn start_discovery(&mut self) -> Result<(), Error> {
+        // Subscribe to discovery topics
+        self.client
+            .subscribe("homeassistant/+/+/config", QoS::AtLeastOnce)
+            .await
+            .map_err(|e| Error::Mqtt(format!("Failed to subscribe to discovery: {}", e)))?;
+        Ok(())
+    }
+
+    async fn stop_discovery(&mut self) -> Result<(), Error> {
+        self.client
+            .unsubscribe("homeassistant/+/+/config")
+            .await
+            .map_err(|e| Error::Mqtt(format!("Failed to unsubscribe from discovery: {}", e)))?;
+        Ok(())
+    }
+
+    async fn get_discovered_devices(&self) -> Result<Vec<DiscoveredDevice>, Error> {
+        Ok(self
+            .devices
+            .iter()
+            .map(|device| DiscoveredDevice {
+                id: device.id.clone(),
+                name: device.name.clone(),
+                device_type: device.device_type.clone(),
+                protocol: ProtocolType::MQTT,
+                capabilities: DeviceCapabilities {
+                    supports_on_off: device.device_type == "light",
+                    supports_brightness: device.device_type == "light",
+                    supports_color: false,
+                    supports_color_temperature: false,
+                    supports_sensor_reading: device.device_type == "sensor",
+                    supports_sensor_reporting: false,
+                    supports_sensor_reporting_interval: false,
+                    supports_sensor_reporting_interval_default: false,
+                    supports_sensor_reporting_interval_min: false,
+                    supports_sensor_reporting_interval_max: false,
+                    supports_sensor_reporting_interval_step: false,
+                    supports_sensor_reporting_interval_min_default: false,
+                    supports_sensor_reporting_interval_max_default: false,
+                },
+                properties: HashMap::new(),
+            })
+            .collect())
+    }
+}
+
+#[async_trait]
+impl DeviceControl for MqttHandler {
+    async fn set_device_state(
+        &self,
+        device_id: &str,
+        state: serde_json::Value,
+    ) -> Result<(), Error> {
+        if let Some(device) = self.devices.iter().find(|d| d.id == device_id) {
+            let message = DeviceStateUpdate {
+                device_id: device_id.to_string(),
+                state,
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+            };
+
+            let payload = serde_json::to_string(&message)
+                .map_err(|e| Error::MessageParse(format!("Failed to serialize message: {}", e)))?;
+
+            self.client
+                .publish(&device.mqtt_topic, QoS::AtLeastOnce, false, payload)
+                .await
+                .map_err(|e| Error::Mqtt(format!("Failed to publish: {}", e)))?;
+
+            Ok(())
+        } else {
+            Err(Error::DeviceNotFound(device_id.to_string()))
+        }
+    }
+
+    async fn get_device_state(&self, device_id: &str) -> Result<serde_json::Value, Error> {
+        // For MQTT, we don't have a direct way to get state, so we return an empty object
+        // In a real implementation, we would maintain a state cache
+        Ok(serde_json::Value::Object(serde_json::Map::new()))
+    }
+
+    async fn subscribe_to_updates(&self) -> broadcast::Receiver<DeviceStateUpdate> {
+        self.state_tx.subscribe()
+    }
+}
+
+#[async_trait]
+impl ProtocolHandler for MqttHandler {
+    fn protocol_type(&self) -> ProtocolType {
+        ProtocolType::MQTT
+    }
+
+    async fn initialize(&mut self) -> Result<(), Error> {
+        // Subscribe to all device topics
+        for device in &self.devices {
+            self.client
+                .subscribe(&device.mqtt_topic, QoS::AtLeastOnce)
+                .await
+                .map_err(|e| Error::Mqtt(format!("Failed to subscribe: {}", e)))?;
+            info!("Subscribed to topic: {}", device.mqtt_topic);
+        }
+
+        // Start discovery
+        self.start_discovery().await?;
+
+        // Start the event loop in a separate task
+        let mut handler = self.clone();
+        tokio::spawn(async move {
+            if let Err(e) = handler.run_event_loop().await {
+                error!("MQTT event loop error: {}", e);
+            }
+        });
+
+        Ok(())
+    }
+
+    async fn shutdown(&mut self) -> Result<(), Error> {
+        self.stop_discovery().await?;
+        Ok(())
+    }
+}
+
+// Implement Clone for MqttHandler
+impl Clone for MqttHandler {
+    fn clone(&self) -> Self {
+        let (client, event_loop) =
+            AsyncClient::new(MqttOptions::new("clone", "localhost", 1883), 10);
+
+        Self {
+            client,
+            event_loop,
+            devices: self.devices.clone(),
+            state_tx: self.state_tx.clone(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::{Config, MqttConfig, WebSocketConfig};
+    use serde_json::json;
+    use std::time::Duration;
+    use tokio::time::sleep;
+
+    fn create_test_config() -> Config {
+        Config {
+            mqtt: MqttConfig {
+                host: "localhost".to_string(),
+                port: 1883,
+                username: None,
+                password: None,
+                client_id: "test-client".to_string(),
+            },
+            devices: vec![
+                Device {
+                    id: "test-light".to_string(),
+                    name: "Test Light".to_string(),
+                    device_type: "light".to_string(),
+                    mqtt_topic: "home/test/light".to_string(),
+                },
+                Device {
+                    id: "test-sensor".to_string(),
+                    name: "Test Sensor".to_string(),
+                    device_type: "sensor".to_string(),
+                    mqtt_topic: "home/test/sensor".to_string(),
+                },
+            ],
+            websocket: WebSocketConfig {
+                host: "0.0.0.0".to_string(),
+                port: 8080,
+            },
+        }
+    }
+
+    #[tokio::test]
+    async fn test_mqtt_handler_initialization() {
+        let config = create_test_config();
+        let handler = MqttHandler::new(&config);
+        assert!(handler.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_device_discovery() {
+        let config = create_test_config();
+        let mut handler = MqttHandler::new(&config).unwrap();
+
+        // Start discovery
+        handler.start_discovery().await.unwrap();
+
+        // Get discovered devices
+        let devices = handler.get_discovered_devices().await.unwrap();
+        assert_eq!(devices.len(), 2);
+
+        let light = devices.iter().find(|d| d.id == "test-light").unwrap();
+        assert_eq!(light.device_type, "light");
+        assert!(light.capabilities.supports_on_off);
+        assert!(light.capabilities.supports_brightness);
+
+        let sensor = devices.iter().find(|d| d.id == "test-sensor").unwrap();
+        assert_eq!(sensor.device_type, "sensor");
+        assert!(sensor.capabilities.supports_sensor_reading);
+    }
+
+    #[tokio::test]
+    async fn test_device_control() {
+        let config = create_test_config();
+        let handler = MqttHandler::new(&config).unwrap();
+
+        // Test setting device state
+        let state = json!({
+            "power": "on",
+            "brightness": 100
+        });
+
+        let result = handler.set_device_state("test-light", state).await;
+        assert!(result.is_ok());
+
+        // Test getting device state (should be empty as we don't maintain state)
+        let state = handler.get_device_state("test-light").await.unwrap();
+        assert!(state.as_object().unwrap().is_empty());
+
+        // Test setting state for non-existent device
+        let result = handler.set_device_state("non-existent", json!({})).await;
+        assert!(matches!(result, Err(Error::DeviceNotFound(_))));
+    }
+
+    #[tokio::test]
+    async fn test_protocol_handler() {
+        let config = create_test_config();
+        let mut handler = MqttHandler::new(&config).unwrap();
+
+        assert_eq!(handler.protocol_type(), ProtocolType::MQTT);
+
+        // Initialize handler
+        handler.initialize().await.unwrap();
+
+        // Subscribe to updates
+        let mut updates = handler.subscribe_to_updates().await;
+
+        // Publish a test message
+        handler
+            .set_device_state(
+                "test-light",
+                json!({
+                    "power": "on"
+                }),
+            )
+            .await
+            .unwrap();
+
+        // Wait a bit for the message to be processed
+        sleep(Duration::from_millis(100)).await;
+
+        // Shutdown
+        handler.shutdown().await.unwrap();
+    }
+}
