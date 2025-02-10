@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     // Start the API server
     let api = Api::new(
         device_registry.clone(),
-        SocketAddr::from(([127, 0, 0, 1], 3000)),
+        SocketAddr::from(([127, 0, 0, 1], 4000)),
     );
     let api_handle = tokio::spawn(async move {
         if let Err(e) = api.start().await {
@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
     });
 
     // Initialize event processor
-    let mut event_processor = EventProcessor::new(
+    let mut event_processor: EventProcessor = EventProcessor::new(
         device_registry.clone(),
         event_manager.subscribe_high_priority(),
         event_manager.subscribe_normal_priority(),

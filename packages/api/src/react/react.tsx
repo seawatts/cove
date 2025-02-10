@@ -3,10 +3,10 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
 import {} from '@trpc/client'
-import { type ReactElement, useState } from 'react'
+import { type PropsWithChildren, type ReactElement, useState } from 'react'
 
 import { FetchTransport, createClient } from '@rspc/client'
-import { createReactQueryHooks } from '@rspc/react'
+import { createReactQueryHooks } from '@rspc/react-query'
 import { env } from '../env.client'
 import { createQueryClient } from './query-client'
 
@@ -25,10 +25,20 @@ const getQueryClient = () => {
   return clientQueryClientSingleton
 }
 
-// export const api = createTRPCReact<AppRouter>()
 export const api = createReactQueryHooks<Procedures>()
 
-type Procedures = {
+export type Device = {
+  id: string
+  friendly_name: string
+  status: string
+  protocol: string
+  categories: string[]
+  location: { room: string; floor: string; zone: string }
+  last_online: string
+  metadata: { icon_url: string }
+}
+
+export type Procedures = {
   mutations: {
     key: 'hello'
     input: {
@@ -44,14 +54,12 @@ type Procedures = {
     result: string
   }
   queries: {
-    key: 'hello'
-    input: {
-      name: string
-    }
-    result: string
+    key: 'devices'
+    input: never
+    result: Device[]
   }
 }
-export function TRPCReactProvider(props: { children: React.ReactNode }) {
+export function TRPCReactProvider(props: PropsWithChildren) {
   const queryClient = getQueryClient()
 
   const [rspcClient] = useState(() =>

@@ -3,7 +3,7 @@
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
     "@rspc/client": "0.3.1",
-    "@rspc/react": "0.2.2",
+    "@rspc/react-query": "0.3.1",
     "@tanstack/react-query": "5.66.0",
     "@trpc/client": "next",
     "@trpc/react-query": "next",
@@ -38,13 +38,6 @@
   "license": "MIT",
   "name": "@acme/api",
   "private": true,
-  "resolutions": {
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "@rspc/client": "0.3.1"
-  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf .turbo node_modules dist",

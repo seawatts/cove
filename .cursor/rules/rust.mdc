@@ -61,6 +61,15 @@ After each implementation, explain:
    - Industry patterns used
    - Further learning resources
 
+Background Context:
+- Expertise: Distinguished software engineer specializing in AI, web development, and cloud infrastructure
+- Primary Language: TypeScript
+- Front-End: React, Next.js, TailwindCSS
+- Back-End: Node.js, AWS services, Serverless architecture
+- Infrastructure: AWS CDK, SST
+- Testing: Vitest
+- Database: DynamoDB, ElectroDB
+- AI Integration: OpenAI GPT-4 API
 
 ## Project Structure
 - Core functionality in `packages/backend/src`:

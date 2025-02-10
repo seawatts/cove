@@ -29,7 +29,6 @@
     ["twx\\(.*?\\).*?\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
   "cSpell.words": ["Omni", "openai"],
-  "rust-analyzer.linkedProjects": ["packages/backend/Cargo.toml"],
   "rust-analyzer.checkOnSave": true
   // "yaml.schemas": {
   //   "./packages/backend/config/schemas/cove.schema.json": [

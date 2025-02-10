@@ -1,37 +1,23 @@
 import 'server-only'
 
-import { headers } from 'next/headers'
-import { NextRequest } from 'next/server'
-
-import { createServerSideHelpers } from '@trpc/react-query/server'
+import { createClient } from '@rspc/client'
+import { FetchTransport } from '@rspc/client'
 import { cache } from 'react'
-import superjson from 'superjson'
-import { createTRPCContext } from '../context'
-import { appRouter } from '../root'
 import { createQueryClient } from './query-client'
-
-/**
- * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
- * handling a tRPC call from a React Server Component.
- */
-const createContext = cache(async () => {
-  const heads = new Headers(await headers())
-  heads.set('x-trpc-source', 'rsc')
-
-  const request = new NextRequest('https://notused.com', {
-    headers: heads,
-  })
-
-  return createTRPCContext(request)
-})
+import type { Procedures } from './react'
+import { createServerSideHelpers } from './server-helpers'
 
 export const getQueryClient = cache(createQueryClient)
+const client = createClient<Procedures>({
+  // Refer to the integration your using for the correct transport.
+  onError: (error) => {
+    console.error(error)
+  },
+  // TODO: Update this with the correct URL. Pull in from env.
+  transport: new FetchTransport('http://localhost:4000/rspc'),
+})
 
-export const getApi = cache(async () =>
-  createServerSideHelpers({
-    ctx: await createContext(),
-    queryClient: getQueryClient(),
-    router: appRouter,
-    transformer: superjson,
-  }),
-)
+export const api = createServerSideHelpers({
+  client,
+  queryClient: getQueryClient(),
+})

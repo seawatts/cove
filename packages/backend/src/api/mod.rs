@@ -4,6 +4,7 @@ use axum::{routing::get, Router as AxumRouter};
 use miette::Result;
 use std::{net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::{error, info};
 
 use crate::{
@@ -29,6 +30,12 @@ impl Api {
         let (router, _) = router::new().build().unwrap();
         let registry = self.registry.clone();
 
+        // Configure CORS
+        let cors = CorsLayer::new()
+            .allow_methods(Any)
+            .allow_headers(Any)
+            .allow_origin(Any);
+
         // Create the Axum app with rspc middleware
         let app = AxumRouter::new()
             .route("/", get(|| async { "Hello from Cove!" }))
@@ -37,7 +44,8 @@ impl Api {
                 rspc_axum::endpoint(router, move || Ctx {
                     registry: registry.clone(),
                 }),
-            );
+            )
+            .layer(cors);
 
         info!("Starting API server on {}", self.addr);
 
