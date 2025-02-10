@@ -2400,3 +2400,725 @@
 1739157019: Saving in-memory database to /mosquitto/data//mosquitto.db.
 1739163614: Saving in-memory database to /mosquitto/data//mosquitto.db.
 1739167907: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1739169708: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1739171327: New connection from 172.20.0.1:64554 on port 1883.
+1739171327: New client connected from 172.20.0.1:64554 as cove-home (p2, c1, k60).
+1739171327: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171327: Client cove-home disconnected due to malformed packet.
+1739171332: New connection from 172.20.0.1:64566 on port 1883.
+1739171332: New client connected from 172.20.0.1:64566 as cove-home (p2, c1, k60).
+1739171332: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171332: Client cove-home disconnected due to malformed packet.
+1739171337: New connection from 172.20.0.1:62042 on port 1883.
+1739171337: New client connected from 172.20.0.1:62042 as cove-home (p2, c1, k60).
+1739171337: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171337: Client cove-home disconnected due to malformed packet.
+1739171342: New connection from 172.20.0.1:62046 on port 1883.
+1739171342: New client connected from 172.20.0.1:62046 as cove-home (p2, c1, k60).
+1739171342: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171342: Client cove-home disconnected due to malformed packet.
+1739171347: New connection from 172.20.0.1:56376 on port 1883.
+1739171347: New client connected from 172.20.0.1:56376 as cove-home (p2, c1, k60).
+1739171347: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171347: Client cove-home disconnected due to malformed packet.
+1739171352: New connection from 172.20.0.1:56380 on port 1883.
+1739171352: New client connected from 172.20.0.1:56380 as cove-home (p2, c1, k60).
+1739171352: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171352: Client cove-home disconnected due to malformed packet.
+1739171357: New connection from 172.20.0.1:64650 on port 1883.
+1739171357: New client connected from 172.20.0.1:64650 as cove-home (p2, c1, k60).
+1739171357: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171357: Client cove-home disconnected due to malformed packet.
+1739171362: New connection from 172.20.0.1:64662 on port 1883.
+1739171362: New client connected from 172.20.0.1:64662 as cove-home (p2, c1, k60).
+1739171362: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171362: Client cove-home disconnected due to malformed packet.
+1739171367: New connection from 172.20.0.1:56490 on port 1883.
+1739171367: New client connected from 172.20.0.1:56490 as cove-home (p2, c1, k60).
+1739171367: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171367: Client cove-home disconnected due to malformed packet.
+1739171372: New connection from 172.20.0.1:56502 on port 1883.
+1739171372: New client connected from 172.20.0.1:56502 as cove-home (p2, c1, k60).
+1739171372: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171372: Client cove-home disconnected due to malformed packet.
+1739171377: New connection from 172.20.0.1:64838 on port 1883.
+1739171377: New client connected from 172.20.0.1:64838 as cove-home (p2, c1, k60).
+1739171377: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171377: Client cove-home disconnected due to malformed packet.
+1739171382: New connection from 172.20.0.1:64850 on port 1883.
+1739171382: New client connected from 172.20.0.1:64850 as cove-home (p2, c1, k60).
+1739171382: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171382: Client cove-home disconnected due to malformed packet.
+1739171387: New connection from 172.20.0.1:64262 on port 1883.
+1739171387: New client connected from 172.20.0.1:64262 as cove-home (p2, c1, k60).
+1739171387: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171387: Client cove-home disconnected due to malformed packet.
+1739171392: New connection from 172.20.0.1:64264 on port 1883.
+1739171392: New client connected from 172.20.0.1:64264 as cove-home (p2, c1, k60).
+1739171392: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171392: Client cove-home disconnected due to malformed packet.
+1739171400: New connection from 172.20.0.1:60814 on port 1883.
+1739171400: New client connected from 172.20.0.1:60814 as cove-home (p2, c1, k60).
+1739171400: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171400: Client cove-home disconnected due to malformed packet.
+1739171405: New connection from 172.20.0.1:63014 on port 1883.
+1739171405: New client connected from 172.20.0.1:63014 as cove-home (p2, c1, k60).
+1739171405: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171405: Client cove-home disconnected due to malformed packet.
+1739171411: New connection from 172.20.0.1:63026 on port 1883.
+1739171411: New client connected from 172.20.0.1:63026 as cove-home (p2, c1, k60).
+1739171411: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171411: Client cove-home disconnected due to malformed packet.
+1739171416: New connection from 172.20.0.1:65172 on port 1883.
+1739171416: New client connected from 172.20.0.1:65172 as cove-home (p2, c1, k60).
+1739171416: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171416: Client cove-home disconnected due to malformed packet.
+1739171421: New connection from 172.20.0.1:65184 on port 1883.
+1739171421: New client connected from 172.20.0.1:65184 as cove-home (p2, c1, k60).
+1739171421: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171421: Client cove-home disconnected due to malformed packet.
+1739171426: New connection from 172.20.0.1:55322 on port 1883.
+1739171426: New client connected from 172.20.0.1:55322 as cove-home (p2, c1, k60).
+1739171426: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171426: Client cove-home disconnected due to malformed packet.
+1739171431: New connection from 172.20.0.1:55338 on port 1883.
+1739171431: New client connected from 172.20.0.1:55338 as cove-home (p2, c1, k60).
+1739171431: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171431: Client cove-home disconnected due to malformed packet.
+1739171436: New connection from 172.20.0.1:56846 on port 1883.
+1739171436: New client connected from 172.20.0.1:56846 as cove-home (p2, c1, k60).
+1739171436: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171436: Client cove-home disconnected due to malformed packet.
+1739171441: New connection from 172.20.0.1:56860 on port 1883.
+1739171441: New client connected from 172.20.0.1:56860 as cove-home (p2, c1, k60).
+1739171441: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171441: Client cove-home disconnected due to malformed packet.
+1739171446: New connection from 172.20.0.1:61782 on port 1883.
+1739171446: New client connected from 172.20.0.1:61782 as cove-home (p2, c1, k60).
+1739171446: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171446: Client cove-home disconnected due to malformed packet.
+1739171451: New connection from 172.20.0.1:61792 on port 1883.
+1739171451: New client connected from 172.20.0.1:61792 as cove-home (p2, c1, k60).
+1739171451: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171451: Client cove-home disconnected due to malformed packet.
+1739171456: New connection from 172.20.0.1:60668 on port 1883.
+1739171456: New client connected from 172.20.0.1:60668 as cove-home (p2, c1, k60).
+1739171456: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171456: Client cove-home disconnected due to malformed packet.
+1739171461: New connection from 172.20.0.1:60670 on port 1883.
+1739171461: New client connected from 172.20.0.1:60670 as cove-home (p2, c1, k60).
+1739171461: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171461: Client cove-home disconnected due to malformed packet.
+1739171466: New connection from 172.20.0.1:60164 on port 1883.
+1739171466: New client connected from 172.20.0.1:60164 as cove-home (p2, c1, k60).
+1739171466: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171466: Client cove-home disconnected due to malformed packet.
+1739171471: New connection from 172.20.0.1:60174 on port 1883.
+1739171471: New client connected from 172.20.0.1:60174 as cove-home (p2, c1, k60).
+1739171471: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171471: Client cove-home disconnected due to malformed packet.
+1739171476: New connection from 172.20.0.1:58964 on port 1883.
+1739171476: New client connected from 172.20.0.1:58964 as cove-home (p2, c1, k60).
+1739171476: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171476: Client cove-home disconnected due to malformed packet.
+1739171481: New connection from 172.20.0.1:58980 on port 1883.
+1739171481: New client connected from 172.20.0.1:58980 as cove-home (p2, c1, k60).
+1739171481: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171481: Client cove-home disconnected due to malformed packet.
+1739171486: New connection from 172.20.0.1:62762 on port 1883.
+1739171486: New client connected from 172.20.0.1:62762 as cove-home (p2, c1, k60).
+1739171486: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171486: Client cove-home disconnected due to malformed packet.
+1739171491: New connection from 172.20.0.1:62764 on port 1883.
+1739171491: New client connected from 172.20.0.1:62764 as cove-home (p2, c1, k60).
+1739171491: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171491: Client cove-home disconnected due to malformed packet.
+1739171496: New connection from 172.20.0.1:57838 on port 1883.
+1739171496: New client connected from 172.20.0.1:57838 as cove-home (p2, c1, k60).
+1739171496: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171496: Client cove-home disconnected due to malformed packet.
+1739171501: New connection from 172.20.0.1:57850 on port 1883.
+1739171501: New client connected from 172.20.0.1:57850 as cove-home (p2, c1, k60).
+1739171501: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171501: Client cove-home disconnected due to malformed packet.
+1739171506: New connection from 172.20.0.1:62688 on port 1883.
+1739171506: New client connected from 172.20.0.1:62688 as cove-home (p2, c1, k60).
+1739171506: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171506: Client cove-home disconnected due to malformed packet.
+1739171509: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1739171511: New connection from 172.20.0.1:62700 on port 1883.
+1739171511: New client connected from 172.20.0.1:62700 as cove-home (p2, c1, k60).
+1739171511: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171511: Client cove-home disconnected due to malformed packet.
+1739171516: New connection from 172.20.0.1:60284 on port 1883.
+1739171516: New client connected from 172.20.0.1:60284 as cove-home (p2, c1, k60).
+1739171516: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171516: Client cove-home disconnected due to malformed packet.
+1739171521: New connection from 172.20.0.1:60286 on port 1883.
+1739171521: New client connected from 172.20.0.1:60286 as cove-home (p2, c1, k60).
+1739171521: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171521: Client cove-home disconnected due to malformed packet.
+1739171526: New connection from 172.20.0.1:57776 on port 1883.
+1739171526: New client connected from 172.20.0.1:57776 as cove-home (p2, c1, k60).
+1739171526: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171526: Client cove-home disconnected due to malformed packet.
+1739171531: New connection from 172.20.0.1:57786 on port 1883.
+1739171531: New client connected from 172.20.0.1:57786 as cove-home (p2, c1, k60).
+1739171531: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171531: Client cove-home disconnected due to malformed packet.
+1739171536: New connection from 172.20.0.1:60798 on port 1883.
+1739171536: New client connected from 172.20.0.1:60798 as cove-home (p2, c1, k60).
+1739171536: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171536: Client cove-home disconnected due to malformed packet.
+1739171541: New connection from 172.20.0.1:60810 on port 1883.
+1739171541: New client connected from 172.20.0.1:60810 as cove-home (p2, c1, k60).
+1739171541: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171541: Client cove-home disconnected due to malformed packet.
+1739171546: New connection from 172.20.0.1:57386 on port 1883.
+1739171546: New client connected from 172.20.0.1:57386 as cove-home (p2, c1, k60).
+1739171546: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171546: Client cove-home disconnected due to malformed packet.
+1739171551: New connection from 172.20.0.1:57398 on port 1883.
+1739171551: New client connected from 172.20.0.1:57398 as cove-home (p2, c1, k60).
+1739171551: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171551: Client cove-home disconnected due to malformed packet.
+1739171556: New connection from 172.20.0.1:63158 on port 1883.
+1739171556: New client connected from 172.20.0.1:63158 as cove-home (p2, c1, k60).
+1739171556: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171556: Client cove-home disconnected due to malformed packet.
+1739171561: New connection from 172.20.0.1:63170 on port 1883.
+1739171561: New client connected from 172.20.0.1:63170 as cove-home (p2, c1, k60).
+1739171561: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171561: Client cove-home disconnected due to malformed packet.
+1739171566: New connection from 172.20.0.1:55134 on port 1883.
+1739171566: New client connected from 172.20.0.1:55134 as cove-home (p2, c1, k60).
+1739171566: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171566: Client cove-home disconnected due to malformed packet.
+1739171571: New connection from 172.20.0.1:55140 on port 1883.
+1739171571: New client connected from 172.20.0.1:55140 as cove-home (p2, c1, k60).
+1739171571: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171571: Client cove-home disconnected due to malformed packet.
+1739171576: New connection from 172.20.0.1:60394 on port 1883.
+1739171576: New client connected from 172.20.0.1:60394 as cove-home (p2, c1, k60).
+1739171576: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171576: Client cove-home disconnected due to malformed packet.
+1739171581: New connection from 172.20.0.1:60396 on port 1883.
+1739171581: New client connected from 172.20.0.1:60396 as cove-home (p2, c1, k60).
+1739171581: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171581: Client cove-home disconnected due to malformed packet.
+1739171586: New connection from 172.20.0.1:56790 on port 1883.
+1739171586: New client connected from 172.20.0.1:56790 as cove-home (p2, c1, k60).
+1739171586: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171586: Client cove-home disconnected due to malformed packet.
+1739171591: New connection from 172.20.0.1:56804 on port 1883.
+1739171591: New client connected from 172.20.0.1:56804 as cove-home (p2, c1, k60).
+1739171591: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171591: Client cove-home disconnected due to malformed packet.
+1739171596: New connection from 172.20.0.1:59340 on port 1883.
+1739171596: New client connected from 172.20.0.1:59340 as cove-home (p2, c1, k60).
+1739171596: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171596: Client cove-home disconnected due to malformed packet.
+1739171601: New connection from 172.20.0.1:59346 on port 1883.
+1739171601: New client connected from 172.20.0.1:59346 as cove-home (p2, c1, k60).
+1739171601: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171601: Client cove-home disconnected due to malformed packet.
+1739171606: New connection from 172.20.0.1:57170 on port 1883.
+1739171606: New client connected from 172.20.0.1:57170 as cove-home (p2, c1, k60).
+1739171606: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171606: Client cove-home disconnected due to malformed packet.
+1739171611: New connection from 172.20.0.1:57180 on port 1883.
+1739171611: New client connected from 172.20.0.1:57180 as cove-home (p2, c1, k60).
+1739171611: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171611: Client cove-home disconnected due to malformed packet.
+1739171616: New connection from 172.20.0.1:61898 on port 1883.
+1739171616: New client connected from 172.20.0.1:61898 as cove-home (p2, c1, k60).
+1739171616: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171616: Client cove-home disconnected due to malformed packet.
+1739171621: New connection from 172.20.0.1:61912 on port 1883.
+1739171621: New client connected from 172.20.0.1:61912 as cove-home (p2, c1, k60).
+1739171621: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171621: Client cove-home disconnected due to malformed packet.
+1739171626: New connection from 172.20.0.1:64322 on port 1883.
+1739171626: New client connected from 172.20.0.1:64322 as cove-home (p2, c1, k60).
+1739171626: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171626: Client cove-home disconnected due to malformed packet.
+1739171631: New connection from 172.20.0.1:64324 on port 1883.
+1739171631: New client connected from 172.20.0.1:64324 as cove-home (p2, c1, k60).
+1739171631: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171631: Client cove-home disconnected due to malformed packet.
+1739171636: New connection from 172.20.0.1:58172 on port 1883.
+1739171636: New client connected from 172.20.0.1:58172 as cove-home (p2, c1, k60).
+1739171636: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171636: Client cove-home disconnected due to malformed packet.
+1739171641: New connection from 172.20.0.1:58188 on port 1883.
+1739171641: New client connected from 172.20.0.1:58188 as cove-home (p2, c1, k60).
+1739171641: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171641: Client cove-home disconnected due to malformed packet.
+1739171644: New connection from 172.20.0.1:58198 on port 1883.
+1739171644: New client connected from 172.20.0.1:58198 as cove-home (p2, c1, k60).
+1739171644: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171644: Client cove-home disconnected due to malformed packet.
+1739171649: New connection from 172.20.0.1:55118 on port 1883.
+1739171649: New client connected from 172.20.0.1:55118 as cove-home (p2, c1, k60).
+1739171649: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171649: Client cove-home disconnected due to malformed packet.
+1739171654: New connection from 172.20.0.1:55122 on port 1883.
+1739171654: New client connected from 172.20.0.1:55122 as cove-home (p2, c1, k60).
+1739171654: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171654: Client cove-home disconnected due to malformed packet.
+1739171659: New connection from 172.20.0.1:62578 on port 1883.
+1739171659: New client connected from 172.20.0.1:62578 as cove-home (p2, c1, k60).
+1739171659: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171659: Client cove-home disconnected due to malformed packet.
+1739171664: New connection from 172.20.0.1:62592 on port 1883.
+1739171664: New client connected from 172.20.0.1:62592 as cove-home (p2, c1, k60).
+1739171664: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171664: Client cove-home disconnected due to malformed packet.
+1739171669: New connection from 172.20.0.1:64198 on port 1883.
+1739171669: New client connected from 172.20.0.1:64198 as cove-home (p2, c1, k60).
+1739171669: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171669: Client cove-home disconnected due to malformed packet.
+1739171674: New connection from 172.20.0.1:64200 on port 1883.
+1739171674: New client connected from 172.20.0.1:64200 as cove-home (p2, c1, k60).
+1739171674: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171674: Client cove-home disconnected due to malformed packet.
+1739171679: New connection from 172.20.0.1:64462 on port 1883.
+1739171679: New client connected from 172.20.0.1:64462 as cove-home (p2, c1, k60).
+1739171679: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171679: Client cove-home disconnected due to malformed packet.
+1739171684: New connection from 172.20.0.1:64470 on port 1883.
+1739171684: New client connected from 172.20.0.1:64470 as cove-home (p2, c1, k60).
+1739171684: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171684: Client cove-home disconnected due to malformed packet.
+1739171689: New connection from 172.20.0.1:63382 on port 1883.
+1739171689: New client connected from 172.20.0.1:63382 as cove-home (p2, c1, k60).
+1739171689: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171689: Client cove-home disconnected due to malformed packet.
+1739171694: New connection from 172.20.0.1:63390 on port 1883.
+1739171694: New client connected from 172.20.0.1:63390 as cove-home (p2, c1, k60).
+1739171694: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171694: Client cove-home disconnected due to malformed packet.
+1739171699: New connection from 172.20.0.1:61302 on port 1883.
+1739171699: New client connected from 172.20.0.1:61302 as cove-home (p2, c1, k60).
+1739171699: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171699: Client cove-home disconnected due to malformed packet.
+1739171704: New connection from 172.20.0.1:61312 on port 1883.
+1739171704: New client connected from 172.20.0.1:61312 as cove-home (p2, c1, k60).
+1739171704: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171704: Client cove-home disconnected due to malformed packet.
+1739171709: New connection from 172.20.0.1:63406 on port 1883.
+1739171709: New client connected from 172.20.0.1:63406 as cove-home (p2, c1, k60).
+1739171709: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171709: Client cove-home disconnected due to malformed packet.
+1739171714: New connection from 172.20.0.1:63416 on port 1883.
+1739171714: New client connected from 172.20.0.1:63416 as cove-home (p2, c1, k60).
+1739171714: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171714: Client cove-home disconnected due to malformed packet.
+1739171719: New connection from 172.20.0.1:57398 on port 1883.
+1739171719: New client connected from 172.20.0.1:57398 as cove-home (p2, c1, k60).
+1739171719: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171719: Client cove-home disconnected due to malformed packet.
+1739171724: New connection from 172.20.0.1:57404 on port 1883.
+1739171724: New client connected from 172.20.0.1:57404 as cove-home (p2, c1, k60).
+1739171724: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171724: Client cove-home disconnected due to malformed packet.
+1739171729: New connection from 172.20.0.1:57888 on port 1883.
+1739171729: New client connected from 172.20.0.1:57888 as cove-home (p2, c1, k60).
+1739171729: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171729: Client cove-home disconnected due to malformed packet.
+1739171734: New connection from 172.20.0.1:57900 on port 1883.
+1739171734: New client connected from 172.20.0.1:57900 as cove-home (p2, c1, k60).
+1739171734: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171734: Client cove-home disconnected due to malformed packet.
+1739171739: New connection from 172.20.0.1:56966 on port 1883.
+1739171739: New client connected from 172.20.0.1:56966 as cove-home (p2, c1, k60).
+1739171739: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171739: Client cove-home disconnected due to malformed packet.
+1739171744: New connection from 172.20.0.1:56982 on port 1883.
+1739171744: New client connected from 172.20.0.1:56982 as cove-home (p2, c1, k60).
+1739171744: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171744: Client cove-home disconnected due to malformed packet.
+1739171749: New connection from 172.20.0.1:60860 on port 1883.
+1739171749: New client connected from 172.20.0.1:60860 as cove-home (p2, c1, k60).
+1739171749: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171749: Client cove-home disconnected due to malformed packet.
+1739171754: New connection from 172.20.0.1:60868 on port 1883.
+1739171754: New client connected from 172.20.0.1:60868 as cove-home (p2, c1, k60).
+1739171754: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171754: Client cove-home disconnected due to malformed packet.
+1739171759: New connection from 172.20.0.1:55984 on port 1883.
+1739171759: New client connected from 172.20.0.1:55984 as cove-home (p2, c1, k60).
+1739171759: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171759: Client cove-home disconnected due to malformed packet.
+1739171764: New connection from 172.20.0.1:56000 on port 1883.
+1739171764: New client connected from 172.20.0.1:56000 as cove-home (p2, c1, k60).
+1739171764: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171764: Client cove-home disconnected due to malformed packet.
+1739171769: New connection from 172.20.0.1:58652 on port 1883.
+1739171769: New client connected from 172.20.0.1:58652 as cove-home (p2, c1, k60).
+1739171769: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171769: Client cove-home disconnected due to malformed packet.
+1739171774: New connection from 172.20.0.1:58658 on port 1883.
+1739171774: New client connected from 172.20.0.1:58658 as cove-home (p2, c1, k60).
+1739171774: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171774: Client cove-home disconnected due to malformed packet.
+1739171779: New connection from 172.20.0.1:60896 on port 1883.
+1739171779: New client connected from 172.20.0.1:60896 as cove-home (p2, c1, k60).
+1739171779: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171779: Client cove-home disconnected due to malformed packet.
+1739171784: New connection from 172.20.0.1:60908 on port 1883.
+1739171784: New client connected from 172.20.0.1:60908 as cove-home (p2, c1, k60).
+1739171784: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171784: Client cove-home disconnected due to malformed packet.
+1739171789: New connection from 172.20.0.1:55458 on port 1883.
+1739171789: New client connected from 172.20.0.1:55458 as cove-home (p2, c1, k60).
+1739171789: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171789: Client cove-home disconnected due to malformed packet.
+1739171794: New connection from 172.20.0.1:55472 on port 1883.
+1739171794: New client connected from 172.20.0.1:55472 as cove-home (p2, c1, k60).
+1739171794: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171794: Client cove-home disconnected due to malformed packet.
+1739171799: New connection from 172.20.0.1:57136 on port 1883.
+1739171799: New client connected from 172.20.0.1:57136 as cove-home (p2, c1, k60).
+1739171799: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171799: Client cove-home disconnected due to malformed packet.
+1739171804: New connection from 172.20.0.1:57146 on port 1883.
+1739171804: New client connected from 172.20.0.1:57146 as cove-home (p2, c1, k60).
+1739171804: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171804: Client cove-home disconnected due to malformed packet.
+1739171809: New connection from 172.20.0.1:62340 on port 1883.
+1739171809: New client connected from 172.20.0.1:62340 as cove-home (p2, c1, k60).
+1739171809: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171809: Client cove-home disconnected due to malformed packet.
+1739171814: New connection from 172.20.0.1:62344 on port 1883.
+1739171814: New client connected from 172.20.0.1:62344 as cove-home (p2, c1, k60).
+1739171814: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171814: Client cove-home disconnected due to malformed packet.
+1739171819: New connection from 172.20.0.1:64496 on port 1883.
+1739171819: New client connected from 172.20.0.1:64496 as cove-home (p2, c1, k60).
+1739171819: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171819: Client cove-home disconnected due to malformed packet.
+1739171824: New connection from 172.20.0.1:64510 on port 1883.
+1739171824: New client connected from 172.20.0.1:64510 as cove-home (p2, c1, k60).
+1739171824: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171824: Client cove-home disconnected due to malformed packet.
+1739171829: New connection from 172.20.0.1:61804 on port 1883.
+1739171829: New client connected from 172.20.0.1:61804 as cove-home (p2, c1, k60).
+1739171829: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171829: Client cove-home disconnected due to malformed packet.
+1739171834: New connection from 172.20.0.1:61816 on port 1883.
+1739171834: New client connected from 172.20.0.1:61816 as cove-home (p2, c1, k60).
+1739171834: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171834: Client cove-home disconnected due to malformed packet.
+1739171839: New connection from 172.20.0.1:64434 on port 1883.
+1739171839: New client connected from 172.20.0.1:64434 as cove-home (p2, c1, k60).
+1739171839: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171839: Client cove-home disconnected due to malformed packet.
+1739171844: New connection from 172.20.0.1:64448 on port 1883.
+1739171844: New client connected from 172.20.0.1:64448 as cove-home (p2, c1, k60).
+1739171844: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171844: Client cove-home disconnected due to malformed packet.
+1739171849: New connection from 172.20.0.1:61810 on port 1883.
+1739171849: New client connected from 172.20.0.1:61810 as cove-home (p2, c1, k60).
+1739171849: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171849: Client cove-home disconnected due to malformed packet.
+1739171854: New connection from 172.20.0.1:61818 on port 1883.
+1739171854: New client connected from 172.20.0.1:61818 as cove-home (p2, c1, k60).
+1739171854: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171854: Client cove-home disconnected due to malformed packet.
+1739171859: New connection from 172.20.0.1:60090 on port 1883.
+1739171859: New client connected from 172.20.0.1:60090 as cove-home (p2, c1, k60).
+1739171859: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171859: Client cove-home disconnected due to malformed packet.
+1739171864: New connection from 172.20.0.1:60092 on port 1883.
+1739171864: New client connected from 172.20.0.1:60092 as cove-home (p2, c1, k60).
+1739171864: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171864: Client cove-home disconnected due to malformed packet.
+1739171869: New connection from 172.20.0.1:59918 on port 1883.
+1739171869: New client connected from 172.20.0.1:59918 as cove-home (p2, c1, k60).
+1739171869: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171869: Client cove-home disconnected due to malformed packet.
+1739171874: New connection from 172.20.0.1:59926 on port 1883.
+1739171874: New client connected from 172.20.0.1:59926 as cove-home (p2, c1, k60).
+1739171874: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171874: Client cove-home disconnected due to malformed packet.
+1739171879: New connection from 172.20.0.1:62860 on port 1883.
+1739171879: New client connected from 172.20.0.1:62860 as cove-home (p2, c1, k60).
+1739171879: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171879: Client cove-home disconnected due to malformed packet.
+1739171884: New connection from 172.20.0.1:62862 on port 1883.
+1739171884: New client connected from 172.20.0.1:62862 as cove-home (p2, c1, k60).
+1739171884: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171884: Client cove-home disconnected due to malformed packet.
+1739171889: New connection from 172.20.0.1:63492 on port 1883.
+1739171889: New client connected from 172.20.0.1:63492 as cove-home (p2, c1, k60).
+1739171889: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171889: Client cove-home disconnected due to malformed packet.
+1739171894: New connection from 172.20.0.1:63494 on port 1883.
+1739171894: New client connected from 172.20.0.1:63494 as cove-home (p2, c1, k60).
+1739171894: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171894: Client cove-home disconnected due to malformed packet.
+1739171899: New connection from 172.20.0.1:56604 on port 1883.
+1739171899: New client connected from 172.20.0.1:56604 as cove-home (p2, c1, k60).
+1739171899: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171899: Client cove-home disconnected due to malformed packet.
+1739171904: New connection from 172.20.0.1:56620 on port 1883.
+1739171904: New client connected from 172.20.0.1:56620 as cove-home (p2, c1, k60).
+1739171904: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171904: Client cove-home disconnected due to malformed packet.
+1739171909: New connection from 172.20.0.1:58842 on port 1883.
+1739171909: New client connected from 172.20.0.1:58842 as cove-home (p2, c1, k60).
+1739171909: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171909: Client cove-home disconnected due to malformed packet.
+1739171914: New connection from 172.20.0.1:58850 on port 1883.
+1739171914: New client connected from 172.20.0.1:58850 as cove-home (p2, c1, k60).
+1739171914: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171914: Client cove-home disconnected due to malformed packet.
+1739171919: New connection from 172.20.0.1:56900 on port 1883.
+1739171919: New client connected from 172.20.0.1:56900 as cove-home (p2, c1, k60).
+1739171919: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171919: Client cove-home disconnected due to malformed packet.
+1739171924: New connection from 172.20.0.1:56904 on port 1883.
+1739171924: New client connected from 172.20.0.1:56904 as cove-home (p2, c1, k60).
+1739171924: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171924: Client cove-home disconnected due to malformed packet.
+1739171929: New connection from 172.20.0.1:60326 on port 1883.
+1739171929: New client connected from 172.20.0.1:60326 as cove-home (p2, c1, k60).
+1739171929: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171929: Client cove-home disconnected due to malformed packet.
+1739171934: New connection from 172.20.0.1:60328 on port 1883.
+1739171934: New client connected from 172.20.0.1:60328 as cove-home (p2, c1, k60).
+1739171934: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171934: Client cove-home disconnected due to malformed packet.
+1739171939: New connection from 172.20.0.1:56246 on port 1883.
+1739171939: New client connected from 172.20.0.1:56246 as cove-home (p2, c1, k60).
+1739171939: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171939: Client cove-home disconnected due to malformed packet.
+1739171944: New connection from 172.20.0.1:56254 on port 1883.
+1739171944: New client connected from 172.20.0.1:56254 as cove-home (p2, c1, k60).
+1739171944: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171944: Client cove-home disconnected due to malformed packet.
+1739171949: New connection from 172.20.0.1:59220 on port 1883.
+1739171949: New client connected from 172.20.0.1:59220 as cove-home (p2, c1, k60).
+1739171949: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171949: Client cove-home disconnected due to malformed packet.
+1739171954: New connection from 172.20.0.1:59226 on port 1883.
+1739171954: New client connected from 172.20.0.1:59226 as cove-home (p2, c1, k60).
+1739171954: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171954: Client cove-home disconnected due to malformed packet.
+1739171959: New connection from 172.20.0.1:60908 on port 1883.
+1739171960: New client connected from 172.20.0.1:60908 as cove-home (p2, c1, k60).
+1739171960: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171960: Client cove-home disconnected due to malformed packet.
+1739171965: New connection from 172.20.0.1:60922 on port 1883.
+1739171965: New client connected from 172.20.0.1:60922 as cove-home (p2, c1, k60).
+1739171965: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171965: Client cove-home disconnected due to malformed packet.
+1739171970: New connection from 172.20.0.1:59890 on port 1883.
+1739171970: New client connected from 172.20.0.1:59890 as cove-home (p2, c1, k60).
+1739171970: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171970: Client cove-home disconnected due to malformed packet.
+1739171975: New connection from 172.20.0.1:59906 on port 1883.
+1739171975: New client connected from 172.20.0.1:59906 as cove-home (p2, c1, k60).
+1739171975: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171975: Client cove-home disconnected due to malformed packet.
+1739171980: New connection from 172.20.0.1:63360 on port 1883.
+1739171980: New client connected from 172.20.0.1:63360 as cove-home (p2, c1, k60).
+1739171980: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171980: Client cove-home disconnected due to malformed packet.
+1739171985: New connection from 172.20.0.1:63376 on port 1883.
+1739171985: New client connected from 172.20.0.1:63376 as cove-home (p2, c1, k60).
+1739171985: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171985: Client cove-home disconnected due to malformed packet.
+1739171990: New connection from 172.20.0.1:62796 on port 1883.
+1739171990: New client connected from 172.20.0.1:62796 as cove-home (p2, c1, k60).
+1739171990: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171990: Client cove-home disconnected due to malformed packet.
+1739171995: New connection from 172.20.0.1:62810 on port 1883.
+1739171995: New client connected from 172.20.0.1:62810 as cove-home (p2, c1, k60).
+1739171995: Invalid subscription string from 172.20.0.1, disconnecting.
+1739171995: Client cove-home disconnected due to malformed packet.
+1739172000: New connection from 172.20.0.1:57916 on port 1883.
+1739172000: New client connected from 172.20.0.1:57916 as cove-home (p2, c1, k60).
+1739172000: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172000: Client cove-home disconnected due to malformed packet.
+1739172005: New connection from 172.20.0.1:57932 on port 1883.
+1739172005: New client connected from 172.20.0.1:57932 as cove-home (p2, c1, k60).
+1739172005: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172005: Client cove-home disconnected due to malformed packet.
+1739172010: New connection from 172.20.0.1:61806 on port 1883.
+1739172010: New client connected from 172.20.0.1:61806 as cove-home (p2, c1, k60).
+1739172010: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172010: Client cove-home disconnected due to malformed packet.
+1739172015: New connection from 172.20.0.1:61814 on port 1883.
+1739172015: New client connected from 172.20.0.1:61814 as cove-home (p2, c1, k60).
+1739172015: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172015: Client cove-home disconnected due to malformed packet.
+1739172020: New connection from 172.20.0.1:60514 on port 1883.
+1739172020: New client connected from 172.20.0.1:60514 as cove-home (p2, c1, k60).
+1739172020: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172020: Client cove-home disconnected due to malformed packet.
+1739172025: New connection from 172.20.0.1:60522 on port 1883.
+1739172025: New client connected from 172.20.0.1:60522 as cove-home (p2, c1, k60).
+1739172025: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172025: Client cove-home disconnected due to malformed packet.
+1739172030: New connection from 172.20.0.1:63278 on port 1883.
+1739172030: New client connected from 172.20.0.1:63278 as cove-home (p2, c1, k60).
+1739172030: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172030: Client cove-home disconnected due to malformed packet.
+1739172035: New connection from 172.20.0.1:63282 on port 1883.
+1739172035: New client connected from 172.20.0.1:63282 as cove-home (p2, c1, k60).
+1739172035: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172035: Client cove-home disconnected due to malformed packet.
+1739172040: New connection from 172.20.0.1:58822 on port 1883.
+1739172040: New client connected from 172.20.0.1:58822 as cove-home (p2, c1, k60).
+1739172040: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172040: Client cove-home disconnected due to malformed packet.
+1739172045: New connection from 172.20.0.1:58828 on port 1883.
+1739172045: New client connected from 172.20.0.1:58828 as cove-home (p2, c1, k60).
+1739172045: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172045: Client cove-home disconnected due to malformed packet.
+1739172050: New connection from 172.20.0.1:60966 on port 1883.
+1739172050: New client connected from 172.20.0.1:60966 as cove-home (p2, c1, k60).
+1739172050: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172050: Client cove-home disconnected due to malformed packet.
+1739172055: New connection from 172.20.0.1:60970 on port 1883.
+1739172055: New client connected from 172.20.0.1:60970 as cove-home (p2, c1, k60).
+1739172055: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172055: Client cove-home disconnected due to malformed packet.
+1739172067: New connection from 172.20.0.1:56264 on port 1883.
+1739172067: New client connected from 172.20.0.1:56264 as cove-home (p2, c1, k60).
+1739172067: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172067: Client cove-home disconnected due to malformed packet.
+1739172072: New connection from 172.20.0.1:56266 on port 1883.
+1739172072: New client connected from 172.20.0.1:56266 as cove-home (p2, c1, k60).
+1739172072: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172072: Client cove-home disconnected due to malformed packet.
+1739172077: New connection from 172.20.0.1:65452 on port 1883.
+1739172077: New client connected from 172.20.0.1:65452 as cove-home (p2, c1, k60).
+1739172077: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172077: Client cove-home disconnected due to malformed packet.
+1739172082: New connection from 172.20.0.1:65460 on port 1883.
+1739172082: New client connected from 172.20.0.1:65460 as cove-home (p2, c1, k60).
+1739172082: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172082: Client cove-home disconnected due to malformed packet.
+1739172087: New connection from 172.20.0.1:61342 on port 1883.
+1739172087: New client connected from 172.20.0.1:61342 as cove-home (p2, c1, k60).
+1739172087: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172087: Client cove-home disconnected due to malformed packet.
+1739172092: New connection from 172.20.0.1:61348 on port 1883.
+1739172092: New client connected from 172.20.0.1:61348 as cove-home (p2, c1, k60).
+1739172092: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172092: Client cove-home disconnected due to malformed packet.
+1739172097: New connection from 172.20.0.1:59924 on port 1883.
+1739172097: New client connected from 172.20.0.1:59924 as cove-home (p2, c1, k60).
+1739172097: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172097: Client cove-home disconnected due to malformed packet.
+1739172102: New connection from 172.20.0.1:59934 on port 1883.
+1739172102: New client connected from 172.20.0.1:59934 as cove-home (p2, c1, k60).
+1739172102: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172102: Client cove-home disconnected due to malformed packet.
+1739172107: New connection from 172.20.0.1:55178 on port 1883.
+1739172107: New client connected from 172.20.0.1:55178 as cove-home (p2, c1, k60).
+1739172107: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172107: Client cove-home disconnected due to malformed packet.
+1739172112: New connection from 172.20.0.1:55184 on port 1883.
+1739172112: New client connected from 172.20.0.1:55184 as cove-home (p2, c1, k60).
+1739172112: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172112: Client cove-home disconnected due to malformed packet.
+1739172117: New connection from 172.20.0.1:58638 on port 1883.
+1739172117: New client connected from 172.20.0.1:58638 as cove-home (p2, c1, k60).
+1739172117: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172117: Client cove-home disconnected due to malformed packet.
+1739172122: New connection from 172.20.0.1:58648 on port 1883.
+1739172122: New client connected from 172.20.0.1:58648 as cove-home (p2, c1, k60).
+1739172122: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172122: Client cove-home disconnected due to malformed packet.
+1739172127: New connection from 172.20.0.1:61554 on port 1883.
+1739172127: New client connected from 172.20.0.1:61554 as cove-home (p2, c1, k60).
+1739172127: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172127: Client cove-home disconnected due to malformed packet.
+1739172132: New connection from 172.20.0.1:61562 on port 1883.
+1739172132: New client connected from 172.20.0.1:61562 as cove-home (p2, c1, k60).
+1739172132: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172132: Client cove-home disconnected due to malformed packet.
+1739172137: New connection from 172.20.0.1:60678 on port 1883.
+1739172137: New client connected from 172.20.0.1:60678 as cove-home (p2, c1, k60).
+1739172137: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172137: Client cove-home disconnected due to malformed packet.
+1739172142: New connection from 172.20.0.1:60686 on port 1883.
+1739172142: New client connected from 172.20.0.1:60686 as cove-home (p2, c1, k60).
+1739172142: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172142: Client cove-home disconnected due to malformed packet.
+1739172147: New connection from 172.20.0.1:56184 on port 1883.
+1739172147: New client connected from 172.20.0.1:56184 as cove-home (p2, c1, k60).
+1739172147: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172147: Client cove-home disconnected due to malformed packet.
+1739172152: New connection from 172.20.0.1:56190 on port 1883.
+1739172152: New client connected from 172.20.0.1:56190 as cove-home (p2, c1, k60).
+1739172152: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172152: Client cove-home disconnected due to malformed packet.
+1739172157: New connection from 172.20.0.1:64882 on port 1883.
+1739172157: New client connected from 172.20.0.1:64882 as cove-home (p2, c1, k60).
+1739172157: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172157: Client cove-home disconnected due to malformed packet.
+1739172162: New connection from 172.20.0.1:64888 on port 1883.
+1739172162: New client connected from 172.20.0.1:64888 as cove-home (p2, c1, k60).
+1739172162: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172162: Client cove-home disconnected due to malformed packet.
+1739172167: New connection from 172.20.0.1:63684 on port 1883.
+1739172167: New client connected from 172.20.0.1:63684 as cove-home (p2, c1, k60).
+1739172167: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172167: Client cove-home disconnected due to malformed packet.
+1739172172: New connection from 172.20.0.1:63696 on port 1883.
+1739172172: New client connected from 172.20.0.1:63696 as cove-home (p2, c1, k60).
+1739172172: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172172: Client cove-home disconnected due to malformed packet.
+1739172177: New connection from 172.20.0.1:57822 on port 1883.
+1739172177: New client connected from 172.20.0.1:57822 as cove-home (p2, c1, k60).
+1739172177: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172177: Client cove-home disconnected due to malformed packet.
+1739172182: New connection from 172.20.0.1:57836 on port 1883.
+1739172182: New client connected from 172.20.0.1:57836 as cove-home (p2, c1, k60).
+1739172182: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172182: Client cove-home disconnected due to malformed packet.
+1739172187: New connection from 172.20.0.1:59150 on port 1883.
+1739172187: New client connected from 172.20.0.1:59150 as cove-home (p2, c1, k60).
+1739172187: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172187: Client cove-home disconnected due to malformed packet.
+1739172192: New connection from 172.20.0.1:59154 on port 1883.
+1739172192: New client connected from 172.20.0.1:59154 as cove-home (p2, c1, k60).
+1739172192: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172192: Client cove-home disconnected due to malformed packet.
+1739172198: New connection from 172.20.0.1:60232 on port 1883.
+1739172198: New client connected from 172.20.0.1:60232 as cove-home (p2, c1, k60).
+1739172198: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172198: Client cove-home disconnected due to malformed packet.
+1739172203: New connection from 172.20.0.1:60236 on port 1883.
+1739172203: New client connected from 172.20.0.1:60236 as cove-home (p2, c1, k60).
+1739172203: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172203: Client cove-home disconnected due to malformed packet.
+1739172208: New connection from 172.20.0.1:60154 on port 1883.
+1739172208: New client connected from 172.20.0.1:60154 as cove-home (p2, c1, k60).
+1739172208: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172208: Client cove-home disconnected due to malformed packet.
+1739172213: New connection from 172.20.0.1:60160 on port 1883.
+1739172213: New client connected from 172.20.0.1:60160 as cove-home (p2, c1, k60).
+1739172213: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172213: Client cove-home disconnected due to malformed packet.
+1739172218: New connection from 172.20.0.1:58174 on port 1883.
+1739172218: New client connected from 172.20.0.1:58174 as cove-home (p2, c1, k60).
+1739172218: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172218: Client cove-home disconnected due to malformed packet.
+1739172223: New connection from 172.20.0.1:58184 on port 1883.
+1739172223: New client connected from 172.20.0.1:58184 as cove-home (p2, c1, k60).
+1739172223: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172223: Client cove-home disconnected due to malformed packet.
+1739172228: New connection from 172.20.0.1:62404 on port 1883.
+1739172228: New client connected from 172.20.0.1:62404 as cove-home (p2, c1, k60).
+1739172228: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172228: Client cove-home disconnected due to malformed packet.
+1739172233: New connection from 172.20.0.1:62408 on port 1883.
+1739172233: New client connected from 172.20.0.1:62408 as cove-home (p2, c1, k60).
+1739172233: Invalid subscription string from 172.20.0.1, disconnecting.
+1739172233: Client cove-home disconnected due to malformed packet.

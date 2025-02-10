@@ -14,6 +14,7 @@ pub enum Protocol {
     Zigbee,
     Usb,
     SSE,
+    ESPHome,
 }
 
 #[derive(Debug, Clone, Display, Serialize, Deserialize, PartialEq, Type)]

@@ -15,24 +15,22 @@ import '@acme/ui/globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 
 import { TRPCReactProvider } from '@acme/api/client'
-
-import { AppSidebar } from '~/components/app-sidebar'
 import { env } from '~/env.server'
 
 export const metadata: Metadata = {
-  description: 'ShelterBuddy is a tool for shelters to manage their animals',
+  description: 'Cove is a powerful and flexible home automation platform',
   metadataBase: new URL(
     env.VERCEL_ENV === 'production'
-      ? 'https://shelterbuddy.vercel.app'
+      ? 'https://cove.vercel.app'
       : 'http://localhost:3000',
   ),
   openGraph: {
-    description: 'ShelterBuddy is a tool for shelters to manage their animals',
-    siteName: 'ShelterBuddy',
-    title: 'ShelterBuddy',
-    url: 'https://shelterbuddy.vercel.app',
+    description: 'Cove is a powerful and flexible home automation platform',
+    siteName: 'Cove',
+    title: 'Cove',
+    url: 'https://cove.vercel.app',
   },
-  title: 'ShelterBuddy',
+  title: 'Cove',
   twitter: {
     card: 'summary_large_image',
     creator: '@seawatts',
@@ -70,7 +68,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                   enableSystem
                 >
                   <SidebarProvider defaultOpen={defaultOpen}>
-                    <AppSidebar />
+                    {/* <AppSidebar /> */}
                     <main className="flex-1">{props.children}</main>
                   </SidebarProvider>
                   <Toaster />
