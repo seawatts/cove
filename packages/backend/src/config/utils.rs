@@ -1,10 +1,10 @@
+use jsonschema;
 use miette::Result;
 use schemars::JsonSchema;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::{path::Path, sync::Arc};
 use tokio::fs::File;
-use tracing::warn;
 
 use crate::config::error::ConfigError;
 
@@ -78,7 +78,7 @@ pub async fn generate_schema<T: JsonSchema>(name: &str) -> Result<(), ConfigErro
 }
 
 /// Load a JSON Schema from disk
-pub async fn load_schema(name: &str) -> Result<jsonschema::JSONSchema, ConfigError> {
+pub async fn load_schema(name: &str) -> Result<schemars::schema::RootSchema, ConfigError> {
     let schema_path = Path::new("./config/schemas").join(format!("{}.schema.json", name));
     let schema_str =
         tokio::fs::read_to_string(&schema_path)
@@ -87,27 +87,17 @@ pub async fn load_schema(name: &str) -> Result<jsonschema::JSONSchema, ConfigErr
                 path: schema_path.clone(),
                 source: Arc::new(e),
             })?;
-    let schema: Value =
-        serde_json::from_str(&schema_str).map_err(|e| ConfigError::InvalidFormat {
-            path: schema_path.clone(),
-            details: e.to_string(),
-            content: schema_str.clone(),
-            span: (0..1).into(),
-            schema_path: schema_path.clone(),
-            schema_span: None,
-        })?;
-    let compiled =
-        jsonschema::JSONSchema::compile(&schema).map_err(|e| ConfigError::SchemaCompile {
-            details: e.to_string(),
-            schema_path: schema_path.clone(),
-            schema: schema_str,
-        })?;
-    Ok(compiled)
+
+    serde_json::from_str(&schema_str).map_err(|e| ConfigError::SchemaCompile {
+        details: e.to_string(),
+        schema_path: schema_path,
+        schema: schema_str,
+    })
 }
 
 /// Validate YAML content against a JSON Schema
 pub fn validate_yaml(
-    schema: &jsonschema::JSONSchema,
+    schema: &schemars::schema::RootSchema,
     yaml_str: &str,
     context: &str,
 ) -> Result<(), ConfigError> {
@@ -121,31 +111,24 @@ pub fn validate_yaml(
             schema_span: None,
         })?;
 
-    if let Err(errors) = schema.validate(&yaml_value) {
-        let mut error_messages = Vec::new();
-        let schema_span = Some((0..1).into()); // Default to start of schema for now
+    let schema_value = serde_json::to_value(schema).map_err(|e| ConfigError::SchemaCompile {
+        details: e.to_string(),
+        schema_path: Path::new("./config/schemas").join(format!("{}.schema.json", context)),
+        schema: yaml_str.to_string(),
+    })?;
 
-        for error in errors {
-            error_messages.push(format!(
-                "{} at {} (schema path: {})",
-                error, error.instance_path, error.schema_path
-            ));
-        }
+    let compiled = jsonschema::is_valid(&schema_value, &yaml_value);
 
-        warn!(
-            "Schema validation errors for {}: {:?}",
-            context, error_messages
-        );
-
+    if !compiled {
         return Err(ConfigError::SchemaValidation {
-            details: error_messages.join(", "),
+            details: "Schema validation failed".to_string(),
             content: yaml_str.to_string(),
             path: None,
             schema_path: Path::new("./config/schemas").join(format!(
                 "{}.schema.json",
                 context.split_whitespace().next().unwrap_or("unknown")
             )),
-            schema_span,
+            schema_span: Some((0..1).into()),
         });
     }
     Ok(())

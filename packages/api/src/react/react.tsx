@@ -2,16 +2,16 @@
 
 import type { QueryClient } from '@tanstack/react-query'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { loggerLink, unstable_httpBatchStreamLink } from '@trpc/client'
-import { createTRPCReact } from '@trpc/react-query'
-import { useState } from 'react'
-import SuperJSON from 'superjson'
+import {} from '@trpc/client'
+import { type ReactElement, useState } from 'react'
 
+import { FetchTransport, createClient } from '@rspc/client'
+import { createReactQueryHooks } from '@rspc/react'
 import { env } from '../env.client'
-import type { AppRouter } from '../root'
 import { createQueryClient } from './query-client'
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined
+
 const getQueryClient = () => {
   if (typeof globalThis === 'undefined') {
     // Server: always make a new query client
@@ -25,36 +25,50 @@ const getQueryClient = () => {
   return clientQueryClientSingleton
 }
 
-export const api = createTRPCReact<AppRouter>()
+// export const api = createTRPCReact<AppRouter>()
+export const api = createReactQueryHooks<Procedures>()
 
+type Procedures = {
+  mutations: {
+    key: 'hello'
+    input: {
+      name: string
+    }
+    result: string
+  }
+  subscriptions: {
+    key: 'hello'
+    input: {
+      name: string
+    }
+    result: string
+  }
+  queries: {
+    key: 'hello'
+    input: {
+      name: string
+    }
+    result: string
+  }
+}
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient()
 
-  const [trpcClient] = useState(() =>
-    api.createClient({
-      links: [
-        loggerLink({
-          enabled: (op) =>
-            env.NODE_ENV === 'development' ||
-            (op.direction === 'down' && op.result instanceof Error),
-        }),
-        unstable_httpBatchStreamLink({
-          headers() {
-            const headers = new Headers()
-            headers.set('x-trpc-source', 'nextjs-react')
-            return headers
-          },
-          transformer: SuperJSON,
-          url: `${getBaseUrl()}/api/trpc`,
-        }),
-      ],
+  const [rspcClient] = useState(() =>
+    createClient<Procedures>({
+      // Refer to the integration your using for the correct transport.
+      onError: (error) => {
+        console.error(error)
+      },
+      // TODO: Update this with the correct URL. Pull in from env.
+      transport: new FetchTransport('http://localhost:4000/rspc'),
     }),
   )
 
   return (
     <QueryClientProvider client={queryClient}>
-      <api.Provider client={trpcClient} queryClient={queryClient}>
-        {props.children}
+      <api.Provider client={rspcClient} queryClient={queryClient}>
+        {props.children as ReactElement}
       </api.Provider>
     </QueryClientProvider>
   )

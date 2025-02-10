@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::Value;
+use specta::Type;
 use strum_macros::{Display, EnumString};
 
-#[derive(Debug, Clone, Display, Copy, Serialize, Deserialize, EnumString, PartialEq)]
+#[derive(Debug, Clone, Display, Copy, Serialize, Deserialize, EnumString, PartialEq, Type)]
 pub enum Protocol {
     Bluetooth,
     Generic,
@@ -11,16 +12,18 @@ pub enum Protocol {
     MQTT,
     WiFi,
     Zigbee,
+    Usb,
+    SSE,
 }
 
-#[derive(Debug, Clone, Display, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Display, Serialize, Deserialize, PartialEq, Type)]
 pub enum DeviceStatus {
     Online,
     Offline,
     Unknown,
 }
 
-#[derive(Debug, Clone, Display, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Display, Serialize, Deserialize, PartialEq, Type)]
 pub enum DeviceCategory {
     Light,
     Switch,
@@ -33,7 +36,7 @@ pub enum DeviceCategory {
     Unknown,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct DeviceCapabilities {
     pub can_power: bool,
     pub can_toggle: bool,
@@ -66,14 +69,14 @@ impl Default for DeviceCapabilities {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Type)]
 pub struct Location {
     pub room: Option<String>,
     pub floor: Option<String>,
     pub zone: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct NetworkInfo {
     pub addresses: Vec<String>,
     pub primary_address: Option<String>,
@@ -82,7 +85,7 @@ pub struct NetworkInfo {
     pub mac_address: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Type)]
 pub struct DeviceMetadata {
     pub manufacturer: Option<String>,
     pub model: Option<String>,
@@ -91,24 +94,8 @@ pub struct DeviceMetadata {
     pub icon_url: Option<String>,
 }
 
-// Base device trait that all protocol-specific devices must implement
-pub trait DeviceProperties {
-    fn get_id(&self) -> &str;
-    fn get_type(&self) -> &str;
-    fn get_friendly_name(&self) -> &str;
-    fn get_description(&self) -> &str;
-    fn get_protocol(&self) -> Protocol;
-    fn get_status(&self) -> DeviceStatus;
-    fn get_categories(&self) -> &[DeviceCategory];
-    fn get_capabilities(&self) -> &DeviceCapabilities;
-    fn get_location(&self) -> &Location;
-    fn get_metadata(&self) -> &DeviceMetadata;
-    fn get_network_info(&self) -> Option<&NetworkInfo>;
-    fn get_raw_details(&self) -> &Value;
-}
-
 // Base device struct that implements common functionality
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct BaseDevice {
     pub id: String,
     pub r#type: String,
@@ -128,14 +115,14 @@ pub struct BaseDevice {
 }
 
 // Protocol-specific device types
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct WiFiDevice {
     pub base: BaseDevice,
     pub mdns_service_type: String,
     pub mdns_properties: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct BluetoothDevice {
     pub base: BaseDevice,
     pub signal_strength: Option<i32>,
@@ -144,7 +131,19 @@ pub struct BluetoothDevice {
     pub is_paired: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+impl AsRef<BaseDevice> for BluetoothDevice {
+    fn as_ref(&self) -> &BaseDevice {
+        &self.base
+    }
+}
+
+impl AsRef<BaseDevice> for WiFiDevice {
+    fn as_ref(&self) -> &BaseDevice {
+        &self.base
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct ZigbeeDevice {
     pub base: BaseDevice,
     pub ieee_address: String,
@@ -154,53 +153,13 @@ pub struct ZigbeeDevice {
     pub route: Option<Vec<u16>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct MatterDevice {
     pub base: BaseDevice,
     pub node_id: u64,
     pub vendor_id: u16,
     pub product_id: u16,
     pub supported_clusters: Vec<String>,
-}
-
-// Implement the DeviceProperties trait for each protocol-specific device
-impl DeviceProperties for WiFiDevice {
-    fn get_id(&self) -> &str {
-        &self.base.id
-    }
-    fn get_type(&self) -> &str {
-        &self.base.r#type
-    }
-    fn get_friendly_name(&self) -> &str {
-        &self.base.friendly_name
-    }
-    fn get_description(&self) -> &str {
-        &self.base.description
-    }
-    fn get_protocol(&self) -> Protocol {
-        self.base.protocol
-    }
-    fn get_status(&self) -> DeviceStatus {
-        self.base.status.clone()
-    }
-    fn get_categories(&self) -> &[DeviceCategory] {
-        &self.base.categories
-    }
-    fn get_capabilities(&self) -> &DeviceCapabilities {
-        &self.base.capabilities
-    }
-    fn get_location(&self) -> &Location {
-        &self.base.location
-    }
-    fn get_metadata(&self) -> &DeviceMetadata {
-        &self.base.metadata
-    }
-    fn get_network_info(&self) -> Option<&NetworkInfo> {
-        self.base.network_info.as_ref()
-    }
-    fn get_raw_details(&self) -> &Value {
-        &self.base.raw_details
-    }
 }
 
 // Helper function to convert legacy Device to new WiFiDevice
@@ -292,7 +251,7 @@ impl From<Device> for WiFiDevice {
 }
 
 // Legacy Device struct that implements DeviceProperties
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct Device {
     pub id: String,
     pub r#type: String,
@@ -311,46 +270,6 @@ pub struct Device {
     pub raw_details: Value,
 }
 
-impl DeviceProperties for Device {
-    fn get_id(&self) -> &str {
-        &self.id
-    }
-    fn get_type(&self) -> &str {
-        &self.r#type
-    }
-    fn get_friendly_name(&self) -> &str {
-        &self.friendly_name
-    }
-    fn get_description(&self) -> &str {
-        &self.description
-    }
-    fn get_protocol(&self) -> Protocol {
-        self.protocol
-    }
-    fn get_status(&self) -> DeviceStatus {
-        self.status.clone()
-    }
-    fn get_categories(&self) -> &[DeviceCategory] {
-        &self.categories
-    }
-    fn get_capabilities(&self) -> &DeviceCapabilities {
-        &self.capabilities
-    }
-    fn get_location(&self) -> &Location {
-        &self.location
-    }
-    fn get_metadata(&self) -> &DeviceMetadata {
-        &self.metadata
-    }
-    fn get_network_info(&self) -> Option<&NetworkInfo> {
-        self.network_info.as_ref()
-    }
-    fn get_raw_details(&self) -> &Value {
-        &self.raw_details
-    }
-}
-
-// Convert protocol-specific devices to the generic Device type
 impl From<WiFiDevice> for Device {
     fn from(device: WiFiDevice) -> Self {
         Device {
@@ -368,11 +287,7 @@ impl From<WiFiDevice> for Device {
             created: device.base.created,
             updated: device.base.updated,
             last_online: device.base.last_online,
-            raw_details: json!({
-                "base": device.base.raw_details,
-                "mdns_service_type": device.mdns_service_type,
-                "mdns_properties": device.mdns_properties,
-            }),
+            raw_details: device.base.raw_details,
         }
     }
 }
@@ -394,20 +309,30 @@ impl From<BluetoothDevice> for Device {
             created: device.base.created,
             updated: device.base.updated,
             last_online: device.base.last_online,
-            raw_details: json!({
-                "base": device.base.raw_details,
-                "signal_strength": device.signal_strength,
-                "services": device.services,
-                "is_connectable": device.is_connectable,
-                "is_paired": device.is_paired,
-            }),
+            raw_details: device.base.raw_details,
         }
     }
 }
 
-impl From<ZigbeeDevice> for Device {
-    fn from(device: ZigbeeDevice) -> Self {
-        Device {
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct UsbDevice {
+    #[serde(flatten)]
+    pub base: BaseDevice,
+    pub vendor_id: u16,
+    pub product_id: u16,
+    pub bus_number: u8,
+    pub address: u8,
+}
+
+impl AsRef<BaseDevice> for UsbDevice {
+    fn as_ref(&self) -> &BaseDevice {
+        &self.base
+    }
+}
+
+impl From<UsbDevice> for Device {
+    fn from(device: UsbDevice) -> Self {
+        Self {
             id: device.base.id,
             r#type: device.base.r#type,
             friendly_name: device.base.friendly_name,
@@ -422,21 +347,27 @@ impl From<ZigbeeDevice> for Device {
             created: device.base.created,
             updated: device.base.updated,
             last_online: device.base.last_online,
-            raw_details: json!({
-                "base": device.base.raw_details,
-                "ieee_address": device.ieee_address,
-                "network_address": device.network_address,
-                "supported_clusters": device.supported_clusters,
-                "link_quality": device.link_quality,
-                "route": device.route,
-            }),
+            raw_details: device.base.raw_details,
         }
     }
 }
 
-impl From<MatterDevice> for Device {
-    fn from(device: MatterDevice) -> Self {
-        Device {
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct MqttDevice {
+    #[serde(flatten)]
+    pub base: BaseDevice,
+    pub topic: String,
+}
+
+impl AsRef<BaseDevice> for MqttDevice {
+    fn as_ref(&self) -> &BaseDevice {
+        &self.base
+    }
+}
+
+impl From<MqttDevice> for Device {
+    fn from(device: MqttDevice) -> Self {
+        Self {
             id: device.base.id,
             r#type: device.base.r#type,
             friendly_name: device.base.friendly_name,
@@ -451,13 +382,48 @@ impl From<MatterDevice> for Device {
             created: device.base.created,
             updated: device.base.updated,
             last_online: device.base.last_online,
-            raw_details: json!({
-                "base": device.base.raw_details,
-                "node_id": device.node_id,
-                "vendor_id": device.vendor_id,
-                "product_id": device.product_id,
-                "supported_clusters": device.supported_clusters,
-            }),
+            raw_details: device.base.raw_details,
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct SseDevice {
+    pub base: BaseDevice,
+    pub endpoint: String,
+}
+
+impl AsRef<BaseDevice> for SseDevice {
+    fn as_ref(&self) -> &BaseDevice {
+        &self.base
+    }
+}
+
+impl From<SseDevice> for Device {
+    fn from(device: SseDevice) -> Self {
+        Device {
+            id: device.base.id,
+            created: device.base.created,
+            updated: device.base.updated,
+            last_online: device.base.last_online,
+            raw_details: device.base.raw_details,
+            r#type: device.base.r#type,
+            friendly_name: device.base.friendly_name,
+            description: device.base.description,
+            protocol: device.base.protocol,
+            status: device.base.status,
+            categories: device.base.categories,
+            capabilities: device.base.capabilities,
+            location: device.base.location,
+            metadata: device.base.metadata,
+            network_info: device.base.network_info,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum DeviceEvent {
+    DeviceUpdated(Device),
+    DeviceRemoved(String),
+    NetworkOffline,
 }

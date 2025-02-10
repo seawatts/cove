@@ -14,8 +14,12 @@
         ".expo/**",
         ".output/**",
         ".vercel/output/**",
-        "dist/**"
+        "dist/**",
+        "target/**"
       ]
+    },
+    "test": {
+      "outputs": ["packages/backend/target/**"]
     },
     "dev": {
       "persistent": true,
@@ -26,7 +30,12 @@
     },
     "typecheck": {
       "dependsOn": ["^topo", "^build"],
-      "outputs": ["node_modules/.cache/tsbuildinfo.json"]
+      "outputs": [
+        "node_modules/.cache/tsbuildinfo.json",
+        "target/debug/.fingerprint/**",
+        "target/debug/deps/**",
+        "target/debug/incremental/**"
+      ]
     },
     "clean": {
       "cache": false

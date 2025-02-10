@@ -1,6 +1,7 @@
 use crate::error::Error;
 use crate::types::Protocol;
 use miette::{Diagnostic, SourceSpan};
+use rusb::Error as UsbError;
 use std::{sync::Arc, time::Duration};
 use thiserror::Error;
 use tracing::error;
@@ -69,4 +70,12 @@ pub enum ProtocolError {
     #[error(transparent)]
     #[diagnostic(code(cove::protocol::mdns))]
     Mdns(#[from] Arc<mdns_sd::Error>),
+
+    #[error(transparent)]
+    #[diagnostic(code(cove::protocol::bluetooth))]
+    Bluetooth(#[from] Arc<btleplug::Error>),
+
+    #[error(transparent)]
+    #[diagnostic(code(cove::protocol::usb))]
+    Usb(#[from] Arc<UsbError>),
 }
