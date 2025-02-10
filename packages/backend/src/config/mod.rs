@@ -1,4 +1,4 @@
-mod device;
+mod devices;
 pub mod error;
 mod logging;
 mod manufacturer;
@@ -6,7 +6,6 @@ mod protocol;
 mod system;
 mod utils;
 
-pub use device::{Device, DeviceCapabilities, DeviceCommands};
 pub use error::ConfigError;
 pub use logging::{LogLevel, Logging};
 pub use manufacturer::Manufacturer;
@@ -14,7 +13,7 @@ pub use protocol::{Discovery, Protocol, ProtocolConfig};
 pub use system::System;
 pub use utils::ConfigFile;
 
-use miette::{Diagnostic, IntoDiagnostic, Report, Result};
+use miette::{Report, Result};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -73,7 +72,7 @@ impl Config {
         // Generate all schemas
         utils::generate_schema::<Config>("cove").await?;
         utils::generate_schema::<Manufacturer>("manufacturer").await?;
-        utils::generate_schema::<Device>("device").await?;
+        utils::generate_schema::<devices::base::Device>("device").await?;
 
         Ok(())
     }
@@ -89,7 +88,7 @@ impl Config {
 pub struct LoadedConfigs {
     pub system: Config,
     pub manufacturers: Vec<(String, Manufacturer)>,
-    pub devices: Vec<(String, String, Device)>, // (manufacturer, model, device)
+    pub devices: Vec<(String, String, devices::base::Device)>, // (manufacturer, model, device)
 }
 
 impl LoadedConfigs {
@@ -98,77 +97,78 @@ impl LoadedConfigs {
         // Load main system config
         let system = Config::from_file("./config/cove.yaml").await?;
 
-        // Load manufacturer configs
+        // Initialize empty vectors for manufacturers and devices
         let mut manufacturers = Vec::new();
         let mut devices = Vec::new();
 
-        // Read manufacturer directories
-        let mut manufacturer_entries = Vec::new();
-        let mut dir =
-            fs::read_dir("./config/manufacturers")
-                .await
-                .map_err(|e| ConfigError::LoadFailed {
+        // Optional: Load manufacturer configs if directory exists
+        if Path::new("./config/manufacturers").exists() {
+            // Read manufacturer directories
+            let mut manufacturer_entries = Vec::new();
+            let mut dir = fs::read_dir("./config/manufacturers").await.map_err(|e| {
+                ConfigError::LoadFailed {
                     path: PathBuf::from("./config/manufacturers"),
                     source: Arc::new(e),
-                })?;
+                }
+            })?;
 
-        // Collect manufacturer entries first
-        while let Ok(Some(entry)) = dir.next_entry().await {
-            let ft = entry
-                .file_type()
-                .await
-                .map_err(|e| ConfigError::LoadFailed {
-                    path: entry.path(),
-                    source: Arc::new(e),
-                })?;
-
-            if ft.is_dir() {
-                manufacturer_entries.push(entry);
-            }
-        }
-
-        // Process each manufacturer
-        for manufacturer_entry in manufacturer_entries {
-            let manufacturer_name = manufacturer_entry.file_name();
-            let manufacturer_name = manufacturer_name.to_string_lossy();
-
-            // Load manufacturer config
-            let manufacturer_config_path = manufacturer_entry.path().join("manufacturer.yaml");
-            if manufacturer_config_path.exists() {
-                let manufacturer = Manufacturer::from_file(&manufacturer_config_path).await?;
-                manufacturers.push((manufacturer_name.to_string(), manufacturer));
-
-                // Load device configs for this manufacturer
-                let mut device_dir =
-                    fs::read_dir(manufacturer_entry.path()).await.map_err(|e| {
-                        ConfigError::LoadFailed {
-                            path: manufacturer_entry.path(),
-                            source: Arc::new(e),
-                        }
+            // Collect manufacturer entries first
+            while let Ok(Some(entry)) = dir.next_entry().await {
+                let ft = entry
+                    .file_type()
+                    .await
+                    .map_err(|e| ConfigError::LoadFailed {
+                        path: entry.path(),
+                        source: Arc::new(e),
                     })?;
 
-                while let Ok(Some(device_entry)) = device_dir.next_entry().await {
-                    let ft =
-                        device_entry
-                            .file_type()
-                            .await
-                            .map_err(|e| ConfigError::LoadFailed {
+                if ft.is_dir() {
+                    manufacturer_entries.push(entry);
+                }
+            }
+
+            // Process each manufacturer
+            for manufacturer_entry in manufacturer_entries {
+                let manufacturer_name = manufacturer_entry.file_name();
+                let manufacturer_name = manufacturer_name.to_string_lossy();
+
+                // Load manufacturer config
+                let manufacturer_config_path = manufacturer_entry.path().join("manufacturer.yaml");
+                if manufacturer_config_path.exists() {
+                    let manufacturer = Manufacturer::from_file(&manufacturer_config_path).await?;
+                    manufacturers.push((manufacturer_name.to_string(), manufacturer));
+
+                    // Load device configs for this manufacturer
+                    let mut device_dir =
+                        fs::read_dir(manufacturer_entry.path()).await.map_err(|e| {
+                            ConfigError::LoadFailed {
+                                path: manufacturer_entry.path(),
+                                source: Arc::new(e),
+                            }
+                        })?;
+
+                    while let Ok(Some(device_entry)) = device_dir.next_entry().await {
+                        let ft = device_entry.file_type().await.map_err(|e| {
+                            ConfigError::LoadFailed {
                                 path: device_entry.path(),
                                 source: Arc::new(e),
-                            })?;
+                            }
+                        })?;
 
-                    if ft.is_dir() {
-                        let device_name = device_entry.file_name();
-                        let device_name = device_name.to_string_lossy();
+                        if ft.is_dir() {
+                            let device_name = device_entry.file_name();
+                            let device_name = device_name.to_string_lossy();
 
-                        let device_config_path = device_entry.path().join("device.yaml");
-                        if device_config_path.exists() {
-                            let device = Device::from_file(&device_config_path).await?;
-                            devices.push((
-                                manufacturer_name.to_string(),
-                                device_name.to_string(),
-                                device,
-                            ));
+                            let device_config_path = device_entry.path().join("device.yaml");
+                            if device_config_path.exists() {
+                                let device =
+                                    devices::base::Device::from_file(&device_config_path).await?;
+                                devices.push((
+                                    manufacturer_name.to_string(),
+                                    device_name.to_string(),
+                                    device,
+                                ));
+                            }
                         }
                     }
                 }
@@ -186,8 +186,6 @@ impl LoadedConfigs {
     pub async fn validate(&self) -> Result<(), ConfigError> {
         // Load schemas
         let cove_schema = utils::load_schema("cove").await?;
-        let manufacturer_schema = utils::load_schema("manufacturer").await?;
-        let device_schema = utils::load_schema("device").await?;
 
         // Validate system config
         let system_yaml =
@@ -201,75 +199,55 @@ impl LoadedConfigs {
             })?;
         utils::validate_yaml(&cove_schema, &system_yaml, "system config")?;
 
-        // Validate manufacturer configs
-        for (name, manufacturer) in &self.manufacturers {
-            let manufacturer_yaml =
-                serde_yaml::to_string(manufacturer).map_err(|e| ConfigError::InvalidFormat {
-                    path: PathBuf::from(format!(
-                        "./config/manufacturers/{}/manufacturer.yaml",
-                        name
-                    )),
-                    details: e.to_string(),
-                    content: String::new(),
-                    span: (0..1).into(),
-                    schema_path: Path::new("./config/schemas").join("manufacturer.schema.json"),
-                    schema_span: None,
+        // Only validate manufacturer and device configs if they exist
+        if !self.manufacturers.is_empty() {
+            let manufacturer_schema = utils::load_schema("manufacturer").await?;
+            let device_schema = utils::load_schema("device").await?;
+
+            // Validate manufacturer configs
+            for (name, manufacturer) in &self.manufacturers {
+                let manufacturer_yaml = serde_yaml::to_string(manufacturer).map_err(|e| {
+                    ConfigError::InvalidFormat {
+                        path: PathBuf::from(format!(
+                            "./config/manufacturers/{}/manufacturer.yaml",
+                            name
+                        )),
+                        details: e.to_string(),
+                        content: String::new(),
+                        span: (0..1).into(),
+                        schema_path: Path::new("./config/schemas").join("manufacturer.schema.json"),
+                        schema_span: None,
+                    }
                 })?;
-            utils::validate_yaml(
-                &manufacturer_schema,
-                &manufacturer_yaml,
-                &format!("manufacturer {}", name),
-            )?;
-        }
+                utils::validate_yaml(
+                    &manufacturer_schema,
+                    &manufacturer_yaml,
+                    &format!("manufacturer {}", name),
+                )?;
+            }
 
-        // Validate device configs
-        for (manufacturer, model, device) in &self.devices {
-            let device_yaml =
-                serde_yaml::to_string(device).map_err(|e| ConfigError::InvalidFormat {
-                    path: PathBuf::from(format!(
-                        "./config/manufacturers/{}/{}/device.yaml",
-                        manufacturer, model
-                    )),
-                    details: e.to_string(),
-                    content: String::new(),
-                    span: (0..1).into(),
-                    schema_path: Path::new("./config/schemas").join("device.schema.json"),
-                    schema_span: None,
-                })?;
-            utils::validate_yaml(
-                &device_schema,
-                &device_yaml,
-                &format!("device {}/{}", manufacturer, model),
-            )?;
-        }
-
-        // Additional cross-config validations
-        self.validate_cross_references()?;
-
-        Ok(())
-    }
-
-    /// Validate cross-references between configurations
-    fn validate_cross_references(&self) -> Result<(), ConfigError> {
-        // Create a set of valid manufacturer names
-        let manufacturer_names: std::collections::HashSet<_> = self
-            .manufacturers
-            .iter()
-            .map(|(name, _)| name.as_str())
-            .collect();
-
-        // Verify all devices reference valid manufacturers
-        for (manufacturer, model, _) in &self.devices {
-            if !manufacturer_names.contains(manufacturer.as_str()) {
-                return Err(ConfigError::InvalidCrossReference {
-                    details: format!(
-                        "Device {}/{} references non-existent manufacturer {}",
-                        manufacturer, model, manufacturer
-                    ),
-                    related: vec![],
-                });
+            // Validate device configs
+            for (manufacturer, model, device) in &self.devices {
+                let device_yaml =
+                    serde_yaml::to_string(device).map_err(|e| ConfigError::InvalidFormat {
+                        path: PathBuf::from(format!(
+                            "./config/manufacturers/{}/{}/device.yaml",
+                            manufacturer, model
+                        )),
+                        details: e.to_string(),
+                        content: String::new(),
+                        span: (0..1).into(),
+                        schema_path: Path::new("./config/schemas").join("device.schema.json"),
+                        schema_span: None,
+                    })?;
+                utils::validate_yaml(
+                    &device_schema,
+                    &device_yaml,
+                    &format!("device {}/{}", manufacturer, model),
+                )?;
             }
         }
+
         Ok(())
     }
 }

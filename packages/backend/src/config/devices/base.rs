@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use super::utils::ConfigFile;
+use crate::config::utils::ConfigFile;
 
 /// Device capabilities configuration
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]

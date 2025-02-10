@@ -53,4 +53,5 @@ dist/
 .turbo
 
 # rust
+logs
 target
