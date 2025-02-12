@@ -1,15 +1,17 @@
 {
   "commitlint": {
-    "extends": ["@acme/commitlint-config"]
+    "extends": [
+      "@acme/commitlint-config"
+    ]
   },
   "devDependencies": {
     "@acme/commitlint-config": "workspace:*",
     "@biomejs/biome": "1.9.4",
-    "@turbo/gen": "2.4.0",
+    "@turbo/gen": "2.4.1",
     "lefthook": "1.10.10",
-    "turbo": "2.4.0",
+    "turbo": "2.4.1",
     "typescript": "5.7.3",
-    "vitest": "3.0.4"
+    "vitest": "3.0.5"
   },
   "engines": {
     "node": ">=20.12.0"

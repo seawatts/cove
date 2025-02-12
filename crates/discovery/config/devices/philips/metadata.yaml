@@ -1,0 +1,48 @@
+name: "Philips"
+id: "philips"
+website: "https://www.philips-hue.com"
+support_url: "https://www.philips-hue.com/support"
+
+# Global API configuration for this manufacturer
+api:
+  base_url: "https://api.meethue.com/v2"
+  discovery:
+    mdns_services:
+      - "_hue._tcp.local."
+    upnp_device_types:
+      - "urn:schemas-upnp-org:device:basic:1"
+
+  auth:
+    type: "oauth2"
+    client_registration:
+      url: "https://api.meethue.com/v2/oauth2/register"
+      type: "dynamic"
+    endpoints:
+      authorize: "https://api.meethue.com/v2/oauth2/authorize"
+      token: "https://api.meethue.com/v2/oauth2/token"
+      device: "https://api.meethue.com/v2/oauth2/device"
+
+# Default retry and timeout settings for this manufacturer
+connection:
+  retry_attempts: 3
+  timeout_seconds: 10
+  backoff_factor: 1.5
+
+# Support for different protocols
+protocols:
+  zigbee:
+    enabled: true
+    coordinator_required: true
+    coordinator_type: "hue_bridge"
+  matter:
+    enabled: true
+    version: "1.0"
+  wifi:
+    enabled: true
+    required_ports: [80, 443]
+
+# Documentation and support resources
+documentation:
+  api_docs: "https://developers.meethue.com"
+  developer_portal: "https://developers.meethue.com/develop"
+  support_forum: "https://developers.meethue.com/forum"
