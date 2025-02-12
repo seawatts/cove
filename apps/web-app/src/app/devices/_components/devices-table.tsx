@@ -1,32 +1,32 @@
-'use client'
+'use client';
 
-import { format } from 'date-fns'
-import { AnimatePresence, motion } from 'motion/react'
-import Link from 'next/link'
+import { format } from 'date-fns';
+import { AnimatePresence, motion } from 'motion/react';
+import Link from 'next/link';
 
-import { api } from '@acme/api/client'
-import { Badge } from '@acme/ui/badge'
+import { api } from '@acme/api/client';
+import { Badge } from '@acme/ui/badge';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@acme/ui/card'
-import { Icons } from '@acme/ui/icons'
-import { cn } from '@acme/ui/lib/utils'
-import { Text } from '@acme/ui/typography'
+} from '@acme/ui/card';
+import { Icons } from '@acme/ui/icons';
+import { cn } from '@acme/ui/lib/utils';
+import { Text } from '@acme/ui/typography';
 
 type Device = {
-  id: string
-  friendly_name: string
-  status: string
-  protocol: string
-  categories: string[]
-  location: { room: string; floor: string; zone: string }
-  last_online: string
-  metadata: { icon_url: string }
-}
+  id: string;
+  friendly_name: string;
+  status: string;
+  protocol: string;
+  categories: string[];
+  location: { room: string; floor: string; zone: string };
+  last_online: string;
+  metadata: { icon_url: string };
+};
 
 // Animation variants for the cards
 const cardVariants = {
@@ -50,10 +50,10 @@ const cardVariants = {
       ease: 'easeOut',
     },
   },
-}
+};
 
 export function DevicesTable() {
-  const { data: devices } = api.useQuery(['devices'])
+  const { data: devices } = api.useQuery(['devices']);
 
   if (devices?.length === 0) {
     return (
@@ -61,7 +61,7 @@ export function DevicesTable() {
         <Icons.GalleryVerticalEnd size="xl" variant="muted" />
         <Text>No devices found</Text>
       </div>
-    )
+    );
   }
 
   return (
@@ -147,5 +147,5 @@ export function DevicesTable() {
         ))}
       </AnimatePresence>
     </div>
-  )
+  );
 }

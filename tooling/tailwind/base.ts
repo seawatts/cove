@@ -1,5 +1,5 @@
-import type { Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
+import type { Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 export default {
   content: [
@@ -163,4 +163,4 @@ export default {
       sans: ['var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
     },
   },
-} satisfies Config
+} satisfies Config;

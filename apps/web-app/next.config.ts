@@ -1,6 +1,6 @@
 // import createJiti from 'jiti'
 
-import baseConfig from '@acme/next-config/base'
+import baseConfig from '@acme/next-config/base';
 
 // Import env files to validate at build time. Use jiti so we can load .ts files in here.
 // createJiti(fileURLToPath(import.meta.url))('./src/env.client')
@@ -16,9 +16,9 @@ const nextConfig = {
     '@acme/ui',
     '@acme/validators',
   ],
-}
+};
 
-export default nextConfig
+export default nextConfig;
 
 // Injected content via Sentry wizard below
 

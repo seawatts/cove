@@ -1,8 +1,6 @@
 {
   "commitlint": {
-    "extends": [
-      "@acme/commitlint-config"
-    ]
+    "extends": ["@acme/commitlint-config"]
   },
   "devDependencies": {
     "@acme/commitlint-config": "workspace:*",

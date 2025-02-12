@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import { forwardRef } from 'react'
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { forwardRef } from 'react';
 
-import { cn } from '@acme/ui/lib/utils'
+import { cn } from '@acme/ui/lib/utils';
 
-import { Button } from './button'
-import { Calendar } from './calendar'
-import { Popover, PopoverContent, PopoverTrigger } from './popover'
+import { Button } from './button';
+import { Calendar } from './calendar';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 export const DatePicker = forwardRef<
   HTMLDivElement,
   {
-    date?: Date
-    setDate: (date?: Date) => void
+    date?: Date;
+    setDate: (date?: Date) => void;
   }
 >(function DatePickerCmp({ date, setDate }, ref) {
   return (
@@ -40,5 +40,5 @@ export const DatePicker = forwardRef<
         />
       </PopoverContent>
     </Popover>
-  )
-})
+  );
+});

@@ -1,12 +1,12 @@
-import { Card } from '@acme/ui/card'
-import { Icons } from '@acme/ui/icons'
-import { H1 } from '@acme/ui/typography'
-import { Suspense } from 'react'
+import { Card } from '@acme/ui/card';
+import { Icons } from '@acme/ui/icons';
+import { H1 } from '@acme/ui/typography';
+import { Suspense } from 'react';
 
 interface DashboardPageProps {
   params: {
-    dashboardId: string
-  }
+    dashboardId: string;
+  };
 }
 
 export default function DashboardPage({ params }: DashboardPageProps) {
@@ -37,7 +37,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
         </Suspense>
       </div>
     </div>
-  )
+  );
 }
 
 async function DeviceGrid({ dashboardId }: { dashboardId: string }) {
@@ -51,7 +51,7 @@ async function DeviceGrid({ dashboardId }: { dashboardId: string }) {
       status: '23°C',
     },
     { id: '3', name: 'Front Door', type: 'door', status: 'locked' },
-  ]
+  ];
 
   return (
     <>
@@ -67,18 +67,18 @@ async function DeviceGrid({ dashboardId }: { dashboardId: string }) {
         </Card>
       ))}
     </>
-  )
+  );
 }
 
 function DeviceIcon({ type }: { type: string }) {
   switch (type) {
     case 'light':
-      return <Icons.SunMedium className="size-6 text-primary" />
+      return <Icons.SunMedium className="size-6 text-primary" />;
     case 'temperature':
-      return <Icons.CircleDot className="size-6 text-primary" />
+      return <Icons.CircleDot className="size-6 text-primary" />;
     case 'door':
-      return <Icons.Home className="size-6 text-primary" />
+      return <Icons.Home className="size-6 text-primary" />;
     default:
-      return <Icons.Circle className="size-6 text-primary" />
+      return <Icons.Circle className="size-6 text-primary" />;
   }
 }

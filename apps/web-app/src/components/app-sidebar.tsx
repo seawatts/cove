@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
   BookOpen,
@@ -17,16 +17,16 @@ import {
   User2,
   Users,
   Workflow,
-} from 'lucide-react'
-import { useParams, usePathname } from 'next/navigation'
+} from 'lucide-react';
+import { useParams, usePathname } from 'next/navigation';
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@acme/ui/dropdown-menu'
-import { Icons } from '@acme/ui/icons'
+} from '@acme/ui/dropdown-menu';
+import { Icons } from '@acme/ui/icons';
 import {
   Sidebar,
   SidebarContent,
@@ -41,14 +41,14 @@ import {
   SidebarMenuSkeleton,
   SidebarSeparator,
   SidebarTrigger,
-} from '@acme/ui/sidebar'
+} from '@acme/ui/sidebar';
 
 export function AppSidebar() {
-  const params = useParams()
-  const pathname = usePathname()
+  const params = useParams();
+  const pathname = usePathname();
 
-  const projectId = params.projectId as string
-  const environmentId = params.environmentId as string
+  const projectId = params.projectId as string;
+  const environmentId = params.environmentId as string;
 
   if (!projectId || !environmentId) {
     return (
@@ -59,7 +59,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         ))}
       </SidebarMenu>
-    )
+    );
   }
 
   // Menu items.
@@ -79,7 +79,7 @@ export function AppSidebar() {
       title: 'Users',
       url: `/projects/${projectId}/environments/${environmentId}/users`,
     },
-  ]
+  ];
   const developmentItems = [
     {
       icon: Sparkles,
@@ -116,7 +116,7 @@ export function AppSidebar() {
       title: 'Playground',
       url: `/projects/${projectId}/environments/${environmentId}/playground`,
     },
-  ]
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -259,5 +259,5 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

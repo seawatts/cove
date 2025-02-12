@@ -1,15 +1,15 @@
-import { FlashList } from '@shopify/flash-list'
-import { Link, Stack } from 'expo-router'
-import { useState } from 'react'
-import { Pressable, Text, TextInput, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { FlashList } from '@shopify/flash-list';
+import { Link, Stack } from 'expo-router';
+import { useState } from 'react';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { RouterOutputs } from '~/utils/api'
-import { api } from '~/utils/api'
+import type { RouterOutputs } from '~/utils/api';
+import { api } from '~/utils/api';
 
 function UserCard(props: {
-  user: RouterOutputs['user']['all'][number]
-  onDelete: () => void
+  user: RouterOutputs['user']['all'][number];
+  onDelete: () => void;
 }) {
   return (
     <View className="flex flex-row rounded-lg bg-muted p-4">
@@ -33,20 +33,20 @@ function UserCard(props: {
         <Text className="font-bold uppercase text-primary">Delete</Text>
       </Pressable>
     </View>
-  )
+  );
 }
 
 function CreateUser() {
-  const utils = api.useUtils()
+  const utils = api.useUtils();
 
-  const [firstName, setFirstName] = useState('')
+  const [firstName, setFirstName] = useState('');
 
   const { mutate, error } = api.user.create.useMutation({
     async onSuccess() {
-      setFirstName('')
-      await utils.user.all.invalidate()
+      setFirstName('');
+      await utils.user.all.invalidate();
     },
-  })
+  });
 
   return (
     <View className="mt-4 flex gap-2">
@@ -69,7 +69,7 @@ function CreateUser() {
             email: 'test@test.com',
             lastName: 'test',
             online: true,
-          })
+          });
         }}
       >
         <Text className="text-foreground">Create</Text>
@@ -80,17 +80,17 @@ function CreateUser() {
         </Text>
       )}
     </View>
-  )
+  );
 }
 
 export default function Index() {
-  const utils = api.useUtils()
+  const utils = api.useUtils();
 
-  const userQuery = api.user.all.useQuery()
+  const userQuery = api.user.all.useQuery();
 
   const deleteUserMutation = api.user.delete.useMutation({
     onSettled: () => utils.user.all.invalidate().then(),
-  })
+  });
 
   return (
     <SafeAreaView className="bg-background">
@@ -129,5 +129,5 @@ export default function Index() {
         <CreateUser />
       </View>
     </SafeAreaView>
-  )
+  );
 }

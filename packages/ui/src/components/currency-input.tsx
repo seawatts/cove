@@ -1,16 +1,16 @@
-import type React from 'react'
-import { useCallback, useEffect, useState } from 'react'
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { formatCurrency } from '../lib/format-currency'
-import { Button } from './button'
-import type { InputProps } from './input'
-import { Input } from './input'
+import { formatCurrency } from '../lib/format-currency';
+import { Button } from './button';
+import type { InputProps } from './input';
+import { Input } from './input';
 
 interface CurrencyInputProps extends Omit<InputProps, 'onChange'> {
-  onChange?: (value: number) => void
-  currency?: string
-  locale?: string
-  quickFillValues?: number[]
+  onChange?: (value: number) => void;
+  currency?: string;
+  locale?: string;
+  quickFillValues?: number[];
 }
 
 export const CurrencyInput: React.FC<CurrencyInputProps> = ({
@@ -20,45 +20,45 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
   quickFillValues,
   ...props
 }) => {
-  const [value, setValue] = useState<string>('')
+  const [value, setValue] = useState<string>('');
 
   const formatWithCommas = useCallback((value_: string) => {
-    const parts = value_.split('.')
+    const parts = value_.split('.');
     if (parts[0]) {
-      parts[0] = parts[0].replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',')
+      parts[0] = parts[0].replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
-    return parts.join('.')
-  }, [])
+    return parts.join('.');
+  }, []);
 
   const handleChange = useCallback(
     (newValue: string | number) => {
-      const rawValue = newValue.toString().replaceAll(/[^\d.]/g, '')
-      const formattedValue = formatWithCommas(rawValue)
-      setValue(formattedValue)
+      const rawValue = newValue.toString().replaceAll(/[^\d.]/g, '');
+      const formattedValue = formatWithCommas(rawValue);
+      setValue(formattedValue);
       if (onChange) {
-        onChange(Number.parseFloat(rawValue) || 0)
+        onChange(Number.parseFloat(rawValue) || 0);
       }
     },
     [formatWithCommas, onChange],
-  )
+  );
 
   useEffect(() => {
     if (props.value !== undefined) {
-      handleChange(props.value.toString())
+      handleChange(props.value.toString());
     }
-  }, [props.value, handleChange])
+  }, [props.value, handleChange]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange(event.target.value)
-  }
+    handleChange(event.target.value);
+  };
 
   const handleQuickFill = (fillValue: number) => {
-    const formattedValue = formatWithCommas(fillValue.toString())
-    setValue(formattedValue)
+    const formattedValue = formatWithCommas(fillValue.toString());
+    setValue(formattedValue);
     if (onChange) {
-      onChange(fillValue)
+      onChange(fillValue);
     }
-  }
+  };
 
   return (
     <div className="w-full">
@@ -96,5 +96,5 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

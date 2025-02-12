@@ -1,8 +1,8 @@
-import { Button } from '@acme/ui/button'
-import { Icons } from '@acme/ui/icons'
-import { H1 } from '@acme/ui/typography'
-import { Suspense } from 'react'
-import { DevicesTable } from './_components/devices-table'
+import { Button } from '@acme/ui/button';
+import { Icons } from '@acme/ui/icons';
+import { H1 } from '@acme/ui/typography';
+import { Suspense } from 'react';
+import { DevicesTable } from './_components/devices-table';
 
 export default function DevicesPage() {
   return (
@@ -39,5 +39,5 @@ export default function DevicesPage() {
         </Suspense>
       </div>
     </div>
-  )
+  );
 }

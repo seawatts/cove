@@ -1,17 +1,17 @@
-'use client'
-import { api } from '@acme/api/client'
-import { Badge } from '@acme/ui/badge'
-import { Button } from '@acme/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@acme/ui/card'
-import { Icons } from '@acme/ui/icons'
-import { cn } from '@acme/ui/lib/utils'
-import { H1, Text } from '@acme/ui/typography'
-import { Suspense } from 'react'
+'use client';
+import { api } from '@acme/api/client';
+import { Badge } from '@acme/ui/badge';
+import { Button } from '@acme/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@acme/ui/card';
+import { Icons } from '@acme/ui/icons';
+import { cn } from '@acme/ui/lib/utils';
+import { H1, Text } from '@acme/ui/typography';
+import { Suspense } from 'react';
 
 interface DevicePageProps {
   params: {
-    deviceId: string
-  }
+    deviceId: string;
+  };
 }
 
 export default function DevicePage({ params }: DevicePageProps) {
@@ -106,12 +106,12 @@ export default function DevicePage({ params }: DevicePageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function DeviceInfo({ deviceId }: { deviceId: string }) {
-  const { data: devices } = api.useQuery(['devices'])
-  const device = devices?.find((d) => d.id === deviceId)
+  const { data: devices } = api.useQuery(['devices']);
+  const device = devices?.find((d) => d.id === deviceId);
 
   if (!device) {
     return (
@@ -119,7 +119,7 @@ function DeviceInfo({ deviceId }: { deviceId: string }) {
         <Icons.AlertCircle className="size-8 text-muted" />
         <Text>Device not found</Text>
       </div>
-    )
+    );
   }
 
   return (
@@ -185,5 +185,5 @@ function DeviceInfo({ deviceId }: { deviceId: string }) {
         </CardContent>
       </Card>
     </>
-  )
+  );
 }

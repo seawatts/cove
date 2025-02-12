@@ -1,5 +1,5 @@
 // @ts-check
-import withBundleAnalyzer from '@next/bundle-analyzer'
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -48,11 +48,11 @@ const nextConfig = {
           },
         },
       ],
-    })
-    return config
+    });
+    return config;
   },
-}
+};
 
 export default withBundleAnalyzer({
   enabled: process.env.NEXT_ANALYZE === 'true',
-})(nextConfig)
+})(nextConfig);
