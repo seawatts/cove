@@ -19,7 +19,7 @@
       ]
     },
     "test": {
-      "outputs": ["packages/backend/target/**"]
+      "outputs": ["target/**"]
     },
     "dev": {
       "persistent": true,

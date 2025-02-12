@@ -1,0 +1,26 @@
+{
+  "license": "MIT",
+  "name": "@acme/backend-rs",
+  "private": true,
+  "scripts": {
+    "build": "cargo build",
+    "build:release": "cargo build --release",
+    "build:types": "cargo test export_ts_bindings",
+    "clean": "rm -rf target",
+    "dev": "cargo run",
+    "dev:release": "cargo run --release",
+    "format": "cargo fmt",
+    "format:check": "cargo fmt --check",
+    "format:fix": "cargo fmt",
+    "lint": "cargo clippy -- -D warnings",
+    "test": "cargo test",
+    "test:watch": "cargo watch -x test",
+    "typecheck": "cargo check",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "devDependencies": {
+    "dotenv-cli": "8.0.0"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}
