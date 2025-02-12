@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
-} from 'lucide-react'
-import type * as React from 'react'
-import type { ChevronProps } from 'react-day-picker'
-import { DayFlag, DayPicker, SelectionState, UI } from 'react-day-picker'
+} from 'lucide-react';
+import type * as React from 'react';
+import type { ChevronProps } from 'react-day-picker';
+import { DayFlag, DayPicker, SelectionState, UI } from 'react-day-picker';
 
-import { cn } from '@acme/ui/lib/utils'
+import { cn } from '@acme/ui/lib/utils';
 
-import { buttonVariants } from './button'
+import { buttonVariants } from './button';
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 export const Calendar = ({
   className,
@@ -67,25 +67,25 @@ export const Calendar = ({
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
 const Chevron = ({ orientation }: ChevronProps) => {
   switch (orientation) {
     case 'left': {
-      return <ChevronLeftIcon className="h-4 w-4" />
+      return <ChevronLeftIcon className="h-4 w-4" />;
     }
     case 'right': {
-      return <ChevronRightIcon className="h-4 w-4" />
+      return <ChevronRightIcon className="h-4 w-4" />;
     }
     case 'up': {
-      return <ChevronUpIcon className="h-4 w-4" />
+      return <ChevronUpIcon className="h-4 w-4" />;
     }
     case 'down': {
-      return <ChevronDownIcon className="h-4 w-4" />
+      return <ChevronDownIcon className="h-4 w-4" />;
     }
     default: {
-      return null
+      return null;
     }
   }
-}
+};

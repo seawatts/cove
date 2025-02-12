@@ -1,23 +1,23 @@
-import { Suspense } from 'react'
+import { Suspense } from 'react';
 
-import { HydrationBoundary, api } from '@acme/api/server'
-import { Button } from '@acme/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@acme/ui/card'
-import { Icons } from '@acme/ui/icons'
-import { Skeleton } from '@acme/ui/skeleton'
-import { H1, P, Text } from '@acme/ui/typography'
-import { DevicesTable } from './devices/_components/devices-table'
+import { HydrationBoundary, api } from '@acme/api/server';
+import { Button } from '@acme/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@acme/ui/card';
+import { Icons } from '@acme/ui/icons';
+import { Skeleton } from '@acme/ui/skeleton';
+import { H1, P, Text } from '@acme/ui/typography';
+import { DevicesTable } from './devices/_components/devices-table';
 
 type Device = {
-  id: string
-  friendly_name: string
-  status: string
-  protocol: string
-  categories: string[]
-  location: { room: string; floor: string; zone: string }
-  last_online: string
-  metadata: { icon_url: string }
-}
+  id: string;
+  friendly_name: string;
+  status: string;
+  protocol: string;
+  categories: string[];
+  location: { room: string; floor: string; zone: string };
+  last_online: string;
+  metadata: { icon_url: string };
+};
 
 function DevicesTableSkeleton() {
   return (
@@ -44,15 +44,15 @@ function DevicesTableSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function DeviceStats({ devices }: { devices: Device[] }) {
   const onlineDevices =
-    devices?.filter((d) => d.status === 'Online').length ?? 0
+    devices?.filter((d) => d.status === 'Online').length ?? 0;
   const offlineDevices =
-    devices?.filter((d) => d.status === 'Offline').length ?? 0
-  const totalDevices = devices?.length ?? 0
+    devices?.filter((d) => d.status === 'Offline').length ?? 0;
+  const totalDevices = devices?.length ?? 0;
 
   const stats = [
     {
@@ -70,7 +70,7 @@ function DeviceStats({ devices }: { devices: Device[] }) {
       value: offlineDevices,
       icon: <Icons.AlertCircle className="size-4 text-destructive" />,
     },
-  ]
+  ];
 
   return (
     <div className="grid gap-4 sm:grid-cols-3">
@@ -86,7 +86,7 @@ function DeviceStats({ devices }: { devices: Device[] }) {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 function QuickActions() {
@@ -114,11 +114,11 @@ function QuickActions() {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default async function Page() {
-  await api.prefetch(['devices'])
+  await api.prefetch(['devices']);
 
   return (
     <main className="container py-16">
@@ -168,5 +168,5 @@ export default async function Page() {
         </Card>
       </div>
     </main>
-  )
+  );
 }

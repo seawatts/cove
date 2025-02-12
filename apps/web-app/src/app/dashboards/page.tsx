@@ -1,25 +1,25 @@
-import {} from '@acme/api/server'
-import { Button } from '@acme/ui/button'
+import {} from '@acme/api/server';
+import { Button } from '@acme/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@acme/ui/card'
-import { Icons } from '@acme/ui/icons'
-import { Skeleton } from '@acme/ui/skeleton'
-import { H1, P, Text } from '@acme/ui/typography'
-import Link from 'next/link'
-import { Suspense } from 'react'
+} from '@acme/ui/card';
+import { Icons } from '@acme/ui/icons';
+import { Skeleton } from '@acme/ui/skeleton';
+import { H1, P, Text } from '@acme/ui/typography';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 type Dashboard = {
-  id: string
-  name: string
-  description: string
-  deviceCount: number
-  updatedAt: string
-}
+  id: string;
+  name: string;
+  description: string;
+  deviceCount: number;
+  updatedAt: string;
+};
 
 function DashboardsSkeleton() {
   return (
@@ -42,7 +42,7 @@ function DashboardsSkeleton() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 function DashboardGrid({ dashboards }: { dashboards: Dashboard[] }) {
@@ -98,7 +98,7 @@ function DashboardGrid({ dashboards }: { dashboards: Dashboard[] }) {
         </Link>
       ))}
     </div>
-  )
+  );
 }
 
 export default async function DashboardsPage() {
@@ -125,7 +125,7 @@ export default async function DashboardsPage() {
       deviceCount: 4,
       updatedAt: new Date().toISOString(),
     },
-  ]
+  ];
 
   return (
     <main className="container py-16">
@@ -152,5 +152,5 @@ export default async function DashboardsPage() {
         </Suspense>
       </div>
     </main>
-  )
+  );
 }

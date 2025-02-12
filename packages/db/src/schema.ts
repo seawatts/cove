@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { relations } from 'drizzle-orm';
 import {
   boolean,
   pgEnum,
@@ -7,15 +7,15 @@ import {
   timestamp,
   unique,
   varchar,
-} from 'drizzle-orm/pg-core'
-import { createInsertSchema } from 'drizzle-zod'
-import { z } from 'zod'
+} from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
-import { createId } from '@acme/id'
+import { createId } from '@acme/id';
 
-export const userRoleEnum = pgEnum('userRole', ['admin', 'superAdmin', 'user'])
+export const userRoleEnum = pgEnum('userRole', ['admin', 'superAdmin', 'user']);
 
-export const UserRoleType = z.enum(userRoleEnum.enumValues).Enum
+export const UserRoleType = z.enum(userRoleEnum.enumValues).Enum;
 
 export const Users = pgTable('user', {
   avatarUrl: text('avatarUrl'),
@@ -34,15 +34,15 @@ export const Users = pgTable('user', {
     mode: 'date',
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
-})
+});
 
 export const UsersRelations = relations(Users, ({ many }) => ({
   orgMembers: many(OrgMembers, {
     relationName: 'user',
   }),
-}))
+}));
 
-export type UserType = typeof Users.$inferSelect
+export type UserType = typeof Users.$inferSelect;
 
 export const CreateUserSchema = createInsertSchema(Users, {
   email: z.string(),
@@ -53,7 +53,7 @@ export const CreateUserSchema = createInsertSchema(Users, {
   createdAt: true,
   id: true,
   updatedAt: true,
-})
+});
 
 export const Orgs = pgTable('orgs', {
   // batch: varchar("batch", { length: 50 }),
@@ -75,16 +75,16 @@ export const Orgs = pgTable('orgs', {
     mode: 'date',
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
-})
+});
 
-export type OrgType = typeof Orgs.$inferSelect
+export type OrgType = typeof Orgs.$inferSelect;
 
 export const updateOrgSchema = createInsertSchema(Orgs, {}).omit({
   createdAt: true,
   createdByUserId: true,
   id: true,
   updatedAt: true,
-})
+});
 
 export const OrgsRelations = relations(Orgs, ({ one, many }) => ({
   createdByUser: one(Users, {
@@ -92,7 +92,7 @@ export const OrgsRelations = relations(Orgs, ({ one, many }) => ({
     references: [Users.id],
   }),
   orgMembers: many(OrgMembers),
-}))
+}));
 
 // Company Members Table
 export const OrgMembers = pgTable(
@@ -130,12 +130,12 @@ export const OrgMembers = pgTable(
   (table) => ({
     orgUserUnique: unique().on(table.orgId, table.userId),
   }),
-)
+);
 
 export type OrgMembersType = typeof OrgMembers.$inferSelect & {
-  user?: UserType
-  org?: OrgType
-}
+  user?: UserType;
+  org?: OrgType;
+};
 
 export const OrgMembersRelations = relations(OrgMembers, ({ one }) => ({
   createdByUser: one(Users, {
@@ -152,7 +152,7 @@ export const OrgMembersRelations = relations(OrgMembers, ({ one }) => ({
     references: [Users.id],
     relationName: 'user',
   }),
-}))
+}));
 
 export const ShortUrl = pgTable('short_url', {
   code: text('code').notNull().unique(),
@@ -166,4 +166,4 @@ export const ShortUrl = pgTable('short_url', {
     mode: 'date',
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
-})
+});

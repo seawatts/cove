@@ -3,12 +3,7 @@
   "title": "Device",
   "description": "Device configuration structure",
   "type": "object",
-  "required": [
-    "capabilities",
-    "commands",
-    "model",
-    "protocol"
-  ],
+  "required": ["capabilities", "commands", "model", "protocol"],
   "properties": {
     "capabilities": {
       "$ref": "#/definitions/DeviceCapabilities"
@@ -29,28 +24,16 @@
       "type": "object",
       "properties": {
         "brightness": {
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "color": {
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "color_temperature": {
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "power": {
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         }
       }
     },

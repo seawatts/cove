@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import * as AvatarPrimitive from '@radix-ui/react-avatar'
-import * as React from 'react'
+import * as AvatarPrimitive from '@radix-ui/react-avatar';
+import * as React from 'react';
 
-import { cn } from '@acme/ui/lib/utils'
+import { cn } from '@acme/ui/lib/utils';
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -14,8 +14,8 @@ const Avatar = React.forwardRef<
     className={cn('relative flex size-5 shrink-0 rounded-full', className)}
     {...props}
   />
-))
-Avatar.displayName = AvatarPrimitive.Root.displayName
+));
+Avatar.displayName = AvatarPrimitive.Root.displayName;
 
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
@@ -26,8 +26,8 @@ const AvatarImage = React.forwardRef<
     className={cn('aspect-square h-full w-full rounded-full', className)}
     {...props}
   />
-))
-AvatarImage.displayName = AvatarPrimitive.Image.displayName
+));
+AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
 const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
@@ -41,19 +41,19 @@ const AvatarFallback = React.forwardRef<
     )}
     {...props}
   />
-))
+));
 
 export function getInitials(props: {
-  firstName?: string | null
-  lastName?: string | null
+  firstName?: string | null;
+  lastName?: string | null;
 }) {
-  const firstInitial = props.firstName?.charAt(0).toUpperCase() ?? ''
-  const lastInitial = props.lastName?.charAt(0).toUpperCase() ?? ''
+  const firstInitial = props.firstName?.charAt(0).toUpperCase() ?? '';
+  const lastInitial = props.lastName?.charAt(0).toUpperCase() ?? '';
 
-  return `${firstInitial}${lastInitial}`
+  return `${firstInitial}${lastInitial}`;
 }
 
-AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
+AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
 const AvatarOnlineIndicator = (props: { online: boolean }) => {
   return (
@@ -66,7 +66,7 @@ const AvatarOnlineIndicator = (props: { online: boolean }) => {
         },
       )}
     />
-  )
-}
+  );
+};
 
-export { Avatar, AvatarImage, AvatarFallback, AvatarOnlineIndicator }
+export { Avatar, AvatarImage, AvatarFallback, AvatarOnlineIndicator };

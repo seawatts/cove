@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { type Variants, motion } from 'framer-motion'
+import { type Variants, motion } from 'framer-motion';
 
-import { cn } from '@acme/ui/lib/utils'
+import { cn } from '@acme/ui/lib/utils';
 
 interface WordFadeInProps {
-  words: string
-  className?: string
-  delay?: number
-  variants?: Variants
+  words: string;
+  className?: string;
+  delay?: number;
+  variants?: Variants;
 }
 
 export function WordFadeIn({
@@ -24,7 +24,7 @@ export function WordFadeIn({
   },
   className,
 }: WordFadeInProps) {
-  const _words = words.split(' ')
+  const _words = words.split(' ');
 
   return (
     <motion.h1
@@ -42,5 +42,5 @@ export function WordFadeIn({
         </motion.span>
       ))}
     </motion.h1>
-  )
+  );
 }

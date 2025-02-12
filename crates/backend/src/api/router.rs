@@ -14,6 +14,11 @@ pub struct MySession {
     name: String,
 }
 
+#[derive(Clone, Serialize, Deserialize, Type)]
+pub struct DeviceId {
+    pub device_id: String,
+}
+
 // `Clone` is only required for usage with Websockets
 #[derive(Clone)]
 pub struct Ctx {
@@ -64,6 +69,12 @@ pub fn new() -> Router<Ctx> {
             <BaseProcedure>::builder().query(|ctx, _: ()| async move {
                 let devices = ctx.registry.get_all_devices().await;
                 Ok(devices)
+            })
+        })
+        .procedure("devices/$deviceId", {
+            <BaseProcedure>::builder().query(|ctx, params: DeviceId| async move {
+                let device = ctx.registry.get_device(&params.device_id).await;
+                Ok(device)
             })
         })
 }

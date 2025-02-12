@@ -2,11 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Config",
   "type": "object",
-  "required": [
-    "discovery",
-    "logging",
-    "system"
-  ],
+  "required": ["discovery", "logging", "system"],
   "properties": {
     "discovery": {
       "$ref": "#/definitions/Discovery"
@@ -23,10 +19,7 @@
       "type": "object",
       "properties": {
         "protocols": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Protocol"
           }
@@ -35,13 +28,7 @@
     },
     "LogLevel": {
       "type": "string",
-      "enum": [
-        "TRACE",
-        "DEBUG",
-        "INFO",
-        "WARN",
-        "ERROR"
-      ]
+      "enum": ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"]
     },
     "Logging": {
       "type": "object",
@@ -99,9 +86,7 @@
     "System": {
       "description": "Main configuration structure for the Cove system",
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "type": "string"

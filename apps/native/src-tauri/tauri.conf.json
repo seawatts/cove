@@ -4,17 +4,22 @@
   "version": "0.1.0",
   "identifier": "com.nextjs.app",
   "build": {
-    "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "pnpm dev:vite",
+    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "pnpm build",
-    "frontendDist": "../out"
+    "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
         "title": "nextjs",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "decorations": true,
+        "transparent": false,
+        "fullscreen": false,
+        "resizable": true,
+        "focus": true
       }
     ],
     "security": {
@@ -24,6 +29,10 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "iOS": {
+      "minimumSystemVersion": "13.0",
+      "developmentTeam": "38383838383838383838383838383838"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

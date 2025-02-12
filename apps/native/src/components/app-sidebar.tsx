@@ -1,32 +1,30 @@
-'use client'
+'use client';
 
+import { Link, useRouter } from '@tanstack/react-router';
 import {
   BookOpen,
-  Bot,
+  CalendarClock,
   ChevronDown,
   ChevronUp,
-  Code,
   ExternalLink,
+  Github,
+  Home,
   LayoutDashboard,
-  Logs,
-  PlayCircle,
+  Lightbulb,
+  ScrollText,
   ShieldCheck,
-  Sparkles,
-  SquareFunction,
-  TestTube2,
+  Smartphone,
   User2,
-  Users,
   Workflow,
-} from 'lucide-react'
-import { useParams, usePathname } from 'next/navigation'
+  Zap,
+} from 'lucide-react';
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@acme/ui/dropdown-menu'
-import { Icons } from '@acme/ui/icons'
+} from '@acme/ui/dropdown-menu';
 import {
   Sidebar,
   SidebarContent,
@@ -38,85 +36,63 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
   SidebarSeparator,
   SidebarTrigger,
-} from '@acme/ui/sidebar'
+} from '@acme/ui/sidebar';
 
 export function AppSidebar() {
-  const params = useParams()
-  const pathname = usePathname()
-
-  const projectId = params.projectId as string
-  const environmentId = params.environmentId as string
-
-  if (!projectId || !environmentId) {
-    return (
-      <SidebarMenu>
-        {['sk1', 'sk2', 'sk3', 'sk4', 'sk5'].map((id) => (
-          <SidebarMenuItem key={id}>
-            <SidebarMenuSkeleton />
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    )
-  }
+  const router = useRouter();
 
   // Menu items.
   const monitoringItems = [
     {
       icon: LayoutDashboard,
       title: 'Dashboard',
-      url: `/projects/${projectId}/environments/${environmentId}/dashboard`,
+      to: '/dashboards',
     },
     {
-      icon: Logs,
-      title: 'Logs',
-      url: `/projects/${projectId}/environments/${environmentId}/logs`,
+      icon: Smartphone,
+      title: 'Devices',
+      to: '/devices',
     },
     {
-      icon: Users,
-      title: 'Users',
-      url: `/projects/${projectId}/environments/${environmentId}/users`,
-    },
-  ]
-  const developmentItems = [
-    {
-      icon: Sparkles,
-      title: 'Prompts',
-      url: `/projects/${projectId}/environments/${environmentId}/prompts`,
+      icon: Home,
+      title: 'Rooms',
+      to: '/rooms',
     },
     {
-      icon: Bot,
-      title: 'Agents',
-      url: `/projects/${projectId}/environments/${environmentId}/agents`,
+      icon: Lightbulb,
+      title: 'Scenes',
+      to: '/scenes',
     },
+  ];
+  const automationItems = [
     {
       icon: Workflow,
-      title: 'Workflows',
-      url: `/projects/${projectId}/environments/${environmentId}/workflows`,
+      title: 'Automations',
+      to: '/automations',
     },
     {
-      icon: SquareFunction,
-      title: 'Tools',
-      url: `/projects/${projectId}/environments/${environmentId}/tools`,
+      icon: CalendarClock,
+      title: 'Schedules',
+      to: '/schedules',
+    },
+    {
+      icon: ScrollText,
+      title: 'Scripts',
+      to: '/scripts',
     },
     {
       icon: ShieldCheck,
-      title: 'Guardrails',
-      url: `/projects/${projectId}/environments/${environmentId}/guardrails`,
+      title: 'Security',
+      to: '/security',
     },
     {
-      icon: TestTube2,
-      title: 'Tests',
-      url: `/projects/${projectId}/environments/${environmentId}/tests`,
+      icon: Zap,
+      title: 'Energy',
+      to: '/energy',
     },
-    {
-      icon: PlayCircle,
-      title: 'Playground',
-      url: `/projects/${projectId}/environments/${environmentId}/playground`,
-    },
-  ]
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -127,16 +103,16 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  BoundaryML
+                  Cove
                   <ChevronDown className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
                 <DropdownMenuItem>
-                  <span>Acme Inc</span>
+                  <span>Home</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span>Acme Corp.</span>
+                  <span>Vacation Home</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -145,16 +121,19 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Monitor</SidebarGroupLabel>
+          <SidebarGroupLabel>Home</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {monitoringItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.url === pathname}>
-                    <a href={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={router.state.location.pathname === item.to}
+                  >
+                    <Link to={item.to}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -162,16 +141,19 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Develop</SidebarGroupLabel>
+          <SidebarGroupLabel>Automation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {developmentItems.map((item) => (
+              {automationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.url === pathname}>
-                    <a href={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={router.state.location.pathname === item.to}
+                  >
+                    <Link to={item.to}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -184,14 +166,14 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a
-                href="https://docs.boundary.ml"
+                href="https://docs.cove.dev"
                 target="_blank"
                 className="flex items-center justify-between"
                 rel="noreferrer"
               >
                 <span className="flex items-center gap-2">
                   <BookOpen className="size-4" />
-                  <span>Docs</span>
+                  <span>Documentation</span>
                 </span>
                 <ExternalLink className="size-4" />
               </a>
@@ -200,30 +182,14 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a
-                href="https://docs.boundary.ml"
+                href="https://github.com/seawatts/cove"
                 target="_blank"
                 className="flex items-center justify-between"
                 rel="noreferrer"
               >
                 <span className="flex items-center gap-2">
-                  <Code className="size-4 shrink-0" />
-                  <span>API Reference</span>
-                </span>
-                <ExternalLink className="size-4" />
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a
-                href="https://discord.gg/boundary"
-                target="_blank"
-                className="flex items-center justify-between"
-                rel="noreferrer"
-              >
-                <span className="flex items-center gap-2">
-                  <Icons.Discord className="size-4" />
-                  <span>Community</span>
+                  <Github className="size-4" />
+                  <span>GitHub</span>
                 </span>
                 <ExternalLink className="size-4" />
               </a>
@@ -245,10 +211,10 @@ export function AppSidebar() {
                 className="w-[--radix-popper-anchor-width]"
               >
                 <DropdownMenuItem>
-                  <span>Account</span>
+                  <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span>Billing</span>
+                  <span>System</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <span>Sign out</span>
@@ -259,5 +225,5 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
