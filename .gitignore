@@ -55,3 +55,6 @@ dist/
 # rust
 logs
 target
+
+# mosquitto
+log
