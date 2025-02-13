@@ -1,0 +1,70 @@
+name: Cove
+options:
+  bundleIdPrefix: com.cove
+  deploymentTarget:
+    iOS: 17.0
+targets:
+  Cove:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+        excludes:
+          - "Components/**"
+          - "Models/**"
+    dependencies:
+      - target: Components
+      - target: Models
+    settings:
+      base:
+        DEVELOPMENT_TEAM: QG5N3R59QB
+        INFOPLIST_FILE: Sources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.cove.ios
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleName: Cove
+        CFBundleDisplayName: Cove
+        UILaunchStoryboardName: LaunchScreen
+        NSLocalNetworkUsageDescription: Cove needs to access your local network to discover and control your devices
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            localhost:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+        NSBonjourServices:
+          - _http._tcp
+          - _bonjour._tcp
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default Configuration
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+
+  Components:
+    type: framework
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Sources/Components
+    dependencies:
+      - target: Models
+    settings:
+      base:
+        DEVELOPMENT_TEAM: QG5N3R59QB
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.cove.ios.components
+
+  Models:
+    type: framework
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Sources/Models
+    settings:
+      base:
+        DEVELOPMENT_TEAM: QG5N3R59QB
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.cove.ios.models

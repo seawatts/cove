@@ -275,20 +275,37 @@ impl WiFiProtocol {
             // Create a task for each service type
             let mut handles = Vec::new();
             let browse_handles = self.browse_handles.read().await;
+
             for (service_type, browse_handle) in browse_handles.iter() {
                 let device_tx = device_tx.clone();
                 let service_type = service_type.clone();
                 let browse_handle = browse_handle.clone();
 
                 let handle = tokio::spawn(async move {
+                    let mut consecutive_errors = 0;
                     loop {
                         match browse_handle.recv_async().await {
                             Ok(event) => {
+                                // Reset error counter on successful event
+                                consecutive_errors = 0;
                                 Self::handle_mdns_event(event, &service_type, &device_tx).await;
                             }
                             Err(e) => {
                                 error!("mDNS receive error for {}: {}", service_type, e);
-                                break; // Break on error to allow service restart
+                                consecutive_errors += 1;
+
+                                // If we've had too many consecutive errors, break to allow service restart
+                                if consecutive_errors >= 3 {
+                                    error!(
+                                        "Too many consecutive errors for {}, restarting service",
+                                        service_type
+                                    );
+                                    break;
+                                }
+
+                                // Exponential backoff for retries
+                                let delay = Duration::from_secs(2u64.pow(consecutive_errors));
+                                tokio::time::sleep(delay).await;
                             }
                         }
                     }
@@ -312,21 +329,27 @@ impl WiFiProtocol {
             // Mark all devices as offline since we lost connectivity
             let _ = device_tx.send(DeviceEvent::NetworkOffline);
 
-            // Wait before trying to restart
-            info!("Network connectivity issue detected, waiting before restart...");
-            tokio::time::sleep(Duration::from_secs(5)).await;
-
-            // Try to recreate the mDNS service
-            match Self::create_mdns_service() {
-                Ok(new_service) => {
-                    info!("Successfully recreated mDNS service");
-                    *self.browse_handles.write().await =
-                        new_service.browse_handles.write().await.clone();
-                }
-                Err(e) => {
-                    error!("Failed to recreate mDNS service: {:?}", e);
-                    tokio::time::sleep(Duration::from_secs(5)).await;
-                    continue;
+            // Wait before trying to restart with exponential backoff
+            let mut retry_count = 0;
+            loop {
+                info!(
+                    "Attempting to recreate mDNS service (attempt {})",
+                    retry_count + 1
+                );
+                match Self::create_mdns_service() {
+                    Ok(new_service) => {
+                        info!("Successfully recreated mDNS service");
+                        *self.browse_handles.write().await =
+                            new_service.browse_handles.write().await.clone();
+                        break;
+                    }
+                    Err(e) => {
+                        error!("Failed to recreate mDNS service: {:?}", e);
+                        retry_count += 1;
+                        let delay = Duration::from_secs(2u64.pow(retry_count.min(6)));
+                        info!("Waiting {:?} before next retry...", delay);
+                        tokio::time::sleep(delay).await;
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ pub mod error;
 
 use miette::Result;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::broadcast;
 use tracing::{error, info};
 
@@ -42,13 +43,13 @@ impl DeviceDiscovery {
         let protocols: Vec<Arc<dyn DeviceProtocol>> = vec![
             WiFiProtocol::get_instance(),
             BluetoothProtocol::get_instance(),
-            Arc::new(
-                UsbProtocol::new(event_manager.clone()).expect("Failed to initialize UsbProtocol"),
-            ),
-            Arc::new(
-                MqttProtocol::new(event_manager.clone())
-                    .expect("Failed to initialize MqttProtocol"),
-            ),
+            // Arc::new(
+            //     UsbProtocol::new(event_manager.clone()).expect("Failed to initialize UsbProtocol"),
+            // ),
+            // Arc::new(
+            //     MqttProtocol::new(event_manager.clone())
+            //         .expect("Failed to initialize MqttProtocol"),
+            // ),
         ];
 
         Self {
@@ -79,9 +80,30 @@ impl DeviceDiscovery {
     pub async fn start_continuous_discovery(&self) -> Result<()> {
         info!("Starting device discovery...");
 
-        // Start all protocol monitoring
+        // Start all protocol monitoring with retry logic
         for protocol in &self.protocols {
-            Self::start_protocol(protocol.clone(), self.device_events.clone()).await;
+            let protocol_clone = protocol.clone();
+            let device_events = self.device_events.clone();
+            let protocol_name = protocol.protocol_name().to_string();
+
+            tokio::spawn(async move {
+                loop {
+                    info!("Starting {} protocol discovery...", protocol_name);
+                    match protocol_clone.start_discovery(device_events.clone()).await {
+                        Ok(_) => {
+                            info!("{} protocol discovery started successfully", protocol_name);
+                            // If start_discovery returns Ok, it means the protocol has its own retry logic
+                            break;
+                        }
+                        Err(e) => {
+                            error!("{} protocol discovery error: {:?}", protocol_name, e);
+                            // Wait before retrying
+                            tokio::time::sleep(Duration::from_secs(5)).await;
+                            continue;
+                        }
+                    }
+                }
+            });
         }
 
         // Process device events
