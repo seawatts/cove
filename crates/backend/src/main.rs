@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     // Start the API server
     let api = Api::new(
         device_registry.clone(),
-        SocketAddr::from(([127, 0, 0, 1], 4000)),
+        SocketAddr::from(([0, 0, 0, 0], 4000)),
     );
     let api_handle = tokio::spawn(async move {
         if let Err(e) = api.start().await {
