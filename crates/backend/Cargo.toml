@@ -37,6 +37,7 @@ once_cell = "1.20.3"
 # Protocol Support
 rumqttc = "0.24.0"        # MQTT client for IoT communication
 reqwest = { version = "0.12.12", features = ["json", "stream"] }  # HTTP client with streaming support
+hostname = "0.3.1"        # System hostname detection
 
 # Device Discovery
 mdns-sd = "0.13.2"        # mDNS/DNS-SD discovery (Apple HomeKit, Google Cast)

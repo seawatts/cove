@@ -1,77 +1,99 @@
 import SwiftUI
 import Models
+import Foundation
 
 public struct MemberAvatar: View {
-    public let member: HouseholdMember
+    let member: HouseholdMember
+    let size: CGFloat
 
-    public init(member: HouseholdMember) {
+    private var initials: String {
+        let components = member.name.components(separatedBy: .whitespacesAndNewlines)
+        if components.count > 1 {
+            return String(components[0].prefix(1) + components[1].prefix(1))
+        }
+        return String(member.name.prefix(1))
+    }
+
+    private var backgroundColor: Color {
+        // Use status color with reduced opacity for background when no image
+        member.status.color.opacity(0.15)
+    }
+
+    public init(member: HouseholdMember, size: CGFloat = 60) {
         self.member = member
+        self.size = size
     }
 
     public var body: some View {
         VStack(spacing: 4) {
-            ZStack(alignment: .topTrailing) {
-                // Avatar Background
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(uiColor: .tertiarySystemBackground))
-                    .frame(width: 60, height: 60)
-                    .overlay(
-                        // Avatar Image or Placeholder
-                        Group {
-                            if let avatarUrl = member.avatarUrl,
-                               let url = URL(string: avatarUrl) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                            } else {
-                                Image(systemName: "person.fill")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    )
+            ZStack {
+                Circle()
+                    .fill(backgroundColor)
+                    .frame(width: size, height: size)
 
-                // Status Indicator
-                ZStack {
-                    Circle()
-                        .fill(Color(uiColor: .systemBackground))
-                        .frame(width: 24, height: 24)
-
-                    Circle()
-                        .fill(Color(uiColor: .tertiarySystemBackground))
-                        .frame(width: 22, height: 22)
-
-                    Image(systemName: member.status.icon)
-                        .font(.system(size: 12))
-                        .foregroundColor(.primary)
+                if let avatarUrl = member.avatarUrl {
+                    AsyncImage(url: avatarUrl) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Text(initials)
+                            .font(.system(size: size * 0.4, weight: .medium))
+                            .foregroundColor(member.status.color)
+                    }
+                    .frame(width: size - 8, height: size - 8)
+                    .clipShape(Circle())
+                } else {
+                    Text(initials)
+                        .font(.system(size: size * 0.4, weight: .medium))
+                        .foregroundColor(member.status.color)
                 }
-                .offset(x: 4, y: -4)
+
+                Circle()
+                    .fill(member.status.color)
+                    .frame(width: size / 4, height: size / 4)
+                    .overlay(
+                        Circle()
+                            .stroke(Color(uiColor: .systemBackground), lineWidth: 2)
+                    )
+                    .offset(x: size / 3, y: size / 3)
             }
 
             Text(member.name)
-                .font(.subheadline)
-                .foregroundColor(.primary)
+                .font(.caption)
                 .lineLimit(1)
         }
     }
 }
 
 #Preview {
-    let mockMember = HouseholdMember(
-        id: "1",
-        name: "John",
-        avatarUrl: nil,
-        status: .home
-    )
+    HStack(spacing: 20) {
+        MemberAvatar(
+            member: HouseholdMember(
+                id: "1",
+                name: "John Smith",
+                avatarUrl: nil,
+                status: .home
+            )
+        )
 
-    return VStack {
-        MemberAvatar(member: mockMember)
-        MemberAvatar(member: mockMember)
-            .preferredColorScheme(.dark)
+        MemberAvatar(
+            member: HouseholdMember(
+                id: "2",
+                name: "Sarah Jane",
+                avatarUrl: URL(string: "https://example.com/avatar.jpg"),
+                status: .away
+            )
+        )
+
+        MemberAvatar(
+            member: HouseholdMember(
+                id: "3",
+                name: "Alex",
+                avatarUrl: nil,
+                status: .work
+            )
+        )
     }
     .padding()
 }

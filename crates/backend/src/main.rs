@@ -42,10 +42,16 @@ async fn main() -> Result<()> {
     let device_discovery = DeviceDiscovery::new(device_registry.clone(), event_manager.clone());
 
     // Start the API server
-    let api = Api::new(
-        device_registry.clone(),
-        SocketAddr::from(([0, 0, 0, 0], 4000)),
-    );
+    let addr = SocketAddr::from(([0, 0, 0, 0], 4000));
+    let mut api = Api::new(device_registry.clone(), addr);
+
+    // Start mDNS service advertisement if enabled
+    if let Some(adv_config) = &configs.system.system.service_advertisement {
+        if adv_config.enabled {
+            api.start_mdns_advertisement(adv_config)?;
+        }
+    }
+
     let api_handle = tokio::spawn(async move {
         if let Err(e) = api.start().await {
             error!("API server error: {}", e);

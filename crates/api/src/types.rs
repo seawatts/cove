@@ -50,6 +50,7 @@ pub struct DeviceCapabilities {
     pub can_motion: bool,
     pub can_occupancy: bool,
     pub can_battery: bool,
+    pub can_energy_monitoring: bool,
 }
 
 impl Default for DeviceCapabilities {
@@ -66,6 +67,7 @@ impl Default for DeviceCapabilities {
             can_motion: false,
             can_occupancy: false,
             can_battery: false,
+            can_energy_monitoring: false,
         }
     }
 }

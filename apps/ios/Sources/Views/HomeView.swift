@@ -1,6 +1,7 @@
 import SwiftUI
 import Models
 import Components
+import MapKit
 
 struct HomeView: View {
     // Make mock data internal instead of private
@@ -9,25 +10,41 @@ struct HomeView: View {
             id: "1",
             name: "John",
             avatarUrl: nil,
-            status: HouseholdMember.Status.home
+            status: HouseholdMember.Status.home,
+            location: HouseholdMember.Location(
+                latitude: 37.7749,
+                longitude: -122.4194,
+                address: "123 Main St, San Francisco, CA"
+            )
         ),
         HouseholdMember(
             id: "2",
             name: "Sarah",
             avatarUrl: nil,
-            status: HouseholdMember.Status.work
+            status: HouseholdMember.Status.work,
+            location: HouseholdMember.Location(
+                latitude: 37.7833,
+                longitude: -122.4167,
+                address: "456 Market St, San Francisco, CA"
+            )
         ),
         HouseholdMember(
             id: "3",
             name: "Kids",
             avatarUrl: nil,
-            status: HouseholdMember.Status.sleeping
+            status: HouseholdMember.Status.sleeping,
+            location: HouseholdMember.Location(
+                latitude: 37.7694,
+                longitude: -122.4862,
+                address: "789 School Ave, San Francisco, CA"
+            )
         ),
         HouseholdMember(
             id: "4",
             name: "Guest",
             avatarUrl: nil,
-            status: HouseholdMember.Status.away
+            status: HouseholdMember.Status.away,
+            location: nil
         )
     ]
 
@@ -54,7 +71,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: false
+                canVolume: false,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",
@@ -82,7 +100,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: false
+                canVolume: false,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",
@@ -110,7 +129,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: false
+                canVolume: false,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",
@@ -138,7 +158,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: true
+                canVolume: true,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",
@@ -166,7 +187,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: false
+                canVolume: false,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",
@@ -194,7 +216,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: true,
                 canToggle: false,
-                canVolume: false
+                canVolume: false,
+                canEnergyMonitoring: true
             ),
             networkInfo: nil,
             created: "",
@@ -222,7 +245,8 @@ struct HomeView: View {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: true
+                canVolume: true,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",
@@ -241,55 +265,99 @@ struct HomeView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Household Members
-                HouseholdMembers(members: mockMembers)
-                    .padding(.horizontal)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Analytics Link
+                    if !mockDevices.isEmpty {
+                        NavigationLink(destination: HomeAnalyticsView(devices: mockDevices)) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Analytics")
+                                        .font(.title2)
+                                        .fontWeight(.bold)
 
-                // Cameras Section
-                if !cameras.isEmpty {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Cameras")
+                                    Text("View home-wide analytics and insights")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "chart.xyaxis.line")
+                                    .font(.title2)
+                            }
+                            .padding()
+                            .background(Color(uiColor: .secondarySystemBackground))
+                            .cornerRadius(16)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.horizontal)
+                    }
+
+                    // Household Members
+                    VStack(alignment: .leading) {
+                        Text("Household")
                             .font(.title2)
                             .fontWeight(.bold)
                             .padding(.horizontal)
 
-                        LazyVGrid(
-                            columns: [
-                                GridItem(.adaptive(minimum: 300, maximum: 500), spacing: 16)
-                            ],
-                            spacing: 16
-                        ) {
-                            ForEach(cameras) { camera in
-                                CameraFeedCard(device: camera)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                ForEach(mockMembers) { member in
+                                    NavigationLink(destination: PersonDetailView(member: member)) {
+                                        MemberAvatar(member: member)
+                                    }
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
-                }
 
-                // Rooms
-                LazyVGrid(
-                    columns: [
-                        GridItem(.adaptive(minimum: 300, maximum: 500), spacing: 16)
-                    ],
-                    spacing: 16
-                ) {
-                    ForEach(Array(devicesByRoom.keys.sorted()), id: \.self) { room in
-                        if let roomDevices = devicesByRoom[room] {
-                            NavigationLink(destination: RoomDetailView(room: room, devices: roomDevices)) {
-                                RoomOverviewCard(room: room, devices: roomDevices)
+                    // Cameras Section
+                    if !cameras.isEmpty {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Cameras")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .padding(.horizontal)
+
+                            LazyVGrid(
+                                columns: [
+                                    GridItem(.adaptive(minimum: 300, maximum: .infinity), spacing: 16)
+                                ],
+                                spacing: 16
+                            ) {
+                                ForEach(cameras) { camera in
+                                    CameraFeedCard(device: camera)
+                                }
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .padding(.horizontal)
                         }
                     }
+
+                    // Rooms
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.adaptive(minimum: 300, maximum: .infinity), spacing: 16)
+                        ],
+                        spacing: 16
+                    ) {
+                        ForEach(Array(devicesByRoom.keys.sorted()), id: \.self) { room in
+                            if let roomDevices = devicesByRoom[room] {
+                                NavigationLink(destination: RoomDetailView(room: room, devices: roomDevices)) {
+                                    RoomOverviewCard(room: room, devices: roomDevices)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
             }
+            .navigationTitle("Home")
+            .background(Color(uiColor: .systemBackground))
         }
-        .navigationTitle("Home")
-        .background(Color(uiColor: .systemBackground))
     }
 }
 
@@ -462,6 +530,106 @@ struct DevicePreviewCard: View {
             return "Open · 100%"
         }
         return device.status
+    }
+}
+
+struct PersonDetailView: View {
+    let member: HouseholdMember
+    @State private var region: MKCoordinateRegion
+
+    init(member: HouseholdMember) {
+        self.member = member
+        if let location = member.location {
+            _region = State(initialValue: MKCoordinateRegion(
+                center: CLLocationCoordinate2D(
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                ),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            ))
+        } else {
+            _region = State(initialValue: MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            ))
+        }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                // Header
+                HStack(spacing: 20) {
+                    Circle()
+                        .fill(Color(uiColor: .secondarySystemBackground))
+                        .frame(width: 80, height: 80)
+                        .overlay(
+                            Text(member.name.prefix(1))
+                                .font(.title)
+                                .foregroundColor(.primary)
+                        )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(member.name)
+                            .font(.title)
+                            .fontWeight(.bold)
+
+                        HStack {
+                            Circle()
+                                .fill(statusColor)
+                                .frame(width: 10, height: 10)
+                            Text(member.status.rawValue.capitalized)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(uiColor: .secondarySystemBackground))
+                .cornerRadius(16)
+
+                // Location Section
+                if let location = member.location {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Location")
+                            .font(.title2)
+                            .fontWeight(.bold)
+
+                        Text(location.address)
+                            .foregroundColor(.secondary)
+
+                        Map(coordinateRegion: $region, annotationItems: [member]) { member in
+                            MapMarker(coordinate: CLLocationCoordinate2D(
+                                latitude: location.latitude,
+                                longitude: location.longitude
+                            ))
+                        }
+                        .frame(height: 300)
+                        .cornerRadius(16)
+                    }
+                    .padding()
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .cornerRadius(16)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color(uiColor: .systemBackground))
+    }
+
+    private var statusColor: Color {
+        switch member.status {
+        case .home:
+            return .green
+        case .away:
+            return .orange
+        case .work:
+            return .blue
+        case .sleeping:
+            return .purple
+        }
     }
 }
 

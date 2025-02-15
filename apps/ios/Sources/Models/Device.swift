@@ -56,8 +56,22 @@ public struct Device: Identifiable, Codable {
         public let canTemperature: Bool
         public let canToggle: Bool
         public let canVolume: Bool
+        public let canEnergyMonitoring: Bool
 
-        public init(canBattery: Bool, canColor: Bool, canDim: Bool, canHumidity: Bool, canMotion: Bool, canOccupancy: Bool, canPlay: Bool, canPower: Bool, canTemperature: Bool, canToggle: Bool, canVolume: Bool) {
+        public init(
+            canBattery: Bool,
+            canColor: Bool,
+            canDim: Bool,
+            canHumidity: Bool,
+            canMotion: Bool,
+            canOccupancy: Bool,
+            canPlay: Bool,
+            canPower: Bool,
+            canTemperature: Bool,
+            canToggle: Bool,
+            canVolume: Bool,
+            canEnergyMonitoring: Bool = false
+        ) {
             self.canBattery = canBattery
             self.canColor = canColor
             self.canDim = canDim
@@ -69,6 +83,7 @@ public struct Device: Identifiable, Codable {
             self.canTemperature = canTemperature
             self.canToggle = canToggle
             self.canVolume = canVolume
+            self.canEnergyMonitoring = canEnergyMonitoring
         }
     }
 
@@ -131,4 +146,80 @@ public struct Device: Identifiable, Codable {
         case created
         case updated
     }
+}
+
+// MARK: - Preview Helpers
+extension Device {
+    public static var samples: [Device] = [
+        Device(
+            id: "light-1",
+            friendlyName: "Living Room Light",
+            status: "online",
+            protocolName: "zigbee",
+            type: "light",
+            description: "Smart Light Bulb",
+            categories: ["lighting"],
+            location: Location(room: "Living Room", floor: "Ground", zone: "Main"),
+            lastOnline: ISO8601DateFormatter().string(from: Date()),
+            metadata: Metadata(
+                iconUrl: nil,
+                manufacturer: "Philips",
+                model: "Hue",
+                firmwareVersion: "1.0.0",
+                hardwareVersion: "1.0"
+            ),
+            capabilities: Capabilities(
+                canBattery: false,
+                canColor: true,
+                canDim: true,
+                canHumidity: false,
+                canMotion: false,
+                canOccupancy: false,
+                canPlay: false,
+                canPower: true,
+                canTemperature: false,
+                canToggle: true,
+                canVolume: false,
+                canEnergyMonitoring: true
+            ),
+            networkInfo: nil,
+            created: ISO8601DateFormatter().string(from: Date().addingTimeInterval(-86400)),
+            updated: ISO8601DateFormatter().string(from: Date())
+        ),
+        Device(
+            id: "sensor-1",
+            friendlyName: "Bedroom Sensor",
+            status: "online",
+            protocolName: "zigbee",
+            type: "sensor",
+            description: "Motion and Temperature Sensor",
+            categories: ["sensor"],
+            location: Location(room: "Bedroom", floor: "First", zone: "Main"),
+            lastOnline: ISO8601DateFormatter().string(from: Date()),
+            metadata: Metadata(
+                iconUrl: nil,
+                manufacturer: "Aqara",
+                model: "RTCGQ11LM",
+                firmwareVersion: "1.0.0",
+                hardwareVersion: "1.0"
+            ),
+            capabilities: Capabilities(
+                canBattery: true,
+                canColor: false,
+                canDim: false,
+                canHumidity: false,
+                canMotion: true,
+                canOccupancy: true,
+                canPlay: false,
+                canPower: false,
+                canTemperature: true,
+                canToggle: false,
+                canVolume: false,
+                canEnergyMonitoring: false
+            ),
+            networkInfo: nil,
+            created: ISO8601DateFormatter().string(from: Date().addingTimeInterval(-86400)),
+            updated: ISO8601DateFormatter().string(from: Date())
+        )
+    ]
 }

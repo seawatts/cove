@@ -17,15 +17,31 @@ use miette::{Report, Result};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashMap,
     path::{Path, PathBuf},
     sync::Arc,
 };
 use tokio::fs;
 use tracing::{error, info};
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct ServiceAdvertisementConfig {
+    pub enabled: bool,
+    pub service_type: String,
+    pub txt_records: Option<HashMap<String, String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+pub struct SystemConfig {
+    pub name: String,
+    pub host: String,
+    pub port: u16,
+    pub service_advertisement: Option<ServiceAdvertisementConfig>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
 pub struct Config {
-    pub system: System,
+    pub system: SystemConfig,
     pub logging: Logging,
     pub discovery: Discovery,
 }

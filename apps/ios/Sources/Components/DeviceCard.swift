@@ -231,7 +231,8 @@ public struct FlowLayout: Layout {
                 canPower: true,
                 canTemperature: false,
                 canToggle: true,
-                canVolume: false
+                canVolume: false,
+                canEnergyMonitoring: false
             ),
             networkInfo: nil,
             created: "",

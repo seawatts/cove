@@ -48,9 +48,43 @@ struct RoomDetailView: View {
         devices.filter { $0.type.lowercased() != "camera" }
     }
 
+    private var hasAnalytics: Bool {
+        devices.contains { device in
+            device.capabilities.canTemperature ||
+            device.capabilities.canHumidity ||
+            device.capabilities.canEnergyMonitoring ||
+            device.capabilities.canMotion ||
+            device.capabilities.canOccupancy
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                // Room Header with Analytics Link
+                HStack {
+                    HStack(spacing: 12) {
+                        Image(systemName: roomIcon)
+                            .font(.title2)
+                        Text(room)
+                            .font(.title)
+                            .fontWeight(.bold)
+                    }
+
+                    Spacer()
+
+                    if hasAnalytics {
+                        NavigationLink(destination: RoomAnalyticsView(room: room, devices: devices)) {
+                            Label("Analytics", systemImage: "chart.xyaxis.line")
+                                .font(.headline)
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(uiColor: .secondarySystemBackground))
+                .cornerRadius(16)
+
                 // Room Header
                 HStack {
                     HStack(spacing: 12) {
@@ -86,7 +120,7 @@ struct RoomDetailView: View {
                     }
                 }
 
-                // Cameras Section (if any)
+                // Cameras Section
                 if !cameras.isEmpty {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Cameras")
@@ -140,7 +174,10 @@ struct RoomDetailView: View {
                             GridItem(.flexible())
                         ], spacing: 16) {
                             ForEach(otherDevices) { device in
-                                DeviceControlCard(device: device)
+                                NavigationLink(destination: DeviceDetailView(device: device)) {
+                                    DeviceCard(device: device)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                     }
@@ -267,27 +304,28 @@ struct DeviceControlCard: View {
             devices: [
                 Device(
                     id: "1",
-                    friendlyName: "Floor Lamp",
-                    status: "On",
+                    friendlyName: "Temperature Sensor",
+                    status: "Online",
                     protocolName: "zigbee",
-                    type: "Light",
-                    description: "Floor lamp",
-                    categories: ["Light"],
+                    type: "Sensor",
+                    description: "Room sensor",
+                    categories: ["Sensor"],
                     location: Device.Location(room: "Living Room", floor: "Ground", zone: nil),
                     lastOnline: nil,
                     metadata: Device.Metadata(iconUrl: nil, manufacturer: nil, model: nil, firmwareVersion: nil, hardwareVersion: nil),
                     capabilities: Device.Capabilities(
-                        canBattery: false,
+                        canBattery: true,
                         canColor: false,
-                        canDim: true,
-                        canHumidity: false,
-                        canMotion: false,
-                        canOccupancy: false,
+                        canDim: false,
+                        canHumidity: true,
+                        canMotion: true,
+                        canOccupancy: true,
                         canPlay: false,
                         canPower: true,
-                        canTemperature: false,
-                        canToggle: true,
-                        canVolume: false
+                        canTemperature: true,
+                        canToggle: false,
+                        canVolume: false,
+                        canEnergyMonitoring: false
                     ),
                     networkInfo: nil,
                     created: "",

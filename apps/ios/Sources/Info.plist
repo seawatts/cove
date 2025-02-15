@@ -42,6 +42,8 @@
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Cove needs to access your local network to discover and control your devices</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Cove needs notifications to alert you about important device events and status changes</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
