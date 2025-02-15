@@ -7,6 +7,12 @@ system:
   name: "Cove Home Automation"
   host: "0.0.0.0"  # Listen on all interfaces
   port: 4000
+  service_advertisement:
+    enabled: true
+    service_type: "_cove._tcp.local."
+    txt_records:
+      type: "home_automation"
+      version: "1.0"
 
 # Device Discovery Configuration
 discovery:

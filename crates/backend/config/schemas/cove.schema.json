@@ -15,7 +15,7 @@
       "$ref": "#/definitions/Logging"
     },
     "system": {
-      "$ref": "#/definitions/System"
+      "$ref": "#/definitions/SystemConfig"
     }
   },
   "definitions": {
@@ -96,15 +96,58 @@
         }
       }
     },
-    "System": {
-      "description": "Main configuration structure for the Cove system",
+    "ServiceAdvertisementConfig": {
       "type": "object",
       "required": [
-        "name"
+        "enabled",
+        "service_type"
       ],
       "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "service_type": {
+          "type": "string"
+        },
+        "txt_records": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SystemConfig": {
+      "type": "object",
+      "required": [
+        "host",
+        "name",
+        "port"
+      ],
+      "properties": {
+        "host": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "format": "uint16",
+          "minimum": 0.0
+        },
+        "service_advertisement": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ServiceAdvertisementConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     }
