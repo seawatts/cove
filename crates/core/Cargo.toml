@@ -15,3 +15,6 @@ logging = { path = "../logging" }
 integrations = { path = "../integrations" }
 api = { path = "../api" }
 types = { path = "../types" }
+discovery = { path = "../discovery" }
+registry = { path = "../registry" }
+bus = { path = "../bus" }

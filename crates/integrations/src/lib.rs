@@ -1,6 +1,5 @@
 use async_trait::async_trait;
 use miette::Result;
-use std::sync::Arc;
 use tokio::sync::Mutex;
 use types::system_service::{Service, ServiceHandle};
 
@@ -11,9 +10,7 @@ pub trait Integration: Send + Sync {
     fn stop(&self) -> Result<()>;
 }
 
-pub struct IntegrationConfig {
-    name: String,
-}
+pub struct IntegrationConfig {}
 
 pub struct IntegrationService {
     integrations: Mutex<Vec<Box<dyn Integration>>>,
@@ -29,7 +26,7 @@ impl IntegrationService {
     }
 
     pub async fn load_integrations(&self) -> Result<()> {
-        let mut integrations = self.integrations.lock().await;
+        // let mut integrations = self.integrations.lock().await;
         // TODO: Implement integration loading
         Ok(())
     }
@@ -42,8 +39,24 @@ impl Service for IntegrationService {
     }
 
     async fn run(&self) -> Result<()> {
-        // TODO: Implement discovery logic
-        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+        let total_duration = tokio::time::Duration::from_secs(5);
+        let sleep_interval = tokio::time::Duration::from_millis(100);
+        let start_time = tokio::time::Instant::now();
+        loop {
+            if start_time.elapsed() >= total_duration {
+                break;
+            }
+            tokio::select! {
+                _ = tokio::time::sleep(sleep_interval) => {},
+                _ = self.handle.wait_for_cancel() => {
+                    return Ok(());
+                }
+            }
+        }
+        Ok(())
+    }
+
+    async fn cleanup(&self) -> Result<()> {
         Ok(())
     }
 

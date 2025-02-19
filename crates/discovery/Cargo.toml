@@ -10,47 +10,39 @@ tokio = { workspace = true }
 tokio-stream = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
+async-trait = { workspace = true }
 
 # Serialization
-serde = { version = "1.0.217", features = ["derive"] }  # Serialization framework
-serde_json = "1.0.138"     # JSON serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
 serde_yaml = "0.9.34"      # YAML serialization for config files
 quick-xml = { version = "0.37.2", features = ["serialize"] }  # XML parsing for SSDP/UPnP
-schemars = "0.8.21"
-jsonschema = "0.29.0"
 
 # Error Handling and Logging
-thiserror = "2.0.11"
-tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }  # Logging configuration
-tracing-error = "0.2.1"
-tracing-appender = "0.2.3"  # File appender for tracing
-miette = { version = "7.5.0", features = ["fancy"] }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+miette = { workspace = true }
 
 # Utilities
 chrono = { version = "0.4.39", features = ["serde"] }  # Date and time utilities
-async-trait = "0.1.86"     # Async trait support
 strum = "0.27.1"          # Enum utilities and string conversion
 strum_macros = "0.27.1"   # Enum derive macros
-once_cell = "1.20.3"
 
 # Protocol Support
-rumqttc = "0.24.0"        # MQTT client for IoT communication
-reqwest = { version = "0.12.12", features = ["json", "stream"] }  # HTTP client with streaming support
-
-# Device Discovery
 mdns-sd = "0.13.2"        # mDNS/DNS-SD discovery (Apple HomeKit, Google Cast)
 ssdp-client = "2.0.0"     # SSDP/UPnP discovery (Philips Hue, Smart TVs)
 btleplug = "0.11.7"       # Bluetooth LE scanning (Smart locks, sensors)
 zeroconf = "0.15.0"       # ZeroConf/Bonjour services (Network device discovery)
-rusb = "0.9.4"
+rusb = "0.9.4"            # USB device discovery
 
 # Web Server
 axum = "0.8.1"
-rspc = { version = "0.4.1" }
-rspc-axum = { version = "0.3.0", features = ["ws"] }
 specta = { version = "2.0.0-rc.22", features = ["chrono"] }
 
-async-stream = "0.3.6"
-validator = "0.20.0"
-tower-http = { version = "0.6.2", features = ["cors"] }
+# Internal Dependencies
+types = { path = "../types" }
+bus = { path = "../bus" }
+
+[lib]
+name = "discovery"
+path = "src/lib.rs"
