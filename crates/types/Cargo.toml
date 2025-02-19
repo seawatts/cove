@@ -1,0 +1,25 @@
+[package]
+name = "types"
+version = "0.1.0"
+edition = "2021"
+description = "Cove - A lightweight, type-safe home automation system"
+
+[dependencies]
+# Async Runtime and Utilities
+tokio = { workspace = true}
+tokio-stream = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+miette = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+
+# Utilities
+strum = "0.27.1"          # Enum utilities and string conversion
+strum_macros = "0.27.1"   # Enum derive macros
+
+[lib]
+name = "types"
+path = "src/lib.rs"

@@ -32,9 +32,8 @@
       "dependsOn": ["^topo", "^build"],
       "outputs": [
         "node_modules/.cache/tsbuildinfo.json",
-        "target/debug/.fingerprint/**",
-        "target/debug/deps/**",
-        "target/debug/incremental/**"
+        "target/**",
+        "**/target/**"
       ]
     },
     "clean": {

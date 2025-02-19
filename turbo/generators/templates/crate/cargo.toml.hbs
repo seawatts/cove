@@ -1,0 +1,12 @@
+[package]
+name = "{{ name }}"
+version = "0.1.0"
+edition = "2021"
+description = "{{ description }}"
+
+[dependencies]
+tracing = { workspace = true }
+miette = { workspace = true }
+tokio = { workspace = true }
+
+# Workspace dependencies will be added here by the generator

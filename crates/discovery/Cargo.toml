@@ -6,10 +6,10 @@ description = "Cove - A lightweight, type-safe home automation system"
 
 [dependencies]
 # Async Runtime and Utilities
-tokio = { version = "1.43.0", features = ["full"] }  # Async runtime and utilities
-tokio-stream = "0.1.17"    # Async stream utilities
-futures = "0.3.31"         # Async utilities and combinators
-futures-util = "0.3.31"    # Additional async utilities
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
 
 # Serialization
 serde = { version = "1.0.217", features = ["derive"] }  # Serialization framework
@@ -30,8 +30,8 @@ miette = { version = "7.5.0", features = ["fancy"] }
 # Utilities
 chrono = { version = "0.4.39", features = ["serde"] }  # Date and time utilities
 async-trait = "0.1.86"     # Async trait support
-strum = "0.27.0"          # Enum utilities and string conversion
-strum_macros = "0.27.0"   # Enum derive macros
+strum = "0.27.1"          # Enum utilities and string conversion
+strum_macros = "0.27.1"   # Enum derive macros
 once_cell = "1.20.3"
 
 # Protocol Support
@@ -46,7 +46,7 @@ zeroconf = "0.15.0"       # ZeroConf/Bonjour services (Network device discovery)
 rusb = "0.9.4"
 
 # Web Server
-axum = "0.7.0"
+axum = "0.8.1"
 rspc = { version = "0.4.1" }
 rspc-axum = { version = "0.3.0", features = ["ws"] }
 specta = { version = "2.0.0-rc.22", features = ["chrono"] }
