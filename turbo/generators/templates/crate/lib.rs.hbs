@@ -1,0 +1,23 @@
+//! {{ description }}
+//!
+//! This module is part of the Cove home automation platform.
+
+use miette::Result;
+use tracing::info;
+
+/// Initialize the module
+pub async fn init() -> Result<()> {
+    info!("Initializing {{ name }} module");
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_init() -> Result<()> {
+        init().await?;
+        Ok(())
+    }
+}

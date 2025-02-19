@@ -4,7 +4,7 @@
     "@acme/validators": "workspace:*",
     "@rspc/client": "0.3.1",
     "@rspc/react-query": "0.3.1",
-    "@tanstack/react-query": "5.66.0",
+    "@tanstack/react-query": "5.66.5",
     "@trpc/client": "next",
     "@trpc/react-query": "next",
     "@trpc/server": "next",
@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
     "typescript": "5.7.3"
   },
   "exports": {
