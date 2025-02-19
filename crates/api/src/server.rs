@@ -1,6 +1,5 @@
 use axum::{routing::get, Router as AxumRouter};
 use miette::{Diagnostic, Report, Result};
-use owo_colors::OwoColorize;
 use std::net::SocketAddr;
 use thiserror::Error;
 use tokio::net::TcpListener;
@@ -25,7 +24,7 @@ impl Api {
 
     pub async fn start(&self, addr: SocketAddr) -> Result<()> {
         // Create the rspc router
-        let (router, _) = router::new().build().unwrap();
+        let (_, _) = router::new().build().unwrap();
         // let registry = self.registry.clone();
 
         // Configure CORS

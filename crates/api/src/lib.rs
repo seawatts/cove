@@ -1,5 +1,4 @@
 use std::net::SocketAddr;
-use std::sync::Arc;
 
 use async_trait::async_trait;
 use miette::Result;
@@ -32,14 +31,25 @@ impl ApiService {
 impl Service for ApiService {
     async fn run(&self) -> Result<()> {
         let port = find_available_port(4000).await?;
-        if let Err(e) = self.api.start(SocketAddr::from(([0, 0, 0, 0], port))).await {
-            error!("API server error: {}", e);
+        let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
+        let start_future = self.api.start(addr);
+        tokio::pin!(start_future);
+        tokio::select! {
+            res = &mut start_future => {
+                if let Err(e) = res {
+                    error!("API server error: {}", e);
+                }
+            },
+            _ = self.handle.wait_for_cancel() => {
+                self.api.stop().await?;
+            }
         }
         Ok(())
     }
 
     async fn cleanup(&self) -> Result<()> {
-        self.api.stop().await
+        self.api.stop().await?;
+        Ok(())
     }
 
     fn handle(&self) -> Option<&ServiceHandle> {

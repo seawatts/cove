@@ -1,8 +1,7 @@
 use miette::{set_hook, GraphicalReportHandler, IntoDiagnostic, Result};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
-    filter::LevelFilter, fmt::format::FmtSpan, layer::SubscriberExt, util::SubscriberInitExt,
-    Layer, Registry,
+    filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt, Layer, Registry,
 };
 
 pub fn setup_logging() -> Result<()> {

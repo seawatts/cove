@@ -1,23 +1,16 @@
 [package]
-name = "registry"
+name = "bus"
 version = "0.1.0"
 edition = "2021"
 description = "Cove - A lightweight, type-safe home automation system"
 
 [dependencies]
-# Async Runtime and Utilities
 tokio = { workspace = true }
-tokio-stream = { workspace = true }
-futures = { workspace = true }
-futures-util = { workspace = true }
-async-trait = { workspace = true }
 miette = { workspace = true }
 tracing = { workspace = true }
-
-# Internal Dependencies
+async-trait = { workspace = true }
 types = { path = "../types" }
-bus = { path = "../bus" }
 
 [lib]
-name = "registry"
+name = "bus"
 path = "src/lib.rs"

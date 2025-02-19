@@ -6,30 +6,30 @@ members = [
 ]
 
 [workspace.dependencies]
-
 # Async Runtime and Utilities
-tokio = { version = "1.43.0", features = ["full"] }  # Async runtime and utilities
-tokio-stream = "0.1.17"    # Async stream utilities
-futures = "0.3.31"         # Async utilities and combinators
-futures-util = "0.3.31"    # Additional async utilities
-async-trait = "0.1.86"     # Async trait support
+tokio = { version = "1.43.0", features = ["full"] }
+tokio-stream = "0.1.17"
+futures = "0.3.31"
+futures-util = "0.3.31"
+async-trait = "0.1.86"
 
-# Logging
+# Serialization
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.138"
+
+# Error Handling and Logging
+thiserror = "2.0.11"
 tracing = "0.1.41"
 miette = { version = "7.5.0", features = ["fancy"] }
 owo-colors = "4.1.0"
 
-# Error Handling
-thiserror = "2.0.11"
+# Utilities
+chrono = { version = "0.4.39", features = ["serde"] }
 
-# Serialization
-serde = "1.0.217"
-serde_json = "1.0.138"
-
-# [workspace.lints.clippy]
-# all = { level = "warn", priority = -1 }
-# cargo = { level = "warn", priority = -1 }
-# unwrap_used = { level = "warn", priority = -1 }
-# panic = { level = "warn", priority = -1 }
-# todo = { level = "warn", priority = -1 }
-# panic_in_result_fn = { level = "warn", priority = -1 }
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+unwrap_used = { level = "warn", priority = -1 }
+panic = { level = "warn", priority = -1 }
+todo = { level = "warn", priority = -1 }
+panic_in_result_fn = { level = "warn", priority = -1 }

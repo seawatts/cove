@@ -1,86 +1,100 @@
-// pub mod api;
-// pub mod config;
-// pub mod device;
-// pub mod discovery;
-// pub mod error;
-// pub mod events;
-// pub mod logging;
-// pub mod protocol;
-// pub mod types;
+// use crate::discovery::DeviceDiscovery;
+// use crate::events::EventManager;
+use async_trait::async_trait;
+use bus::EventBus;
+use miette::Result;
+use std::sync::Arc;
+use types::{
+    // events::BusEvent,
+    system_service::{Service, ServiceHandle},
+};
 
-// use miette::Result;
-// use std::{net::SocketAddr, sync::Arc};
-// use tokio::signal;
-// use tracing::{error, info};
+pub struct DiscoveryService {
+    event_bus: Arc<EventBus>,
+    // device_discovery: Arc<DeviceDiscovery>,
+    handle: ServiceHandle,
+}
 
-// use crate::{api::Api, device::DeviceRegistry, discovery::DeviceDiscovery};
-// use events::{EventManager, EventProcessor};
+impl DiscoveryService {
+    pub fn new(event_bus: Arc<EventBus>) -> Self {
+        // let event_manager = Arc::new(EventManager::new());
+        // let device_discovery = Arc::new(DeviceDiscovery::new(event_manager.clone()));
 
-// #[tokio::main]
-// async fn main() -> Result<()> {
-//     logging::setup_tracing()?;
-//     logging::setup_miette()?;
+        Self {
+            event_bus,
+            // device_discovery,
+            handle: ServiceHandle::new(),
+        }
+    }
 
-//     // Generate schemas
-//     config::Config::generate_schema().await?;
-//     info!("✅ Schema generation completed");
+    async fn handle_device_events(&self) -> Result<()> {
+        // let mut rx = self.device_discovery.subscribe_device_events();
 
-//     // Load all configurations
-//     info!("Loading configurations...");
-//     let configs = config::LoadedConfigs::load_all().await?;
+        // while let Ok(event) = rx.recv().await {
+        //     match event {
+        //         BusEvent::DeviceUpdated(device) => {
+        //             self.event_bus.publish(BusEvent::DeviceDiscovered {
+        //                 id: device.id.clone(),
+        //                 device_type: device.r#type.clone(),
+        //                 metadata: device
+        //                     .raw_details
+        //                     .as_object()
+        //                     .map(|obj| {
+        //                         obj.iter()
+        //                             .map(|(k, v)| (k.clone(), v.to_string()))
+        //                             .collect()
+        //                     })
+        //                     .unwrap_or_default(),
+        //             })?;
+        //         } // crate::types::DeviceEvent::DeviceRemoved(id) => {
+        //           //     self.event_bus
+        //           //         .publish(BusEvent::DeviceRemoved { id: id.clone() })?;
+        //           // }
+        //           // crate::types::DeviceEvent::NetworkOffline => {
+        //           // Handle network offline event if needed
+        //           // }
+        //     }
+        // }
 
-//     // Validate all configurations
-//     info!("Validating configurations...");
-//     configs.validate().await?;
-//     info!("✅ All configurations loaded and validated");
+        Ok(())
+    }
+}
 
-//     info!("Starting Cove home automation system...");
+#[async_trait]
+impl Service for DiscoveryService {
+    async fn init(&self) -> Result<()> {
+        Ok(())
+    }
 
-//     // Initialize components
-//     let device_registry = Arc::new(DeviceRegistry::new());
-//     let event_manager = Arc::new(EventManager::new());
-//     let device_discovery = DeviceDiscovery::new(device_registry.clone(), event_manager.clone());
+    async fn run(&self) -> Result<()> {
+        // Start device discovery in the background
+        // let discovery = self.device_discovery.clone();
+        // tokio::spawn(async move {
+        //     if let Err(e) = discovery.start_continuous_discovery().await {
+        //         tracing::error!("Device discovery error: {:?}", e);
+        //     }
+        // });
 
-//     // Start the API server
-//     let api = Api::new(
-//         device_registry.clone(),
-//         SocketAddr::from(([127, 0, 0, 1], 4000)),
-//     );
-//     let api_handle = tokio::spawn(async move {
-//         if let Err(e) = api.start().await {
-//             error!("API server error: {}", e);
-//         }
-//     });
+        // Handle device events and publish to event bus
+        self.handle_device_events().await?;
+        Ok(())
+    }
 
-//     // Initialize event processor
-//     let mut event_processor: EventProcessor = EventProcessor::new(
-//         device_registry.clone(),
-//         event_manager.subscribe_high_priority(),
-//         event_manager.subscribe_normal_priority(),
-//         event_manager.subscribe_low_priority(),
-//     );
+    async fn cleanup(&self) -> Result<()> {
+        Ok(())
+    }
 
-//     // Start discovery and event processing
-//     tokio::select! {
-//         _ = device_discovery.start_continuous_discovery() => {
-//             info!("Device discovery completed");
-//         }
-//         _ = event_processor.start() => {
-//             info!("Event processor completed");
-//         }
-//     }
+    fn handle(&self) -> Option<&ServiceHandle> {
+        Some(&self.handle)
+    }
+}
 
-//     // Wait for shutdown signal
-//     match signal::ctrl_c().await {
-//         Ok(()) => {
-//             info!("Shutdown signal received, stopping services...");
-//             api_handle.abort();
-//             info!("Services stopped");
-//         }
-//         Err(err) => {
-//             error!("Unable to listen for shutdown signal: {}", err);
-//         }
-//     }
-
-//     Ok(())
-// }
+impl Clone for DiscoveryService {
+    fn clone(&self) -> Self {
+        Self {
+            event_bus: self.event_bus.clone(),
+            // device_discovery: self.device_discovery.clone(),
+            handle: ServiceHandle::new(),
+        }
+    }
+}
