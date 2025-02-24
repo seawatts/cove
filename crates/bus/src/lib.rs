@@ -58,19 +58,14 @@ impl Service for EventBus {
     }
 
     async fn run(&self) -> Result<()> {
+        // Keep the service alive with a simple heartbeat
         loop {
-            tokio::select! {
-                _ = tokio::time::sleep(Duration::from_millis(100)) => {},
-                _ = self.handle.wait_for_cancel() => {
-                    break;
-                }
-            }
+            sleep(Duration::from_millis(100)).await;
         }
-        Ok(())
     }
 
     async fn cleanup(&self) -> Result<()> {
-        // Clear the keep-alive receiver
+        // Clear the keep-alive receiver to allow the channel to close
         *self._keep_alive_rx.lock().await = None;
         Ok(())
     }

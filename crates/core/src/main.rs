@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use bus::EventBus;
-use discovery::DiscoveryService;
+use discovery::service::DiscoveryService;
 use miette::Result;
 use owo_colors::OwoColorize;
 use registry::RegistryService;

@@ -42,16 +42,12 @@ impl Service for IntegrationService {
         let total_duration = tokio::time::Duration::from_secs(5);
         let sleep_interval = tokio::time::Duration::from_millis(100);
         let start_time = tokio::time::Instant::now();
+
         loop {
             if start_time.elapsed() >= total_duration {
                 break;
             }
-            tokio::select! {
-                _ = tokio::time::sleep(sleep_interval) => {},
-                _ = self.handle.wait_for_cancel() => {
-                    return Ok(());
-                }
-            }
+            tokio::time::sleep(sleep_interval).await;
         }
         Ok(())
     }
