@@ -1,12 +1,11 @@
-use crate::error::Error;
-use crate::types::Protocol;
-use miette::{Diagnostic, SourceSpan};
+use miette::{Diagnostic, MietteError, SourceSpan};
 use rusb::Error as UsbError;
 use std::{sync::Arc, time::Duration};
 use thiserror::Error;
 use tracing::error;
+use types::structs::Protocol;
 
-#[derive(Error, Diagnostic, Debug, Clone)]
+#[derive(Error, Diagnostic, Debug)]
 pub enum ProtocolError {
     #[error("Connection failed for {protocol}")]
     #[diagnostic(
@@ -16,7 +15,7 @@ pub enum ProtocolError {
     ConnectionFailed {
         protocol: Protocol,
         #[related]
-        related: Vec<Error>,
+        related: Vec<MietteError>,
     },
 
     #[error("Authentication failed for {protocol}")]
@@ -24,7 +23,7 @@ pub enum ProtocolError {
     AuthenticationFailed {
         protocol: Protocol,
         #[related]
-        related: Vec<Error>,
+        related: Vec<MietteError>,
     },
 
     #[error("Invalid message format for {protocol}")]

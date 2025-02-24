@@ -69,7 +69,7 @@ impl Clone for IntegrationService {
     fn clone(&self) -> Self {
         Self {
             integrations: Mutex::new(vec![]),
-            handle: ServiceHandle::new(),
+            handle: self.handle.clone(),
         }
     }
 }

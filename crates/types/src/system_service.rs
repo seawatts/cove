@@ -62,6 +62,17 @@ pub struct ServiceHandle {
     task_handle: Mutex<Option<JoinHandle<()>>>,
 }
 
+impl Clone for ServiceHandle {
+    fn clone(&self) -> Self {
+        Self {
+            running: self.running.clone(),
+            stopped: self.stopped.clone(),
+            cancel: self.cancel.clone(),
+            task_handle: Mutex::new(None),
+        }
+    }
+}
+
 impl ServiceHandle {
     pub fn new() -> Self {
         Self {

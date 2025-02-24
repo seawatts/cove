@@ -12,16 +12,20 @@ use miette::{Report, Result};
 use once_cell::sync::Lazy;
 use serde_json::json;
 use tokio::sync::{broadcast, RwLock};
-use tracing::{debug, error, info};
-
-use crate::{
-    discovery::{error::DiscoveryError, DeviceProtocol},
-    error::{Error, ProtocolError},
-    types::{
-        BaseDevice, DeviceCapabilities, DeviceCategory, DeviceEvent, DeviceMetadata, DeviceStatus,
-        Location, NetworkInfo, Protocol, WiFiDevice,
-    },
+use tracing::{error, info};
+use types::{
+    devices::{Device, DeviceKind},
+    BusEvent,
 };
+
+use crate::discovery::DeviceProtocol;
+use crate::protocol::error::ProtocolError;
+use bus::EventBus;
+
+#[derive(Debug, Clone)]
+pub struct DiscoveryError {
+    pub message: String,
+}
 
 // Common mDNS service types for various devices
 const MDNS_SERVICE_TYPES: &[&str] = &[
@@ -140,196 +144,176 @@ const MDNS_SERVICE_TYPES: &[&str] = &[
     "_xiaomi._tcp.local.",  // Xiaomi devices
 ];
 
-pub static INSTANCE: Lazy<Arc<WiFiProtocol>> =
-    Lazy::new(|| Arc::new(WiFiProtocol::new().expect("Failed to initialize WiFiProtocol")));
+pub static INSTANCE: Lazy<Arc<WiFiProtocol>> = Lazy::new(|| {
+    let event_bus = Arc::new(EventBus::new());
+    Arc::new(WiFiProtocol::new(event_bus).expect("Failed to initialize WiFiProtocol"))
+});
 
 #[derive(Clone)]
 pub struct WiFiProtocol {
     browse_handles: Arc<RwLock<HashMap<String, Receiver<ServiceEvent>>>>,
+    shutdown: broadcast::Sender<()>,
+    daemon: Arc<ServiceDaemon>,
+    event_bus: Arc<EventBus>,
 }
 
 impl WiFiProtocol {
-    pub fn new() -> Result<Self> {
-        Self::create_mdns_service()
+    pub fn new(event_bus: Arc<EventBus>) -> Result<Self> {
+        let (shutdown_tx, _) = broadcast::channel(1);
+        let daemon = ServiceDaemon::new()
+            .map_err(|e| Report::msg(format!("Failed to create mDNS daemon: {}", e)))?;
+        let daemon = Arc::new(daemon);
+
+        let mut browse_handles = HashMap::new();
+        for &service_type in MDNS_SERVICE_TYPES {
+            match daemon.browse(service_type) {
+                Ok(handle) => {
+                    browse_handles.insert(service_type.to_string(), handle);
+                }
+                Err(e) => {
+                    error!("Failed to browse service type {}: {}", service_type, e);
+                    continue;
+                }
+            }
+        }
+
+        Ok(Self {
+            browse_handles: Arc::new(RwLock::new(browse_handles)),
+            shutdown: shutdown_tx,
+            daemon,
+            event_bus,
+        })
     }
 
     pub fn get_instance() -> Arc<WiFiProtocol> {
         INSTANCE.clone()
     }
 
-    fn create_mdns_service() -> Result<Self> {
-        let daemon = ServiceDaemon::new().map_err(|e| {
-            let err = DiscoveryError::Failed {
-                protocol: Protocol::WiFi,
-                span: (0..1).into(),
-                related: vec![Error::Protocol(ProtocolError::Mdns(Arc::new(e)))],
-            };
-
-            error!("{:?}", Report::new(err.clone()));
-            err
-        })?;
-
-        let mut browse_handles = HashMap::new();
-        for &service_type in MDNS_SERVICE_TYPES {
-            let handle = daemon.browse(service_type).map_err(|e| {
-                let err = DiscoveryError::Failed {
-                    protocol: Protocol::WiFi,
-                    span: (0..1).into(),
-                    related: vec![Error::Protocol(ProtocolError::Mdns(Arc::new(e)))],
-                };
-                error!("{:?}", Report::new(err.clone()));
-                err
-            })?;
-
-            browse_handles.insert(service_type.to_string(), handle);
-        }
-        Ok(Self {
-            browse_handles: Arc::new(RwLock::new(browse_handles)),
-        })
-    }
-
-    async fn handle_mdns_event(
-        event: ServiceEvent,
-        service_type: &str,
-        device_tx: &broadcast::Sender<DeviceEvent>,
-    ) {
+    async fn handle_mdns_event(event: ServiceEvent, service_type: &str, event_bus: &EventBus) {
         match event {
             ServiceEvent::ServiceResolved(info) => {
-                debug!("Resolved service: {:?}", info);
+                info!("Resolved service: {:?}", info);
                 let addresses: HashSet<IpAddr> = info.get_addresses().iter().cloned().collect();
                 let primary_address = addresses.iter().next().cloned();
 
-                let device = WiFiDevice {
-                    base: BaseDevice {
+                info!(
+                    "Publishing DeviceDiscovered event for resolved service: {}",
+                    info.get_fullname()
+                );
+                if let Err(e) = event_bus
+                    .publish(BusEvent::DeviceDiscovered {
                         id: format!("wifi_{}", info.get_fullname()),
-                        r#type: info.get_type().to_string(),
-                        friendly_name: info.get_fullname().to_string(),
-                        description: format!("WiFi device: {}", info.get_fullname()),
-                        protocol: Protocol::WiFi,
-                        status: DeviceStatus::Online,
-                        categories: vec![DeviceCategory::Unknown],
-                        capabilities: DeviceCapabilities::default(),
-                        location: Location {
-                            room: None,
-                            floor: None,
-                            zone: None,
-                        },
-                        metadata: DeviceMetadata {
-                            manufacturer: None,
-                            model: None,
-                            firmware_version: None,
-                            hardware_version: None,
-                            icon_url: None,
-                        },
-                        network_info: Some(NetworkInfo {
-                            addresses: addresses.iter().map(|addr| addr.to_string()).collect(),
-                            primary_address: primary_address.map(|addr| addr.to_string()),
-                            port: Some(info.get_port()),
-                            hostname: Some(info.get_hostname().to_string()),
-                            mac_address: None,
-                        }),
-                        created: Utc::now(),
-                        updated: Utc::now(),
-                        last_online: Some(Utc::now()),
-                        raw_details: json!({
-                            "service_type": service_type,
-                            "fullname": info.get_fullname(),
-                            "hostname": info.get_hostname(),
-                            "port": info.get_port(),
-                            "addresses": addresses,
-                        }),
-                    },
-                    mdns_service_type: service_type.to_string(),
-                    mdns_properties: info
-                        .get_properties()
-                        .iter()
-                        .map(|prop: &TxtProperty| {
-                            (prop.key().to_string(), prop.val_str().to_string())
-                        })
-                        .collect(),
-                };
-
-                let _ = device_tx.send(DeviceEvent::DeviceUpdated(device.into()));
+                        device_type: info.get_type().to_string(),
+                        metadata: info
+                            .get_properties()
+                            .iter()
+                            .map(|prop| (prop.key().to_string(), prop.val_str().to_string()))
+                            .collect(),
+                    })
+                    .await
+                {
+                    error!("Failed to publish DeviceDiscovered event: {}", e);
+                } else {
+                    info!(
+                        "Successfully published DeviceDiscovered event for: {}",
+                        info.get_fullname()
+                    );
+                }
             }
             ServiceEvent::ServiceRemoved(_, fullname) => {
-                debug!("Service removed: {} (type: {})", fullname, service_type);
+                info!("Service removed: {} (type: {})", fullname, service_type);
                 let device_id = format!("wifi_{}", fullname);
-                let _ = device_tx.send(DeviceEvent::DeviceRemoved(device_id));
+                // let _ = device_tx.send(DeviceEvent::DeviceRemoved(device_id));
             }
             ServiceEvent::ServiceFound(_, fullname) => {
-                debug!("Found service: {} (type: {})", fullname, service_type);
+                info!("Found service: {} (type: {})", fullname, service_type);
+                info!(
+                    "Publishing DeviceDiscovered event for found service: {}",
+                    fullname
+                );
+                if let Err(e) = event_bus
+                    .publish(BusEvent::DeviceDiscovered {
+                        id: format!("wifi_{}", fullname),
+                        device_type: service_type.to_string(),
+                        metadata: HashMap::new(),
+                    })
+                    .await
+                {
+                    error!("Failed to publish DeviceDiscovered event: {}", e);
+                } else {
+                    info!(
+                        "Successfully published DeviceDiscovered event for: {}",
+                        fullname
+                    );
+                }
             }
             ServiceEvent::SearchStarted(_) => {
-                debug!("Search started for type: {}", service_type);
+                // info!("Search started for type: {}", service_type);
             }
             ServiceEvent::SearchStopped(_) => {
-                debug!("Search stopped for type: {}", service_type);
+                // info!("Search stopped for type: {}", service_type);
             }
         }
     }
 
-    async fn monitor_mdns(&self, device_tx: broadcast::Sender<DeviceEvent>) {
+    async fn monitor_mdns(&self) {
         info!("Starting WiFi device monitoring...");
+        let mut shutdown_rx = self.shutdown.subscribe();
+        let browse_handles = self.browse_handles.read().await;
 
-        loop {
-            // Create a task for each service type
-            let mut handles = Vec::new();
-            let browse_handles = self.browse_handles.read().await;
-            for (service_type, browse_handle) in browse_handles.iter() {
-                let device_tx = device_tx.clone();
-                let service_type = service_type.clone();
-                let browse_handle = browse_handle.clone();
+        if browse_handles.is_empty() {
+            error!("No mDNS browse handles available");
+            return;
+        }
 
-                let handle = tokio::spawn(async move {
-                    loop {
-                        match browse_handle.recv_async().await {
-                            Ok(event) => {
-                                Self::handle_mdns_event(event, &service_type, &device_tx).await;
-                            }
-                            Err(e) => {
-                                error!("mDNS receive error for {}: {}", service_type, e);
-                                break; // Break on error to allow service restart
+        let mut join_set = tokio::task::JoinSet::new();
+
+        // Start a monitoring task for each service type
+        for (service_type, browse_handle) in browse_handles.iter() {
+            let service_type = service_type.clone();
+            let browse_handle = browse_handle.clone();
+            let mut shutdown = shutdown_rx.resubscribe();
+            let event_bus = self.event_bus.clone();
+
+            join_set.spawn(async move {
+                loop {
+                    tokio::select! {
+                        result = browse_handle.recv_async() => {
+                            match result {
+                                Ok(event) => {
+                                    // info!("Received mDNS event: {:?}", event);
+                                    Self::handle_mdns_event(event, &service_type, &event_bus).await;
+                                }
+                                Err(e) => {
+                                    error!("mDNS receive error for {}: {}", service_type, e);
+                                    break;
+                                }
                             }
                         }
+                        _ = shutdown.recv() => {
+                            info!("Shutting down mDNS monitoring for {}", service_type);
+                            break;
+                        }
                     }
-                });
-
-                handles.push(handle);
-            }
-            drop(browse_handles);
-
-            // Wait for any task to complete (which indicates an error)
-            let (result, _, remaining) = futures::future::select_all(handles).await;
-            if let Err(e) = result {
-                error!("mDNS monitoring task failed: {}", e);
-            }
-
-            // Cleanup remaining tasks
-            for handle in remaining {
-                handle.abort();
-            }
-
-            // Mark all devices as offline since we lost connectivity
-            let _ = device_tx.send(DeviceEvent::NetworkOffline);
-
-            // Wait before trying to restart
-            info!("Network connectivity issue detected, waiting before restart...");
-            tokio::time::sleep(Duration::from_secs(5)).await;
-
-            // Try to recreate the mDNS service
-            match Self::create_mdns_service() {
-                Ok(new_service) => {
-                    info!("Successfully recreated mDNS service");
-                    *self.browse_handles.write().await =
-                        new_service.browse_handles.write().await.clone();
                 }
-                Err(e) => {
-                    error!("Failed to recreate mDNS service: {:?}", e);
-                    tokio::time::sleep(Duration::from_secs(5)).await;
-                    continue;
-                }
+            });
+        }
+        drop(browse_handles);
+
+        // Wait for shutdown signal or all tasks to complete
+        tokio::select! {
+            _ = shutdown_rx.recv() => {
+                info!("Received shutdown signal, stopping WiFi monitoring");
+                join_set.abort_all();
+            }
+            _ = async {
+                while join_set.join_next().await.is_some() {}
+            } => {
+                info!("All mDNS monitoring tasks completed");
             }
         }
+
+        info!("WiFi device monitoring stopped");
     }
 }
 
@@ -343,14 +327,24 @@ impl DeviceProtocol for WiFiProtocol {
         INSTANCE.clone()
     }
 
-    async fn start_discovery(&self, device_events: broadcast::Sender<DeviceEvent>) -> Result<()> {
-        // Start the monitoring in the background
+    async fn start_discovery(&self, _event_bus: EventBus) -> Result<()> {
         tokio::spawn({
             let this = self.clone();
             async move {
-                this.monitor_mdns(device_events).await;
+                this.monitor_mdns().await;
             }
         });
+
+        Ok(())
+    }
+
+    async fn stop_discovery(&self) -> Result<()> {
+        // Send shutdown signal
+        let _ = self.shutdown.send(());
+
+        // Clean up mDNS daemon
+        let mut handles = self.browse_handles.write().await;
+        handles.clear();
 
         Ok(())
     }

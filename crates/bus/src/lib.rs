@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 use miette::Result;
+use std::sync::Arc;
 use tokio::sync::broadcast;
+use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 use types::{
     events::BusEvent,
@@ -10,26 +12,42 @@ use types::{
 pub struct EventBus {
     tx: broadcast::Sender<BusEvent>,
     handle: ServiceHandle,
+    // Keep a receiver alive to prevent channel from closing
+    _keep_alive_rx: Arc<Mutex<Option<broadcast::Receiver<BusEvent>>>>,
 }
 
 impl EventBus {
     pub fn new() -> Self {
-        let (tx, _) = broadcast::channel(100); // Buffer size of 100 events
+        let (tx, rx) = broadcast::channel(1000); // Increase buffer size to 1000 events
         Self {
             tx,
             handle: ServiceHandle::new(),
+            _keep_alive_rx: Arc::new(Mutex::new(Some(rx))),
         }
     }
 
-    pub fn subscribe(&self) -> broadcast::Receiver<BusEvent> {
+    pub async fn subscribe(&self) -> broadcast::Receiver<BusEvent> {
         self.tx.subscribe()
     }
 
-    pub fn publish(&self, event: BusEvent) -> Result<()> {
-        self.tx
-            .send(event)
-            .map_err(|e| miette::miette!("Failed to publish event: {}", e))?;
-        Ok(())
+    pub async fn publish(&self, event: BusEvent) -> Result<()> {
+        match self.tx.send(event.clone()) {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                tracing::warn!("Failed to publish event (channel might be lagging): {}", e);
+                // Try to resubscribe and publish again
+                let _ = self._keep_alive_rx.lock().await.as_mut().map(|rx| {
+                    *rx = self.tx.subscribe();
+                });
+                match self.tx.send(event) {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        tracing::error!("Failed to publish event after resubscribe: {}", e);
+                        Ok(()) // Still don't propagate errors to callers
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -40,15 +58,20 @@ impl Service for EventBus {
     }
 
     async fn run(&self) -> Result<()> {
-        // The ServiceHandle will call this method in a loop while running is true
-        // We just need to yield control back regularly to allow shutdown
-        sleep(Duration::from_millis(100)).await;
+        loop {
+            tokio::select! {
+                _ = tokio::time::sleep(Duration::from_millis(100)) => {},
+                _ = self.handle.wait_for_cancel() => {
+                    break;
+                }
+            }
+        }
         Ok(())
     }
 
     async fn cleanup(&self) -> Result<()> {
-        // The tx will be dropped when the service is dropped
-        // This will automatically close all receivers
+        // Clear the keep-alive receiver
+        *self._keep_alive_rx.lock().await = None;
         Ok(())
     }
 
@@ -61,7 +84,8 @@ impl Clone for EventBus {
     fn clone(&self) -> Self {
         Self {
             tx: self.tx.clone(),
-            handle: ServiceHandle::new(),
+            handle: self.handle.clone(),
+            _keep_alive_rx: self._keep_alive_rx.clone(),
         }
     }
 }

@@ -1,11 +1,10 @@
-use crate::error::Error;
-use crate::types::Protocol;
-use miette::{Diagnostic, SourceSpan};
+use miette::{Diagnostic, MietteError, SourceSpan};
 use std::{sync::Arc, time::Duration};
 use thiserror::Error;
 use tracing::error;
+use types::structs::Protocol;
 
-#[derive(Error, Diagnostic, Debug, Clone)]
+#[derive(Error, Debug, Diagnostic)]
 pub enum DiscoveryError {
     #[error("Failed to discover {protocol} devices")]
     #[diagnostic(
@@ -18,7 +17,7 @@ pub enum DiscoveryError {
         #[label("Error occurred here")]
         span: SourceSpan,
         #[related]
-        related: Vec<Error>,
+        related: Vec<MietteError>,
     },
 
     #[error("Discovery timed out for {protocol} after {duration:?}")]
@@ -41,6 +40,6 @@ pub enum DiscoveryError {
     NoDevicesFound {
         protocol: Option<Protocol>,
         #[related]
-        related: Vec<Error>,
+        related: Vec<MietteError>,
     },
 }
