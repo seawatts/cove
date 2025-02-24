@@ -1,3 +1,6 @@
+use strum_macros::Display;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display)]
 pub enum Protocol {
     Bluetooth,
     Generic,
