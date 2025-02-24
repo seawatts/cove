@@ -33,7 +33,29 @@ pub trait Service: Send + Sync {
             None => return Err(miette!("Service has no handle")),
         };
 
-        handle.start(service).await
+        // Run the service's main task with cancellation support
+        let handle_clone = handle.clone();
+        handle
+            .task_handle
+            .lock()
+            .await
+            .replace(tokio::spawn(async move {
+                tokio::select! {
+                    _ = handle_clone.wait_for_cancel() => {
+                        if let Err(e) = service.cleanup().await {
+                            tracing::error!("Service cleanup failed: {:?}", e);
+                        }
+                    }
+                    result = service.run() => {
+                        if let Err(e) = result {
+                            tracing::error!("Service task error: {:?}", e);
+                        }
+                    }
+                }
+            }));
+
+        handle.running.store(true, Ordering::SeqCst);
+        Ok(())
     }
 
     /// Stop the service

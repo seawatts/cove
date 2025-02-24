@@ -1,16 +1,12 @@
-pub mod error;
-
+use crate::protocol::mdns::MdnsProtocol;
+use async_trait::async_trait;
 use bus::EventBus;
 use miette::Result;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use tracing::{error, info};
-use types::{BusEvent, Device, DeviceKind};
-
-use async_trait::async_trait;
-use std::collections::HashMap;
-
-use crate::protocol::WiFiProtocol;
+use types::{BusEvent, Device, DeviceKind, Service, ServiceHandle};
 
 #[async_trait]
 pub trait DeviceProtocol: Send + Sync + 'static {
@@ -23,27 +19,29 @@ pub trait DeviceProtocol: Send + Sync + 'static {
 }
 
 #[derive(Clone)]
-pub struct DeviceDiscovery {
-    shutdown: broadcast::Sender<()>,
+pub struct DiscoveryService {
     event_bus: Arc<EventBus>,
+    handle: ServiceHandle,
+    shutdown: broadcast::Sender<()>,
     protocols: Vec<Arc<dyn DeviceProtocol>>,
 }
 
-impl DeviceDiscovery {
+impl DiscoveryService {
     pub fn new(event_bus: Arc<EventBus>) -> Self {
         let (shutdown, _) = broadcast::channel(1);
 
         // Initialize all protocols
         let protocols: Vec<Arc<dyn DeviceProtocol>> = vec![
-            WiFiProtocol::get_instance(),
+            MdnsProtocol::get_instance(),
             // BluetoothProtocol::get_instance(),
             // Arc::new(UsbProtocol::get_instance()),
             // Arc::new(MqttProtocol::get_instance()),
         ];
 
         Self {
+            event_bus: event_bus.clone(),
+            handle: ServiceHandle::new(),
             shutdown,
-            event_bus,
             protocols,
         }
     }
@@ -70,33 +68,10 @@ impl DeviceDiscovery {
             id: id.clone(),
             kind: DeviceKind::Other,
             capabilities: vec![],
-            // r#type: device_type,
-            // friendly_name: metadata.get("friendly_name").cloned().unwrap_or_else(|| id),
-            // description: metadata.get("description").cloned().unwrap_or_default(),
-            // protocol: metadata
-            //     .get("protocol")
-            //     .and_then(|p| p.parse().ok())
-            //     .unwrap_or(Protocol::Generic),
-            // status: DeviceStatus::Online,
-            // categories: vec![DeviceCategory::Unknown], // Can be updated based on metadata
-            // capabilities: DeviceCapabilities::default(),
-            // location: Location::default(),
-            // metadata: DeviceMetadata {
-            //     manufacturer: metadata.get("manufacturer").cloned(),
-            //     model: metadata.get("model").cloned(),
-            //     firmware_version: metadata.get("firmware_version").cloned(),
-            //     hardware_version: metadata.get("hardware_version").cloned(),
-            //     icon_url: metadata.get("icon_url").cloned(),
-            // },
-            // network_info: None, // Can be populated if network info is in metadata
-            // created: Utc::now(),
-            // updated: Utc::now(),
-            // last_online: Some(Utc::now()),
-            // raw_details: serde_json::json!(metadata),
         }
     }
 
-    pub async fn start_continuous_discovery(&self) -> Result<()> {
+    async fn start_continuous_discovery(&self) -> Result<()> {
         info!("Starting device discovery...");
 
         // Start all protocol monitoring
@@ -153,5 +128,26 @@ impl DeviceDiscovery {
     // Helper method to publish device removal events
     pub async fn publish_device_removed(&self, id: String) {
         let _ = self.event_bus.publish(BusEvent::DeviceRemoved { id });
+    }
+}
+
+#[async_trait]
+impl Service for DiscoveryService {
+    async fn init(&self) -> Result<()> {
+        Ok(())
+    }
+
+    async fn run(&self) -> Result<()> {
+        // Start device discovery and wait for completion or shutdown
+        self.start_continuous_discovery().await
+    }
+
+    async fn cleanup(&self) -> Result<()> {
+        self.trigger_shutdown();
+        Ok(())
+    }
+
+    fn handle(&self) -> Option<&ServiceHandle> {
+        Some(&self.handle)
     }
 }

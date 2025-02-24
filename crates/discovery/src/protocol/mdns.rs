@@ -12,14 +12,14 @@ use miette::{Report, Result};
 use once_cell::sync::Lazy;
 use serde_json::json;
 use tokio::sync::{broadcast, RwLock};
-use tracing::{error, info};
+use tracing::{debug, error, info};
 use types::{
     devices::{Device, DeviceKind},
     BusEvent,
 };
 
-use crate::discovery::DeviceProtocol;
 use crate::protocol::error::ProtocolError;
+use crate::service::DeviceProtocol;
 use bus::EventBus;
 
 #[derive(Debug, Clone)]
@@ -144,20 +144,20 @@ const MDNS_SERVICE_TYPES: &[&str] = &[
     "_xiaomi._tcp.local.",  // Xiaomi devices
 ];
 
-pub static INSTANCE: Lazy<Arc<WiFiProtocol>> = Lazy::new(|| {
+pub static INSTANCE: Lazy<Arc<MdnsProtocol>> = Lazy::new(|| {
     let event_bus = Arc::new(EventBus::new());
-    Arc::new(WiFiProtocol::new(event_bus).expect("Failed to initialize WiFiProtocol"))
+    Arc::new(MdnsProtocol::new(event_bus).expect("Failed to initialize MdnsProtocol"))
 });
 
 #[derive(Clone)]
-pub struct WiFiProtocol {
+pub struct MdnsProtocol {
     browse_handles: Arc<RwLock<HashMap<String, Receiver<ServiceEvent>>>>,
     shutdown: broadcast::Sender<()>,
     daemon: Arc<ServiceDaemon>,
     event_bus: Arc<EventBus>,
 }
 
-impl WiFiProtocol {
+impl MdnsProtocol {
     pub fn new(event_bus: Arc<EventBus>) -> Result<Self> {
         let (shutdown_tx, _) = broadcast::channel(1);
         let daemon = ServiceDaemon::new()
@@ -185,18 +185,18 @@ impl WiFiProtocol {
         })
     }
 
-    pub fn get_instance() -> Arc<WiFiProtocol> {
+    pub fn get_instance() -> Arc<MdnsProtocol> {
         INSTANCE.clone()
     }
 
     async fn handle_mdns_event(event: ServiceEvent, service_type: &str, event_bus: &EventBus) {
         match event {
             ServiceEvent::ServiceResolved(info) => {
-                info!("Resolved service: {:?}", info);
+                debug!("Resolved service: {:?}", info);
                 let addresses: HashSet<IpAddr> = info.get_addresses().iter().cloned().collect();
                 let primary_address = addresses.iter().next().cloned();
 
-                info!(
+                debug!(
                     "Publishing DeviceDiscovered event for resolved service: {}",
                     info.get_fullname()
                 );
@@ -214,7 +214,7 @@ impl WiFiProtocol {
                 {
                     error!("Failed to publish DeviceDiscovered event: {}", e);
                 } else {
-                    info!(
+                    debug!(
                         "Successfully published DeviceDiscovered event for: {}",
                         info.get_fullname()
                     );
@@ -227,10 +227,6 @@ impl WiFiProtocol {
             }
             ServiceEvent::ServiceFound(_, fullname) => {
                 info!("Found service: {} (type: {})", fullname, service_type);
-                info!(
-                    "Publishing DeviceDiscovered event for found service: {}",
-                    fullname
-                );
                 if let Err(e) = event_bus
                     .publish(BusEvent::DeviceDiscovered {
                         id: format!("wifi_{}", fullname),
@@ -241,7 +237,7 @@ impl WiFiProtocol {
                 {
                     error!("Failed to publish DeviceDiscovered event: {}", e);
                 } else {
-                    info!(
+                    debug!(
                         "Successfully published DeviceDiscovered event for: {}",
                         fullname
                     );
@@ -318,9 +314,9 @@ impl WiFiProtocol {
 }
 
 #[async_trait]
-impl DeviceProtocol for WiFiProtocol {
+impl DeviceProtocol for MdnsProtocol {
     fn protocol_name(&self) -> &'static str {
-        "WiFi"
+        "mDNS"
     }
 
     fn get_instance() -> Arc<Self> {
