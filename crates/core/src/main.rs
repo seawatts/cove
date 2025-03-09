@@ -14,7 +14,7 @@ use types::system_service::Service;
 use api::{self, ApiService};
 use integrations::IntegrationService;
 use logging;
-
+use timeseries::TimeseriesDbService;
 pub struct System {
     integration_service: Arc<IntegrationService>,
     api_service: Arc<ApiService>,
@@ -22,6 +22,7 @@ pub struct System {
     discovery_service: Arc<DiscoveryService>,
     registry_service: Arc<RegistryService>,
     db_service: Arc<DbService>,
+    timeseries_service: Arc<TimeseriesDbService>,
 }
 
 impl System {
@@ -47,6 +48,9 @@ impl System {
         info!("Starting API service...");
         self.api_service.clone().start().await?;
 
+        info!("Starting timeseries service...");
+        self.timeseries_service.clone().start().await?;
+
         Ok(())
     }
 
@@ -70,6 +74,9 @@ impl System {
         info!("Stopping database service...");
         self.db_service.stop().await?;
 
+        info!("Stopping timeseries service...");
+        self.timeseries_service.stop().await?;
+
         Ok(())
     }
 }
@@ -92,8 +99,24 @@ async fn main() -> Result<()> {
     let registry_service = Arc::new(RegistryService::new(event_bus.clone()));
 
     // Configure database path from environment variable or use default
-    let db_path = std::env::var("COVE_DB_PATH").unwrap_or_else(|_| "data/cove.db".to_string());
+    let db_path = std::env::var("COVE_DB_PATH").unwrap_or_else(|_| {
+        // Use the workspace root directory instead of a relative path
+        let workspace_root = std::env::current_dir()
+            .unwrap_or_else(|_| std::path::PathBuf::from("."))
+            .ancestors()
+            .find(|p| p.join("Cargo.toml").exists())
+            .unwrap_or_else(|| std::path::Path::new("."))
+            .to_path_buf();
+
+        workspace_root
+            .join(".data")
+            .join("sqlite")
+            .join("cove.db")
+            .to_string_lossy()
+            .to_string()
+    });
     let db_service = Arc::new(DbService::new(db_path));
+    let timeseries_service = Arc::new(TimeseriesDbService::new());
 
     // Create the system
     let system = Arc::new(System {
@@ -103,6 +126,7 @@ async fn main() -> Result<()> {
         discovery_service,
         registry_service,
         db_service,
+        timeseries_service,
     });
 
     // Start the system
