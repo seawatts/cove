@@ -4,6 +4,11 @@ options:
   deploymentTarget:
     iOS: 17.0
   generateEmptyDirectories: true
+  groupSortPosition: top
+packages:
+  SwiftLint:
+    url: https://github.com/realm/SwiftLint
+    version: 0.54.0
 
 targets:
   Models:
@@ -143,12 +148,16 @@ targets:
             UIWindowSceneSessionRoleApplication:
               - UISceneConfigurationName: Default Configuration
                 UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        NSHomeKitUsageDescription: "Cove needs access to HomeKit to set up and control your smart locks."
+        LSApplicationQueriesSchemes:
+          - homekit
     entitlements:
       path: Sources/Cove.entitlements
       properties:
         com.apple.security.application-groups:
           - group.com.cove.ios
         com.apple.developer.usernotifications.time-sensitive: true
+        com.apple.developer.homekit: true
 
   CoveWidgets:
     type: app-extension
