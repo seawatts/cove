@@ -18,3 +18,4 @@ types = { path = "../types" }
 discovery = { path = "../discovery" }
 registry = { path = "../registry" }
 bus = { path = "../bus" }
+db = { path = "../db" }

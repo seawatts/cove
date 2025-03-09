@@ -4,6 +4,7 @@ use miette::Result;
 use std::sync::Arc;
 use tracing::{error, info};
 use types::{
+    devices,
     events::BusEvent,
     system_service::{Service, ServiceHandle},
 };
@@ -30,7 +31,7 @@ impl RegistryService {
 #[async_trait]
 impl Service for RegistryService {
     async fn init(&self) -> Result<()> {
-        tracing::info!("Registry service initialized");
+        info!("Registry service initialized");
         Ok(())
     }
 
@@ -52,29 +53,56 @@ impl Service for RegistryService {
                                     metadata,
                                 } => {
                                     info!("Device discovered: {}", id);
-                                    // Convert the event into a device and register it
-                                    // let device = types::Device {
-                                    //     id: id.clone(),
-                                    //     r#type: device_type,
-                                    //     friendly_name: metadata
-                                    //         .get("friendly_name")
-                                    //         .cloned()
-                                    //         .unwrap_or_else(|| id.clone()),
-                                    //     description: metadata.get("description").cloned().unwrap_or_default(),
-                                    //     protocol: types::Protocol::Generic, // Set based on metadata
-                                    //     status: types::DeviceStatus::Online,
-                                    //     categories: vec![], // Set based on metadata
-                                    //     capabilities: types::DeviceCapabilities::default(),
-                                    //     location: types::Location::default(),
-                                    //     metadata: types::DeviceMetadata::default(),
-                                    //     network_info: None,
-                                    //     created: chrono::Utc::now(),
-                                    //     updated: chrono::Utc::now(),
-                                    //     last_online: Some(chrono::Utc::now()),
-                                    //     raw_details: serde_json::json!(metadata),
-                                    // };
 
-                                    // self.device_registry.register_device(device).await?;
+                                    // First, save to database
+                                    let db_device = db::Device::new(
+                                        &metadata
+                                            .get("friendly_name")
+                                            .cloned()
+                                            .unwrap_or_else(|| id.clone()),
+                                        match device_type.as_str() {
+                                            "light" => db::DeviceType::Light,
+                                            "switch" => db::DeviceType::Switch,
+                                            "sensor" => db::DeviceType::Sensor,
+                                            "thermostat" => db::DeviceType::Thermostat,
+                                            "camera" => db::DeviceType::Camera,
+                                            _ => db::DeviceType::Other(device_type.clone()),
+                                        }
+                                    )
+                                    .with_capability(db::DeviceCapability::OnOff);
+
+                                    match db::Db::create(db_device) {
+                                        Ok(created_device) => {
+                                            info!("Device registered in database with ID: {}", created_device.id);
+
+                                            // Now register in memory
+                                            let device_kind = match device_type.as_str() {
+                                                "light" => types::devices::DeviceKind::Light,
+                                                "switch" => types::devices::DeviceKind::Switch,
+                                                "sensor" => types::devices::DeviceKind::Sensor,
+                                                "camera" => types::devices::DeviceKind::Camera,
+                                                "climate" => types::devices::DeviceKind::Climate,
+                                                "media" => types::devices::DeviceKind::Media,
+                                                "speaker" => types::devices::DeviceKind::Speaker,
+                                                "display" => types::devices::DeviceKind::Display,
+                                                "security" => types::devices::DeviceKind::Security,
+                                                _ => types::devices::DeviceKind::Other,
+                                            };
+
+                                            let registry_device = types::devices::Device {
+                                                id: id.clone(),
+                                                kind: device_kind,
+                                                capabilities: vec![], // Fill with appropriate capabilities
+                                            };
+
+                                            if let Err(err) = self.device_registry.register_device(registry_device).await {
+                                                error!("Failed to register device in memory: {}", err);
+                                            }
+                                        },
+                                        Err(err) => {
+                                            error!("Failed to register device in database: {}", err);
+                                        }
+                                    }
                                 }
                                 BusEvent::DeviceUpdated { id, metadata } => {
                                     if let Some(mut device) = self.device_registry.get_device(&id).await {

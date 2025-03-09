@@ -17,6 +17,7 @@ tracing = { workspace = true }
 # Internal Dependencies
 types = { path = "../types" }
 bus = { path = "../bus" }
+db = { path = "../db" }
 
 [lib]
 name = "registry"
