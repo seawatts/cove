@@ -19,3 +19,4 @@ discovery = { path = "../discovery" }
 registry = { path = "../registry" }
 bus = { path = "../bus" }
 db = { path = "../db" }
+timeseries = { path = "../timeseries" }
