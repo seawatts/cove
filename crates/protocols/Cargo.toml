@@ -20,23 +20,23 @@ tracing = { workspace = true }
 async-trait = { workspace = true }
 
 # HTTP Client
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.12", features = ["json"] }
 
 # Time
-chrono = { version = "0.4.35", features = ["serde"] }
+chrono = { version = "0.4.40", features = ["serde"] }
 
 # Error Handling
-thiserror = "1.0"
+thiserror = "2.0"
 
 # Utilities
-uuid = { version = "1.7", features = ["v4", "serde"] }
+uuid = { version = "1.15", features = ["v4", "serde"] }
 url = "2.5"
 
 # HomeKit
-hap = "0.1.0"
-ed25519-dalek = "1.0"
-base64 = "0.21"
-rand = "0.8"
+hap = "0.0.10"
+ed25519-dalek = "2.1"
+base64 = "0.22"
+rand = "0.9"
 
 [lib]
 name = "protocols"
