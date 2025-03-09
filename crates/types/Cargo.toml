@@ -16,6 +16,12 @@ miette = { workspace = true }
 tracing = { workspace = true }
 async-trait = { workspace = true }
 
+# Time and Date
+chrono = { version = "0.4.35", features = ["serde"] }
+
+# Type System
+specta = "2.0.0-rc.7"
+
 # Utilities
 strum = "0.27.1"          # Enum utilities and string conversion
 strum_macros = "0.27.1"   # Enum derive macros

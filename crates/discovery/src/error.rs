@@ -2,7 +2,7 @@ use miette::{Diagnostic, MietteError, SourceSpan};
 use std::{sync::Arc, time::Duration};
 use thiserror::Error;
 use tracing::error;
-use types::structs::Protocol;
+use types::protocols::Protocol;
 
 #[derive(Error, Debug, Diagnostic)]
 pub enum DiscoveryError {

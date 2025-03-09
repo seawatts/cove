@@ -3,7 +3,7 @@ use rusb::Error as UsbError;
 use std::{sync::Arc, time::Duration};
 use thiserror::Error;
 use tracing::error;
-use types::structs::Protocol;
+use types::protocols::Protocol;
 
 #[derive(Error, Diagnostic, Debug)]
 pub enum ProtocolError {

@@ -8,11 +8,11 @@
     "@acme/commitlint-config": "workspace:*",
     "@biomejs/biome": "1.9.4",
     "@iarna/toml": "2.2.5",
-    "@turbo/gen": "2.4.2",
-    "lefthook": "1.10.10",
-    "turbo": "2.4.2",
-    "typescript": "5.7.3",
-    "vitest": "3.0.5"
+    "@turbo/gen": "2.4.4",
+    "lefthook": "1.11.3",
+    "turbo": "2.4.4",
+    "typescript": "5.8.2",
+    "vitest": "3.0.8"
   },
   "engines": {
     "node": ">=20.12.0"

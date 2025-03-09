@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use tracing::{error, info};
-use types::{BusEvent, Device, DeviceKind, Service, ServiceHandle};
+use types::{system_service::Service, BusEvent, Device, DeviceKind, ServiceHandle};
 
 #[async_trait]
 pub trait DeviceProtocol: Send + Sync + 'static {
