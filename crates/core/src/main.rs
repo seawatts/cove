@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use bus::EventBus;
+use db::DbService;
 use discovery::service::DiscoveryService;
 use miette::Result;
 use owo_colors::OwoColorize;
@@ -20,11 +21,16 @@ pub struct System {
     event_bus: Arc<EventBus>,
     discovery_service: Arc<DiscoveryService>,
     registry_service: Arc<RegistryService>,
+    db_service: Arc<DbService>,
 }
 
 impl System {
     pub async fn start(&self) -> Result<()> {
-        // Start EventBus first and wait for it to be ready
+        // Start database service first to ensure the database is ready
+        info!("Starting database service...");
+        self.db_service.clone().start().await?;
+
+        // Start EventBus next and wait for it to be ready
         info!("Starting event bus...");
         self.event_bus.clone().start().await?;
 
@@ -61,6 +67,9 @@ impl System {
         info!("Stopping event bus...");
         self.event_bus.stop().await?;
 
+        info!("Stopping database service...");
+        self.db_service.stop().await?;
+
         Ok(())
     }
 }
@@ -76,11 +85,16 @@ async fn main() -> Result<()> {
     info!("   {} {}", "▲ Cove".magenta(), VERSION.magenta());
 
     // Create services
+    let event_bus = Arc::new(EventBus::new());
     let api_service = Arc::new(ApiService::new());
     let integration_service = Arc::new(IntegrationService::new());
-    let event_bus = Arc::new(EventBus::new());
     let discovery_service = Arc::new(DiscoveryService::new(event_bus.clone()));
     let registry_service = Arc::new(RegistryService::new(event_bus.clone()));
+
+    // Configure database path from environment variable or use default
+    let db_path = std::env::var("COVE_DB_PATH").unwrap_or_else(|_| "data/cove.db".to_string());
+    let db_service = Arc::new(DbService::new(db_path));
+
     // Create the system
     let system = Arc::new(System {
         integration_service,
@@ -88,34 +102,19 @@ async fn main() -> Result<()> {
         event_bus,
         discovery_service,
         registry_service,
+        db_service,
     });
 
-    // Clone system for the signal handler
-    let system_for_signal = system.clone();
+    // Start the system
+    system.clone().start().await?;
 
-    // Start the system in a separate task
-    let system_handle = tokio::spawn(async move {
-        if let Err(e) = system.start().await {
-            error!("System error: {}", e);
-        }
-    });
-
-    info!("");
-    info!("   {} Starting...", "✓".green());
-    info!(
-        "   {} Ready in {}ms",
-        "✓".green(),
-        start_time.elapsed().as_millis()
-    );
+    // Wait for signals
+    info!("System running, press Ctrl+C to exit");
 
     // Wait for shutdown signal
     match signal::ctrl_c().await {
         Ok(()) => {
-            system_for_signal.stop().await?;
-            // Wait for the system tasks to complete gracefully
-            if let Err(e) = system_handle.await {
-                error!("Error waiting for system to stop: {}", e);
-            }
+            system.stop().await?;
             std::process::exit(0);
         }
         Err(err) => {
