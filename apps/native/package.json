@@ -2,6 +2,7 @@
   "dependencies": {
     "@radix-ui/react-label": "2.1.2",
     "@radix-ui/react-toast": "1.2.6",
+    "@tanstack/router-plugin": "1.114.2",
     "@tauri-apps/api": "2.3.0",
     "@yudiel/react-qr-scanner": "2.2.1",
     "class-variance-authority": "0.7.1",
