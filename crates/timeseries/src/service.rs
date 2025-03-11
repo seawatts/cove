@@ -7,7 +7,8 @@ use types::system_service::{Service, ServiceHandle};
 use crate::connection::initialize_client;
 use crate::db::QuestDb;
 use crate::model::TimeSeriesModel;
-use crate::models::{DeviceStateReading, SensorReading};
+use crate::models::{DeviceStateReading, LogReading, SensorReading};
+use crate::EventReading;
 
 /// TimeseriesDB service for the Cove system
 pub struct TimeseriesDbService {
@@ -88,6 +89,24 @@ impl Service for TimeseriesDbService {
         )
         .await
         .map_err(|e| miette::miette!("Failed to create device_states table: {}", e))?;
+
+        // Create the logs table using the schema defined in the model
+        db.create_table(
+            LogReading::table_name(),
+            &LogReading::schema().as_slice(),
+            LogReading::timestamp_field(),
+        )
+        .await
+        .map_err(|e| miette::miette!("Failed to create logs table: {}", e))?;
+
+        // Create the events table using the schema defined in the model
+        db.create_table(
+            EventReading::table_name(),
+            &EventReading::schema().as_slice(),
+            EventReading::timestamp_field(),
+        )
+        .await
+        .map_err(|e| miette::miette!("Failed to create events table: {}", e))?;
 
         info!("Timeseries database service initialized");
 

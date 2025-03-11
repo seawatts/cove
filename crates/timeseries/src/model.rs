@@ -5,10 +5,8 @@ use serde::{de::DeserializeOwned, Serialize};
 use std::collections::HashMap;
 use std::time::Duration;
 
-use crate::{
-    error::{TsError, TsResult},
-    types::ColumnType,
-};
+use crate::types::ColumnType;
+use miette::Result;
 
 /// Base trait for time series models
 pub trait TimeSeriesModel: Send + Sync {
@@ -24,10 +22,10 @@ pub trait TimeSeriesModel: Send + Sync {
     fn timestamp(&self) -> DateTime<Utc>;
 
     /// Add this model to a QuestDB buffer
-    fn add_to_buffer(&self, buffer: &mut Buffer) -> TsResult<()>;
+    fn add_to_buffer(&self, buffer: &mut Buffer) -> Result<()>;
 
     /// Create a model from a row of data
-    fn from_row(row: HashMap<String, serde_json::Value>) -> TsResult<Self>
+    fn from_row(row: HashMap<String, serde_json::Value>) -> Result<Self>
     where
         Self: Sized;
 
@@ -223,14 +221,14 @@ impl<T: TimeSeriesModel> TimeSeriesQuery<T> {
 #[async_trait]
 pub trait TimeSeriesDb<T: TimeSeriesModel> {
     /// Create a new time series record
-    async fn create(&self, model: T) -> TsResult<()>;
+    async fn create(&self, model: T) -> Result<()>;
 
     /// Query time series data
-    async fn query(&self, query: TimeSeriesQuery<T>) -> TsResult<Vec<T>>;
+    async fn query(&self, query: TimeSeriesQuery<T>) -> Result<Vec<T>>;
 
     /// Get the latest record
-    async fn latest(&self) -> TsResult<Option<T>>;
+    async fn latest(&self) -> Result<Option<T>>;
 
     /// Delete records by time range
-    async fn delete_range(&self, start: DateTime<Utc>, end: DateTime<Utc>) -> TsResult<usize>;
+    async fn delete_range(&self, start: DateTime<Utc>, end: DateTime<Utc>) -> Result<usize>;
 }

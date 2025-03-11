@@ -1,16 +1,4 @@
 services:
-  mqtt:
-    image: eclipse-mosquitto:2.0
-    ports:
-      - "1883:1883"  # MQTT
-      - "9001:9001"  # WebSocket
-    volumes:
-      - ./.data/mosquitto/config:/mosquitto/config
-      - ./.data/mosquitto/data:/mosquitto/data
-      - ./.data/mosquitto/log:/mosquitto/log
-    networks:
-      - cove-network
-
   questdb:
     image: questdb/questdb:latest
     container_name: cove-questdb
@@ -18,20 +6,9 @@ services:
       - "9000:9000"  # HTTP API and web console
       - "9009:9009"  # InfluxDB line protocol
       - "8812:8812"  # PostgreSQL wire protocol (optional)
-    volumes:
-      - ./.data/questdb:/root/.questdb/db
-    environment:
-      - QDB_TELEMETRY_ENABLED=false  # Disable telemetry
-    restart: unless-stopped
-    networks:
-      - cove-network
-  esphome:
-    image: esphome/esphome:latest
-    container_name: cove-esphome
-    ports:
-      - "6053:6053"
-    volumes:
-      - ./.data/esphome/config:/config
+      - "9003:9003"  # Min health check
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - cove-network
 

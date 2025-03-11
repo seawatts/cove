@@ -1,7 +1,8 @@
+use miette::Diagnostic;
 use thiserror::Error;
 
 /// Timeseries database error types
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Diagnostic)]
 pub enum TsError {
     #[error("QuestDB client error: {0}")]
     QuestDbClient(#[from] questdb::Error),
@@ -33,6 +34,3 @@ pub enum TsError {
     #[error("Invalid data type: {0}")]
     InvalidDataType(String),
 }
-
-/// Result type for timeseries database operations
-pub type TsResult<T> = std::result::Result<T, TsError>;

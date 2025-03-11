@@ -7,6 +7,8 @@ description = "Protocol handlers for Cove home automation system"
 [dependencies]
 # Internal dependencies
 types = { path = "../types" }
+esphome = { path = "../esphome" }
+timeseries = { path = "../timeseries" }
 
 # Async Runtime and Utilities
 tokio = { workspace = true }
@@ -18,6 +20,7 @@ serde_json = { workspace = true }
 miette = { workspace = true }
 tracing = { workspace = true }
 async-trait = { workspace = true }
+thiserror = { workspace = true }
 
 # HTTP Client
 reqwest = { version = "0.12", features = ["json"] }
@@ -25,8 +28,6 @@ reqwest = { version = "0.12", features = ["json"] }
 # Time
 chrono = { version = "0.4.40", features = ["serde"] }
 
-# Error Handling
-thiserror = "2.0"
 
 # Utilities
 uuid = { version = "1.15", features = ["v4", "serde"] }

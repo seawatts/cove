@@ -1,4 +1,6 @@
 use async_trait::async_trait;
+use miette::Result;
+use std::future::Future;
 use tokio::sync::mpsc;
 
 use crate::proto::api::{
@@ -6,7 +8,6 @@ use crate::proto::api::{
     SubscribeLogsResponse,
 };
 use crate::types::{Entity, StateResponse};
-use miette::Result;
 
 /// Core trait defining the ESPHome device API capabilities
 #[async_trait]
@@ -41,7 +42,10 @@ pub trait EntityManagement {
 #[async_trait]
 pub trait StateManagement {
     /// Subscribe to state updates
-    async fn subscribe_states(&mut self) -> Result<mpsc::Receiver<StateResponse>>;
+    async fn subscribe_states<F, Fut>(&mut self, callback: F) -> Result<()>
+    where
+        F: Fn(Entity, StateResponse) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + 'static;
 
     /// Unsubscribe from state updates
     fn unsubscribe_states(&mut self);
