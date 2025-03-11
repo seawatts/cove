@@ -1,6 +1,6 @@
 {
   "license": "MIT",
-  "name": "@acme/db-rs",
+  "name": "@acme/esphome-rs",
   "private": true,
   "scripts": {
     "build": "cargo build",
@@ -13,8 +13,12 @@
     "format:check": "cargo fmt --check",
     "format:fix": "cargo fmt",
     "lint": "cargo clippy -- -D warnings",
-    "test": "cargo test",
+    "test": "cargo test -- --nocapture",
+    "test:apollo": "cargo test test_apollo_air_device -- --nocapture",
     "test:watch": "cargo watch -x test",
+    "test:connection": "cargo run --example connection_test",
+    "test:connection:verbose": "cargo test test_real_device_connection -- --nocapture",
+    "test:logging": "RUST_LOG=debug cargo run --example logging_test",
     "typecheck": "cargo check",
     "with-env": "dotenv -e ../../.env --"
   },

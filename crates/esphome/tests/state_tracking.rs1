@@ -1,0 +1,102 @@
+use esphome::connection::ESPHomeConnection;
+use esphome::ESPHomeClient;
+use esphome::{Connection, EntityState, Result};
+use std::time::Duration;
+use tokio::time::sleep;
+
+// Import the shared test utilities
+mod utils;
+
+/// Test that we can track state changes from an ESPHome device
+#[tokio::test]
+async fn test_state_tracking() -> Result<()> {
+    println!("=== STARTING STATE TRACKING TEST ===");
+
+    // Initialize logging
+    utils::init_logging();
+    println!("Logging initialized");
+
+    // Get device info from environment or defaults
+    let (host, port, password) = match utils::get_real_device_info() {
+        Some(info) => {
+            println!("Got device info: {}:{}", info.0, info.1);
+            info
+        }
+        None => {
+            println!("Skipping state tracking test (no device info available)");
+            return Ok(());
+        }
+    };
+
+    println!(
+        "Starting state tracking test with device at {}:{}",
+        host, port
+    );
+
+    // Create a new ESPHome client
+    let client = ESPHomeClient::new();
+
+    // Add a device with the given hostname and optional password
+    let device_id = client
+        .add_device(host.clone(), Some(port), password.clone())
+        .await?;
+    println!("Added device with ID: {}", device_id);
+
+    // Connect to the device
+    client.connect_device(&device_id).await?;
+    println!("Connected to device");
+
+    // Get device info
+    let info = client.get_device_info(&device_id).await?;
+    println!("Device info: {} ({})", info.name, info.model);
+
+    // Create a direct connection to the device
+    let mut connection =
+        ESPHomeConnection::new(info.address.host.clone(), info.address.port, password);
+
+    // Connect the standalone connection
+    connection.connect().await?;
+    println!("Established direct connection");
+
+    // Register for state tracking
+    let states = connection.register_state_tracking().await?;
+    println!("Registered for state tracking");
+
+    // Subscribe to all states through the client
+    println!("Subscribing to states...");
+    client.subscribe_states(&device_id).await?;
+    println!("Subscribed to states");
+
+    // Wait for state changes to arrive (adjust time as needed)
+    println!("Waiting for state updates (30 seconds)...");
+    sleep(Duration::from_secs(30)).await;
+
+    // Print out all collected states
+    println!("\nCollected states:");
+    {
+        let states_guard = states.read().unwrap();
+        if states_guard.is_empty() {
+            println!("  No states received yet");
+        } else {
+            for (key, state) in states_guard.iter() {
+                match state {
+                    EntityState::Measurement(value) => println!("  Sensor {}: {}", key, value),
+                    EntityState::Binary(value) => println!("  Binary sensor {}: {}", key, value),
+                    EntityState::Text(value) => println!("  Text sensor {}: {}", key, value),
+                    EntityState::Light(light) => println!(
+                        "  Light {}: on={}, brightness={:?}",
+                        key, light.state, light.brightness
+                    ),
+                    _ => println!("  Other entity {}: {:?}", key, state),
+                }
+            }
+        }
+    }
+
+    // Disconnect both connections
+    connection.disconnect().await?;
+    client.disconnect_device(&device_id).await?;
+    println!("Disconnected from device");
+
+    Ok(())
+}

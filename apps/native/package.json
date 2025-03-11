@@ -2,7 +2,7 @@
   "dependencies": {
     "@radix-ui/react-label": "2.1.2",
     "@radix-ui/react-toast": "1.2.6",
-    "@tanstack/router-plugin": "1.114.2",
+    "@tanstack/router-plugin": "1.114.13",
     "@tauri-apps/api": "2.3.0",
     "@yudiel/react-qr-scanner": "2.2.1",
     "class-variance-authority": "0.7.1",
@@ -18,7 +18,7 @@
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "@vitejs/plugin-react": "4.3.4",
-    "autoprefixer": "10.4.20",
+    "autoprefixer": "10.4.21",
     "postcss": "8.5.3",
     "tailwindcss": "4.0.12",
     "typescript": "5.8.2",

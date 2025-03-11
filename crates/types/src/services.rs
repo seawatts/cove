@@ -1,11 +1,10 @@
 use serde::{Deserialize, Serialize};
-use specta::Type;
 use strum_macros::{Display, EnumString};
 
 use crate::characteristics::Characteristic;
 
 /// Represents a service type that an accessory can provide
-#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ServiceType {
     // Lighting
@@ -58,7 +57,7 @@ pub enum ServiceType {
 }
 
 /// Represents a service that an accessory provides
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Service {
     /// Unique identifier for the service
     pub id: String,

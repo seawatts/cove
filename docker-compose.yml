@@ -5,9 +5,9 @@ services:
       - "1883:1883"  # MQTT
       - "9001:9001"  # WebSocket
     volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - ./.data/mosquitto/config:/mosquitto/config
+      - ./.data/mosquitto/data:/mosquitto/data
+      - ./.data/mosquitto/log:/mosquitto/log
     networks:
       - cove-network
 
@@ -23,6 +23,15 @@ services:
     environment:
       - QDB_TELEMETRY_ENABLED=false  # Disable telemetry
     restart: unless-stopped
+    networks:
+      - cove-network
+  esphome:
+    image: esphome/esphome:latest
+    container_name: cove-esphome
+    ports:
+      - "6053:6053"
+    volumes:
+      - ./.data/esphome/config:/config
     networks:
       - cove-network
 

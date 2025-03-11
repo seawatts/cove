@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@tailwindcss/postcss": "4.0.12",
-    "autoprefixer": "10.4.20",
+    "autoprefixer": "10.4.21",
     "cssnano": "7.0.6",
     "postcss": "8.5.3",
     "postcss-focus-visible": "10.0.1",

@@ -1,10 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use specta::Type;
 use strum_macros::{Display, EnumString};
 
 /// Represents the format of a characteristic's value
-#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Format {
     Bool,
@@ -20,7 +19,7 @@ pub enum Format {
 }
 
 /// Represents the unit of measurement for a characteristic
-#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Unit {
     // Temperature
@@ -57,7 +56,7 @@ pub enum Unit {
 }
 
 /// Represents the permissions for a characteristic
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Permissions {
     /// Whether the characteristic can be read
     pub readable: bool,
@@ -80,7 +79,7 @@ impl Default for Permissions {
 }
 
 /// Represents a characteristic type
-#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize, Display, EnumString, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum CharacteristicType {
     // Power
@@ -155,7 +154,7 @@ pub enum CharacteristicType {
 }
 
 /// Represents a characteristic of a service
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Characteristic {
     /// Unique identifier for the characteristic
     pub id: String,
