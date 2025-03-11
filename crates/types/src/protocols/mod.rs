@@ -3,11 +3,10 @@ pub mod traits;
 pub use traits::*;
 
 use serde::{Deserialize, Serialize};
-use specta::Type;
 use strum_macros::{Display, EnumString};
 
 /// Represents the communication protocol used by an accessory
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, Display, EnumString, PartialEq, Type)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Display, EnumString, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Protocol {
     /// Bluetooth Low Energy
@@ -39,7 +38,7 @@ pub enum Protocol {
 }
 
 /// Represents transport-specific connection details
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Transport {
     /// The host/address to connect to
     pub host: Option<String>,

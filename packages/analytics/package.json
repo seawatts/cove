@@ -8,7 +8,7 @@
     "@vercel/analytics": "1.5.0",
     "@vercel/speed-insights": "1.2.0",
     "nextjs-google-analytics": "2.3.7",
-    "posthog-js": "1.229.5",
+    "posthog-js": "1.230.1",
     "posthog-node": "4.10.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",

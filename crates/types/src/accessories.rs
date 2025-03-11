@@ -1,12 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
-use specta::Type;
 
-use crate::characteristics::{Characteristic, CharacteristicType, Format, Permissions, Unit};
 use crate::protocols::Protocol;
 use crate::services::Service;
-use crate::services::ServiceType;
 
 /// Represents a physical device that can provide one or more services
 ///
@@ -92,7 +88,7 @@ use crate::services::ServiceType;
 /// // Add the service to the accessory
 /// light.add_service(lightbulb_service);
 /// ```
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Accessory {
     /// Unique identifier for the accessory
     pub id: String,
@@ -135,7 +131,7 @@ pub struct Accessory {
 }
 
 /// Represents the physical location of an accessory
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Location {
     /// The room where the accessory is located
     pub room: Option<String>,

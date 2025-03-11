@@ -1,0 +1,30 @@
+[package]
+name = "esphome"
+version = "0.1.0"
+edition = "2021"
+description = "Cove - A lightweight, type-safe home automation system"
+
+[dependencies]
+tokio = { workspace = true }
+miette = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+types = { path = "../types" }
+logging = { path = "../logging" }
+prost = "0.13.5"
+prost-types = "0.13.5"
+bytes = "1.10.1"
+tokio-stream = "0.1.17"
+futures = "0.3.31"
+serde = { workspace = true }
+serde_json = { workspace = true }
+tonic = { version = "0.12.3", features = ["tls", "transport", "prost"] }
+tokio-util = { version = "0.7.13", features = ["codec"] }
+
+[build-dependencies]
+tonic-build = { version = "0.12.3", features = ["prost"] }
+
+[lib]
+name = "esphome"
+path = "src/lib.rs"

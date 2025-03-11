@@ -13,5 +13,4 @@ pub use characteristics::*;
 pub use devices::*;
 pub use events::*;
 pub use protocols::*;
-pub use services::*;
 pub use system_service::*;

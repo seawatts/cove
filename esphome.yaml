@@ -1,0 +1,66 @@
+esphome:
+  name: "apollo-air-1-12944c"
+  friendly_name: "Apollo Air 1"
+
+# Define the ESP32 as a separate component
+esp32:
+  board: esp32dev
+
+# Enable logging
+logger:
+  level: INFO
+  baud_rate: 0 # Disable UART logging since we're using Serial
+
+# Enable Home Assistant API - configured for Rust test compatibility
+api:
+  # encryption:
+    # key: "ireLJsLzoslg2sFi3IqJmc72TslXmkRVdlyXh8FHrqE="
+
+
+# # WiFi connection info
+wifi:
+  ssid: "SunsetCity"
+  password: "Buddy98103"
+
+#   # Enable fallback hotspot in case WiFi connection fails
+#   ap:
+#     ssid: "Cove Fallback Hotspot"
+#     password: "covedevice"
+
+# # Enable web server for device status page
+# web_server:
+#   port: 80
+
+# # Define captive portal for easier setup
+# captive_portal:
+
+# Optional components - uncomment and configure as needed
+
+# Example: Status LED
+# gpio:
+#   - pin: GPIO2
+#     output: true
+#     id: status_led_pin
+
+# light:
+#   - platform: binary
+#     name: "Status LED"
+#     output: status_led_pin
+
+# Example: Temperature Sensor (if you have one connected)
+# sensor:
+#   - platform: dht
+#     pin: GPIO15
+#     model: DHT22
+#     temperature:
+#       name: "Room Temperature"
+#     humidity:
+#       name: "Room Humidity"
+#     update_interval: 60s
+
+# Example: Simple Button
+# binary_sensor:
+#   - platform: gpio
+#     pin: GPIO0
+#     name: "Button"
+#     device_class: "button"
