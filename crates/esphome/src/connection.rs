@@ -2,6 +2,8 @@ use async_trait::async_trait;
 use bytes::Bytes;
 use miette::Result;
 use prost::Message;
+use std::future::Future;
+use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
@@ -152,7 +154,11 @@ impl EntityManagement for ESPHomeConnection {
 
 #[async_trait]
 impl StateManagement for ESPHomeConnection {
-    async fn subscribe_states(&mut self) -> Result<mpsc::Receiver<StateResponse>> {
+    async fn subscribe_states<F, Fut>(&mut self, callback: F) -> Result<()>
+    where
+        F: Fn(Entity, StateResponse) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + 'static,
+    {
         if !self.connected {
             return Err(ESPHomeError::ConnectionError("Not connected".into()).into());
         }
@@ -162,10 +168,18 @@ impl StateManagement for ESPHomeConnection {
             .send(MessageType::SubscribeStatesRequest, &request)
             .await?;
 
-        let (tx, rx) = mpsc::channel::<StateResponse>(32);
+        // Register callbacks for all state types
+        let (tx, mut rx) = mpsc::channel::<(Entity, StateResponse)>(32);
         self.register_state_callbacks(&tx).await?;
 
-        Ok(rx)
+        // Spawn a task to handle the state updates
+        tokio::spawn(async move {
+            while let Some((entity, state)) = rx.recv().await {
+                callback(entity, state).await;
+            }
+        });
+
+        Ok(())
     }
 
     fn unsubscribe_states(&mut self) {
@@ -355,7 +369,10 @@ impl ESPHomeConnection {
     }
 
     /// Helper function to register callbacks for state responses
-    async fn register_state_callbacks(&mut self, tx: &mpsc::Sender<StateResponse>) -> Result<()> {
+    async fn register_state_callbacks(
+        &mut self,
+        tx: &mpsc::Sender<(Entity, StateResponse)>,
+    ) -> Result<()> {
         let alarm_control_panel_rx = self
             .protocol
             .register_callback(MessageType::AlarmControlPanelStateResponse)
@@ -440,27 +457,123 @@ impl ESPHomeConnection {
         spawn_state_handler(
             alarm_control_panel_rx,
             tx.clone(),
+            Entity::AlarmControlPanel(Default::default()),
             StateResponse::AlarmControlPanel,
         );
-        spawn_state_handler(binary_sensor_rx, tx.clone(), StateResponse::BinarySensor);
-        spawn_state_handler(climate_rx, tx.clone(), StateResponse::Climate);
-        spawn_state_handler(cover_rx, tx.clone(), StateResponse::Cover);
-        spawn_state_handler(date_rx, tx.clone(), StateResponse::Date);
-        spawn_state_handler(datetime_rx, tx.clone(), StateResponse::DateTime);
-        spawn_state_handler(fan_rx, tx.clone(), StateResponse::Fan);
-        spawn_state_handler(light_rx, tx.clone(), StateResponse::Light);
-        spawn_state_handler(lock_rx, tx.clone(), StateResponse::Lock);
-        spawn_state_handler(media_player_rx, tx.clone(), StateResponse::MediaPlayer);
-        spawn_state_handler(number_rx, tx.clone(), StateResponse::Number);
-        spawn_state_handler(select_rx, tx.clone(), StateResponse::Select);
-        spawn_state_handler(sensor_rx, tx.clone(), StateResponse::Sensor);
-        spawn_state_handler(siren_rx, tx.clone(), StateResponse::Siren);
-        spawn_state_handler(switch_rx, tx.clone(), StateResponse::Switch);
-        spawn_state_handler(text_rx, tx.clone(), StateResponse::Text);
-        spawn_state_handler(text_sensor_rx, tx.clone(), StateResponse::TextSensor);
-        spawn_state_handler(time_rx, tx.clone(), StateResponse::Time);
-        spawn_state_handler(update_rx, tx.clone(), StateResponse::Update);
-        spawn_state_handler(valve_rx, tx.clone(), StateResponse::Valve);
+        spawn_state_handler(
+            binary_sensor_rx,
+            tx.clone(),
+            Entity::BinarySensor(Default::default()),
+            StateResponse::BinarySensor,
+        );
+        spawn_state_handler(
+            climate_rx,
+            tx.clone(),
+            Entity::Climate(Default::default()),
+            StateResponse::Climate,
+        );
+        spawn_state_handler(
+            cover_rx,
+            tx.clone(),
+            Entity::Cover(Default::default()),
+            StateResponse::Cover,
+        );
+        spawn_state_handler(
+            date_rx,
+            tx.clone(),
+            Entity::Date(Default::default()),
+            StateResponse::Date,
+        );
+        spawn_state_handler(
+            datetime_rx,
+            tx.clone(),
+            Entity::DateTime(Default::default()),
+            StateResponse::DateTime,
+        );
+        spawn_state_handler(
+            fan_rx,
+            tx.clone(),
+            Entity::Fan(Default::default()),
+            StateResponse::Fan,
+        );
+        spawn_state_handler(
+            light_rx,
+            tx.clone(),
+            Entity::Light(Default::default()),
+            StateResponse::Light,
+        );
+        spawn_state_handler(
+            lock_rx,
+            tx.clone(),
+            Entity::Lock(Default::default()),
+            StateResponse::Lock,
+        );
+        spawn_state_handler(
+            media_player_rx,
+            tx.clone(),
+            Entity::MediaPlayer(Default::default()),
+            StateResponse::MediaPlayer,
+        );
+        spawn_state_handler(
+            number_rx,
+            tx.clone(),
+            Entity::Number(Default::default()),
+            StateResponse::Number,
+        );
+        spawn_state_handler(
+            select_rx,
+            tx.clone(),
+            Entity::Select(Default::default()),
+            StateResponse::Select,
+        );
+        spawn_state_handler(
+            sensor_rx,
+            tx.clone(),
+            Entity::Sensor(Default::default()),
+            StateResponse::Sensor,
+        );
+        spawn_state_handler(
+            siren_rx,
+            tx.clone(),
+            Entity::Siren(Default::default()),
+            StateResponse::Siren,
+        );
+        spawn_state_handler(
+            switch_rx,
+            tx.clone(),
+            Entity::Switch(Default::default()),
+            StateResponse::Switch,
+        );
+        spawn_state_handler(
+            text_rx,
+            tx.clone(),
+            Entity::Text(Default::default()),
+            StateResponse::Text,
+        );
+        spawn_state_handler(
+            text_sensor_rx,
+            tx.clone(),
+            Entity::TextSensor(Default::default()),
+            StateResponse::TextSensor,
+        );
+        spawn_state_handler(
+            time_rx,
+            tx.clone(),
+            Entity::Time(Default::default()),
+            StateResponse::Time,
+        );
+        spawn_state_handler(
+            update_rx,
+            tx.clone(),
+            Entity::Update(Default::default()),
+            StateResponse::Update,
+        );
+        spawn_state_handler(
+            valve_rx,
+            tx.clone(),
+            Entity::Valve(Default::default()),
+            StateResponse::Valve,
+        );
 
         Ok(())
     }
@@ -579,16 +692,18 @@ fn spawn_entity_handler<T: prost::Message + Default + 'static>(
 }
 
 /// Helper function to spawn a task that handles a specific state type
-fn spawn_state_handler<T: prost::Message + Default + 'static>(
+fn spawn_state_handler<T: prost::Message + Default + 'static, E: Into<Entity> + Clone>(
     rx: mpsc::Receiver<Bytes>,
-    tx: mpsc::Sender<StateResponse>,
+    tx: mpsc::Sender<(Entity, StateResponse)>,
+    entity_type: E,
     mapper: fn(T) -> StateResponse,
 ) -> JoinHandle<()> {
+    let entity = entity_type.into();
     tokio::spawn(async move {
         let mut rx = rx;
         while let Some(data) = rx.recv().await {
             if let Ok(state) = T::decode(data) {
-                let _ = tx.send(mapper(state)).await;
+                let _ = tx.send((entity.clone(), mapper(state))).await;
             }
         }
     })

@@ -3,12 +3,10 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use questdb::ingress::{Buffer, Sender};
 use std::collections::HashMap;
-use std::sync::Arc;
-use std::time::Duration;
 
 use crate::connection::create_sender;
-use crate::error::{TsError, TsResult};
 use crate::model::{Order, TimeSeriesDb, TimeSeriesModel, TimeSeriesQuery};
+use miette::Result;
 
 /// QuestDB client for time series operations
 pub struct QuestDb;
@@ -20,10 +18,7 @@ impl QuestDb {
     }
 
     /// Execute a SQL query directly
-    pub async fn execute_sql(
-        &self,
-        sql: &str,
-    ) -> TsResult<Vec<HashMap<String, serde_json::Value>>> {
+    pub async fn execute_sql(&self, sql: &str) -> Result<Vec<HashMap<String, serde_json::Value>>> {
         // We would need to implement HTTP requests to QuestDB's REST API
         // For example, using reqwest or ureq to make a POST request to:
         // http://localhost:9000/exec?query=SELECT+*+FROM+mytable
@@ -34,14 +29,14 @@ impl QuestDb {
     }
 
     /// Get a buffer for data ingestion
-    pub fn get_buffer() -> TsResult<Buffer> {
+    pub fn get_buffer() -> Result<Buffer> {
         // Create a new buffer directly - this follows the documentation example
         // Buffer is designed to be reused between operations
         Ok(Buffer::new())
     }
 
     /// Get a sender for data ingestion
-    pub fn get_sender() -> TsResult<Sender> {
+    pub fn get_sender() -> Result<Sender> {
         // Create a new sender instance using the connection string
         // This follows the latest QuestDB pattern
         create_sender()
@@ -53,7 +48,7 @@ impl QuestDb {
         table_name: &str,
         schema: &[(&str, ColumnType)],
         timestamp_column: &str,
-    ) -> TsResult<()> {
+    ) -> Result<()> {
         // Build CREATE TABLE SQL
         let sql = self.build_create_table_sql(table_name, schema, timestamp_column);
 
@@ -107,7 +102,7 @@ impl QuestDb {
 
 #[async_trait]
 impl<T: TimeSeriesModel + Send + Sync + 'static> TimeSeriesDb<T> for QuestDb {
-    async fn create(&self, model: T) -> TsResult<()> {
+    async fn create(&self, model: T) -> Result<()> {
         // Create a new mutable sender instance
         let mut sender = create_sender()?;
         // Create a new buffer to add our model
@@ -118,12 +113,12 @@ impl<T: TimeSeriesModel + Send + Sync + 'static> TimeSeriesDb<T> for QuestDb {
 
         // Now we have a mutable sender and can call flush with a mutable buffer
         // This follows the pattern from the QuestDB documentation
-        sender.flush(&mut buffer)?;
+        sender.flush(&mut buffer);
 
         Ok(())
     }
 
-    async fn query(&self, query: TimeSeriesQuery<T>) -> TsResult<Vec<T>> {
+    async fn query(&self, query: TimeSeriesQuery<T>) -> Result<Vec<T>> {
         let sql = query.build_sql();
         let results = self.execute_sql(&sql).await?;
 
@@ -136,14 +131,14 @@ impl<T: TimeSeriesModel + Send + Sync + 'static> TimeSeriesDb<T> for QuestDb {
         Ok(models)
     }
 
-    async fn latest(&self) -> TsResult<Option<T>> {
+    async fn latest(&self) -> Result<Option<T>> {
         let query = TimeSeriesQuery::<T>::new().order(Order::Desc).limit(1);
 
         let results = self.query(query).await?;
         Ok(results.into_iter().next())
     }
 
-    async fn delete_range(&self, start: DateTime<Utc>, end: DateTime<Utc>) -> TsResult<usize> {
+    async fn delete_range(&self, start: DateTime<Utc>, end: DateTime<Utc>) -> Result<usize> {
         // For now, just warn and return 0
         // In a real implementation, we'd need to send a DELETE SQL query via HTTP
         tracing::warn!(

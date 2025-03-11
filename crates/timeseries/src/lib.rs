@@ -11,14 +11,15 @@ mod service;
 mod types;
 
 use chrono::{DateTime, Utc};
+use miette::Result;
 use questdb::ingress::Buffer;
 use questdb::ingress::Sender;
-use questdb::ingress::TimestampNanos;
 
 // Re-export public items
-pub use connection::{create_sender, initialize_client};
+pub use connection::initialize_client;
 pub use db::QuestDb;
-pub use error::{TsError, TsResult};
+pub use error::TsError;
+
 pub use model::{Order, TimeSeriesDb, TimeSeriesModel, TimeSeriesQuery};
 pub use models::*;
 pub use service::TimeseriesDbService;
@@ -28,7 +29,7 @@ pub struct Ts;
 
 impl Ts {
     /// Create a new timeseries record
-    pub async fn create<T: TimeSeriesModel + Send + Sync + 'static>(model: T) -> TsResult<()> {
+    pub async fn create<T: TimeSeriesModel + Send + Sync + 'static>(model: T) -> Result<()> {
         let db = QuestDb::new();
         db.create(model).await
     }
@@ -36,13 +37,13 @@ impl Ts {
     /// Query timeseries data
     pub async fn query<T: TimeSeriesModel + Send + Sync + 'static>(
         query: TimeSeriesQuery<T>,
-    ) -> TsResult<Vec<T>> {
+    ) -> Result<Vec<T>> {
         let db = QuestDb::new();
         db.query(query).await
     }
 
     /// Get the latest record
-    pub async fn latest<T: TimeSeriesModel + Send + Sync + 'static>() -> TsResult<Option<T>> {
+    pub async fn latest<T: TimeSeriesModel + Send + Sync + 'static>() -> Result<Option<T>> {
         let db = QuestDb::new();
         db.latest().await
     }
@@ -51,7 +52,7 @@ impl Ts {
     pub async fn delete_range<T: TimeSeriesModel + Send + Sync + 'static>(
         start: DateTime<Utc>,
         end: DateTime<Utc>,
-    ) -> TsResult<usize> {
+    ) -> Result<usize> {
         // Create a QuestDb instance to access the database
         let db = QuestDb::new();
 
@@ -69,18 +70,18 @@ impl Ts {
     /// Execute a raw SQL query
     pub async fn execute_sql(
         sql: &str,
-    ) -> TsResult<Vec<std::collections::HashMap<String, serde_json::Value>>> {
+    ) -> Result<Vec<std::collections::HashMap<String, serde_json::Value>>> {
         let db = QuestDb::new();
         db.execute_sql(sql).await
     }
 
     /// Get a buffer for manual data entry
-    pub fn get_buffer() -> TsResult<Buffer> {
+    pub fn get_buffer() -> Result<Buffer> {
         QuestDb::get_buffer()
     }
 
     /// Get a sender for manual data entry
-    pub fn get_sender() -> TsResult<Sender> {
+    pub fn get_sender() -> Result<Sender> {
         QuestDb::get_sender()
     }
 }
@@ -92,6 +93,7 @@ mod tests {
 
     use super::*;
     use chrono::Utc;
+    use questdb::ingress::TimestampNanos;
 
     // Example test showcasing how to use the timeseries database
     #[tokio::test]
