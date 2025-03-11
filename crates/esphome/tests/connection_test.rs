@@ -131,13 +131,15 @@ async fn test_subscribe_states() -> Result<()> {
     connection.hello().await?;
     connection.connect().await?;
 
-    let mut states_rx = connection.subscribe_states().await?;
-
+    let mut states_rx = connection
+        .subscribe_states(move |entity, response| {
+            Box::pin(async move {
+                println!("State: {:?}", entity);
+                println!("Response: {:?}", response);
+            })
+        })
+        .await?;
     println!("Subscribed to states");
-
-    while let Some(state) = states_rx.recv().await {
-        println!("State: {:?}", state);
-    }
 
     Ok(())
 }

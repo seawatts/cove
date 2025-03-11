@@ -12,6 +12,7 @@ use tracing::{error, info};
 use types::system_service::Service;
 
 use api::{self, ApiService};
+// use integrations::{esphome::apollo_air::create_apollo_air_1, IntegrationService};
 use integrations::IntegrationService;
 use logging;
 use timeseries::TimeseriesDbService;
@@ -85,7 +86,8 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let start_time = Instant::now();
+    let now = Instant::now();
+    let start_time = now;
     logging::setup_logging()?;
 
     info!("");
@@ -132,6 +134,13 @@ async fn main() -> Result<()> {
     // Start the system
     system.clone().start().await?;
 
+    // let apollo_air_1 = create_apollo_air_1(
+    //     "apollo_air_1".to_string(),
+    //     "10.0.0.84".to_string(),
+    //     6053,
+    //     event_bus.clone(),
+    // );
+    // apollo_air_1.start().await?;
     // Wait for signals
     info!("System running, press Ctrl+C to exit");
 

@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use miette::Result;
 use tokio::sync::Mutex;
 use types::system_service::{Service, ServiceHandle};
+// pub mod esphome;
 
 pub trait Integration: Send + Sync {
     fn name(&self) -> &str;

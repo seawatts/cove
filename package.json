@@ -1,8 +1,6 @@
 {
   "commitlint": {
-    "extends": [
-      "@acme/commitlint-config"
-    ]
+    "extends": ["@acme/commitlint-config"]
   },
   "devDependencies": {
     "@acme/commitlint-config": "workspace:*",
@@ -22,7 +20,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "clean": "git clean -xdf node_modules",
+    "clean": "cargo clean && git clean -xdf node_modules",
     "clean:ws": "turbo run clean",
     "db:gen-migration": "turbo -F @acme/db gen-migration",
     "db:migrate": "turbo -F @acme/db migrate",
@@ -39,7 +37,7 @@
     "postinstall": "pnpm lint:ws",
     "prepare": "npx lefthook install",
     "test": "pnpm with-env vitest",
-    "typecheck": "turbo run typecheck",
+    "typecheck:ws": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
     "with-env": "dotenv -e ./.env --"
   }
