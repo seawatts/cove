@@ -10,9 +10,11 @@ use tokio::net::TcpStream;
 use tokio::sync::{mpsc, oneshot};
 use tokio::task::JoinHandle;
 use tokio_util::codec::{Decoder, Encoder, Framed};
+use tracing::error;
 
 // Import the MessageType enum and helpers from proto.rs
 use crate::proto::MessageType;
+use crate::ESPHomeError;
 
 /// Error types for ESPHome protocol operations
 #[derive(Debug, Error, Diagnostic)]
@@ -39,10 +41,10 @@ pub enum ProtocolError {
     InvalidResponse(String),
 }
 
-impl From<crate::error::Error> for ProtocolError {
-    fn from(err: crate::error::Error) -> Self {
+impl From<ESPHomeError> for ProtocolError {
+    fn from(err: ESPHomeError) -> Self {
         match err {
-            crate::error::Error::InvalidResponse(msg) => Self::InvalidResponse(msg),
+            ESPHomeError::InvalidResponse(msg) => Self::InvalidResponse(msg),
             _ => Self::ProtocolError(err.to_string()),
         }
     }
@@ -484,7 +486,7 @@ impl ESPHomeProtocolClient {
 
                         // Send the frame
                         if let Err(e) = sink.send(frame).await {
-                            eprintln!("Failed to send frame: {}", e);
+                            error!("Failed to send frame: {}", e);
                             break;
                         }
                     }
@@ -523,12 +525,12 @@ impl ESPHomeProtocolClient {
                                         }
                                     } else {
                                         // No callbacks registered for this message type
-                                        eprintln!("Received unhandled message type: {:?}", frame.msg_type);
+                                        error!("Received unhandled message type: {:?}", frame.msg_type);
                                     }
                                 }
                             }
                             Some(Err(e)) => {
-                                eprintln!("Frame error: {}", e);
+                                error!("Frame error: {}", e);
                                 break;
                             }
                             None => {

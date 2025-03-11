@@ -1,9 +1,10 @@
 use esphome::{
     connection::{ESPHomeConnection, ESPHomeConnectionBuilder},
     proto::api::LogLevel,
+    traits::{ESPHomeApi, EntityManagement, LogManagement, StateManagement},
+    types::{ESPHomeConfig, Entity},
 };
 use miette::Result;
-use tokio::time::timeout;
 
 // Import the shared test utilities
 mod utils;
@@ -25,15 +26,21 @@ async fn test_basic_connection() -> Result<()> {
     };
 
     let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
 
     // Try to create a connection - if it fails, show mock device info
-    let mut connection = ESPHomeConnection::new(address.clone(), password.clone()).await?;
+    let mut connection = ESPHomeConnection::new(config).await?;
 
+    connection.hello().await?;
     connection.connect().await?;
 
     println!("Connected to device");
 
-    let device_info = connection.device_info().await;
+    let device_info = connection.device_info().await?;
     println!("Device info: {:?}", device_info);
 
     Ok(())
@@ -49,11 +56,17 @@ async fn test_list_binary_sensors() -> Result<()> {
     };
 
     let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
 
-    let mut connection = ESPHomeConnection::new(address, password).await?;
+    let mut connection = ESPHomeConnection::new(config).await?;
+    connection.hello().await?;
     connection.connect().await?;
 
-    let binary_sensors = connection.list_binary_sensors().await?;
+    let binary_sensors = connection.list_entities().await?;
     println!("Binary sensors: {:?}", binary_sensors);
 
     Ok(())
@@ -70,8 +83,14 @@ async fn test_subscribe_logs() -> Result<()> {
     };
 
     let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
 
-    let mut connection = ESPHomeConnection::new(address, password).await?;
+    let mut connection = ESPHomeConnection::new(config).await?;
+    connection.hello().await?;
     connection.connect().await?;
 
     let mut logs_rx = connection
@@ -91,6 +110,215 @@ async fn test_subscribe_logs() -> Result<()> {
     Ok(())
 }
 
+#[tokio::test]
+async fn test_subscribe_states() -> Result<()> {
+    // Initialize logging
+    utils::init_logging();
+
+    let (host, port, password) = match utils::get_real_device_info() {
+        Some(info) => info,
+        None => return Ok(()),
+    };
+
+    let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
+
+    let mut connection = ESPHomeConnection::new(config).await?;
+    connection.hello().await?;
+    connection.connect().await?;
+
+    let mut states_rx = connection.subscribe_states().await?;
+
+    println!("Subscribed to states");
+
+    while let Some(state) = states_rx.recv().await {
+        println!("State: {:?}", state);
+    }
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_list_entities() -> Result<()> {
+    // Initialize logging
+    utils::init_logging();
+
+    let (host, port, password) = match utils::get_real_device_info() {
+        Some(info) => info,
+        None => return Ok(()),
+    };
+
+    let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
+
+    let mut connection = ESPHomeConnection::new(config).await?;
+    connection.hello().await?;
+    connection.connect().await?;
+
+    let entities = connection.list_entities().await?;
+
+    // Pretty print all entities
+    println!("All Entities (pretty-print):");
+    println!("{:#?}", entities);
+
+    // Print count by entity type
+    let binary_sensors = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::BinarySensor(_)))
+        .count();
+    let sensors = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Sensor(_)))
+        .count();
+    let lights = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Light(_)))
+        .count();
+    let text_sensors = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::TextSensor(_)))
+        .count();
+    let covers = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Cover(_)))
+        .count();
+    let fans = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Fan(_)))
+        .count();
+    let switches = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Switch(_)))
+        .count();
+    let climates = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Climate(_)))
+        .count();
+    let cameras = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Camera(_)))
+        .count();
+    let numbers = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Number(_)))
+        .count();
+    let selects = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Select(_)))
+        .count();
+    let sirens = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Siren(_)))
+        .count();
+    let locks = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Lock(_)))
+        .count();
+    let buttons = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Button(_)))
+        .count();
+    let media_players = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::MediaPlayer(_)))
+        .count();
+    let events = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Event(_)))
+        .count();
+    let alarm_control_panels = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::AlarmControlPanel(_)))
+        .count();
+    let dates = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Date(_)))
+        .count();
+    let datetimes = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::DateTime(_)))
+        .count();
+    let texts = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Text(_)))
+        .count();
+    let times = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Time(_)))
+        .count();
+    let valves = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Valve(_)))
+        .count();
+    let updates = entities
+        .iter()
+        .filter(|e| matches!(e, Entity::Update(_)))
+        .count();
+
+    println!("\nEntity Count Summary:");
+    println!("- Binary Sensors: {}", binary_sensors);
+    println!("- Sensors: {}", sensors);
+    println!("- Lights: {}", lights);
+    println!("- Text Sensors: {}", text_sensors);
+    println!("- Covers: {}", covers);
+    println!("- Fans: {}", fans);
+    println!("- Switches: {}", switches);
+    println!("- Climates: {}", climates);
+    println!("- Cameras: {}", cameras);
+    println!("- Numbers: {}", numbers);
+    println!("- Selects: {}", selects);
+    println!("- Sirens: {}", sirens);
+    println!("- Locks: {}", locks);
+    println!("- Buttons: {}", buttons);
+    println!("- Media Players: {}", media_players);
+    println!("- Events: {}", events);
+    println!("- Alarm Control Panels: {}", alarm_control_panels);
+    println!("- Dates: {}", dates);
+    println!("- DateTimes: {}", datetimes);
+    println!("- Texts: {}", texts);
+    println!("- Times: {}", times);
+    println!("- Valves: {}", valves);
+    println!("- Updates: {}", updates);
+    println!("- Total: {}", entities.len());
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_list_services() -> Result<()> {
+    // Initialize logging
+    utils::init_logging();
+
+    let (host, port, password) = match utils::get_real_device_info() {
+        Some(info) => info,
+        None => return Ok(()),
+    };
+
+    let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
+
+    let mut connection = ESPHomeConnection::new(config).await?;
+    connection.hello().await?;
+    connection.connect().await?;
+
+    // let services = connection.list_services().await?;
+    // println!("Services: {:?}", services);
+
+    Ok(())
+}
+
 /// Test the ESPHomeConnectionBuilder
 ///
 /// This test verifies creating a connection using the builder pattern
@@ -106,13 +334,15 @@ async fn test_connection_builder() -> Result<()> {
     };
 
     let address = format!("{}:{}", host, port);
+    let config = ESPHomeConfig {
+        address,
+        password,
+        timeout: std::time::Duration::from_secs(5),
+    };
 
     // Test building a connection without connecting - this should always work
-    let builder = ESPHomeConnectionBuilder::new(address.clone());
-    let _builder_with_password = match &password {
-        Some(pwd) => builder.password(pwd.clone()),
-        None => builder,
-    };
+    let builder = ESPHomeConnectionBuilder::new();
+    let _builder_with_config = builder.config(config);
 
     Ok(())
 }
@@ -127,7 +357,12 @@ async fn test_connection_errors() -> Result<()> {
 
     // Test connection error with invalid address
     let invalid_address = "127.0.0.1:1234"; // Assuming nothing is running on this port
-    let result = ESPHomeConnection::new(invalid_address, None).await;
+    let config = ESPHomeConfig {
+        address: invalid_address.to_string(),
+        password: None,
+        timeout: std::time::Duration::from_secs(5),
+    };
+    let result = ESPHomeConnection::new(config).await;
 
     match result {
         Ok(_) => {
