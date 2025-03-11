@@ -235,65 +235,33 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
-  crates/api:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/api: {}
 
   crates/bus: {}
 
-  crates/config:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/config: {}
 
-  crates/core:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/core: {}
 
   crates/db: {}
 
-  crates/discovery:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/discovery: {}
 
-  crates/errors:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/errors: {}
 
   crates/esphome: {}
 
   crates/integrations: {}
 
-  crates/logging:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/logging: {}
 
   crates/protocols: {}
 
-  crates/registry:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/registry: {}
 
   crates/timeseries: {}
 
-  crates/types:
-    devDependencies:
-      dotenv-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+  crates/types: {}
 
   packages/analytics:
     dependencies:
