@@ -117,7 +117,7 @@ mod tests {
         let reading = SensorReading {
             ts: Utc::now(),
             device_id: "device_123".to_string(),
-            sensor: "temperature".to_string(),
+            sensor_id: "temperature".to_string(),
             value: 22.5,
             unit: Some("celsius".to_string()),
             room: Some("living_room".to_string()),

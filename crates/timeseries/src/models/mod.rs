@@ -1,3 +1,3 @@
 mod sensor;
 
-pub use sensor::SensorReading;
+pub use sensor::{DeviceStateReading, SensorReading};
