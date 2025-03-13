@@ -5,6 +5,7 @@ use esphome::{
     types::{ESPHomeConfig, Entity},
 };
 use miette::Result;
+use tracing::info;
 
 // Import the shared test utilities
 mod utils;
@@ -97,13 +98,13 @@ async fn test_subscribe_logs() -> Result<()> {
         .subscribe_logs(Some(LogLevel::Debug as i32))
         .await?;
 
-    println!("Subscribed to logs");
+    info!("Subscribed to logs");
 
     while let Some(log) = logs_rx.recv().await {
         // Convert the message bytes to a UTF-8 string
         match String::from_utf8(log.message) {
-            Ok(message) => println!("Log: {}", message),
-            Err(e) => println!("Invalid UTF-8 log message: {:?}", e),
+            Ok(message) => info!("Log: {}", message),
+            Err(e) => info!("Invalid UTF-8 log message: {:?}", e),
         }
     }
 
@@ -134,12 +135,13 @@ async fn test_subscribe_states() -> Result<()> {
     let states_rx = connection
         .subscribe_states(move |entity, response| {
             Box::pin(async move {
-                println!("State: {:?}", entity);
-                println!("Response: {:?}", response);
+                info!("State: {:?}", entity);
+                info!("Response: {:?}", response);
             })
         })
         .await?;
-    println!("Subscribed to states");
+    info!("Subscribed to states");
+    tokio::time::sleep(std::time::Duration::from_secs(30)).await;
 
     Ok(())
 }
@@ -168,8 +170,8 @@ async fn test_list_entities() -> Result<()> {
     let entities = connection.list_entities().await?;
 
     // Pretty print all entities
-    println!("All Entities (pretty-print):");
-    println!("{:#?}", entities);
+    info!("All Entities (pretty-print):");
+    info!("{:#?}", entities);
 
     // Print count by entity type
     let binary_sensors = entities
@@ -265,31 +267,31 @@ async fn test_list_entities() -> Result<()> {
         .filter(|e| matches!(e, Entity::Update(_)))
         .count();
 
-    println!("\nEntity Count Summary:");
-    println!("- Binary Sensors: {}", binary_sensors);
-    println!("- Sensors: {}", sensors);
-    println!("- Lights: {}", lights);
-    println!("- Text Sensors: {}", text_sensors);
-    println!("- Covers: {}", covers);
-    println!("- Fans: {}", fans);
-    println!("- Switches: {}", switches);
-    println!("- Climates: {}", climates);
-    println!("- Cameras: {}", cameras);
-    println!("- Numbers: {}", numbers);
-    println!("- Selects: {}", selects);
-    println!("- Sirens: {}", sirens);
-    println!("- Locks: {}", locks);
-    println!("- Buttons: {}", buttons);
-    println!("- Media Players: {}", media_players);
-    println!("- Events: {}", events);
-    println!("- Alarm Control Panels: {}", alarm_control_panels);
-    println!("- Dates: {}", dates);
-    println!("- DateTimes: {}", datetimes);
-    println!("- Texts: {}", texts);
-    println!("- Times: {}", times);
-    println!("- Valves: {}", valves);
-    println!("- Updates: {}", updates);
-    println!("- Total: {}", entities.len());
+    info!("\nEntity Count Summary:");
+    info!("- Binary Sensors: {}", binary_sensors);
+    info!("- Sensors: {}", sensors);
+    info!("- Lights: {}", lights);
+    info!("- Text Sensors: {}", text_sensors);
+    info!("- Covers: {}", covers);
+    info!("- Fans: {}", fans);
+    info!("- Switches: {}", switches);
+    info!("- Climates: {}", climates);
+    info!("- Cameras: {}", cameras);
+    info!("- Numbers: {}", numbers);
+    info!("- Selects: {}", selects);
+    info!("- Sirens: {}", sirens);
+    info!("- Locks: {}", locks);
+    info!("- Buttons: {}", buttons);
+    info!("- Media Players: {}", media_players);
+    info!("- Events: {}", events);
+    info!("- Alarm Control Panels: {}", alarm_control_panels);
+    info!("- Dates: {}", dates);
+    info!("- DateTimes: {}", datetimes);
+    info!("- Texts: {}", texts);
+    info!("- Times: {}", times);
+    info!("- Valves: {}", valves);
+    info!("- Updates: {}", updates);
+    info!("- Total: {}", entities.len());
 
     Ok(())
 }

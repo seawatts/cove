@@ -1,6 +1,7 @@
 use questdb::ingress::Sender;
 use std::net::{IpAddr, Ipv4Addr};
 use std::sync::OnceLock;
+use tracing::info;
 
 use crate::error::TsError;
 use miette::Result;
@@ -37,10 +38,19 @@ pub async fn initialize_client(
 /// This follows the recommended pattern from the QuestDB documentation
 pub fn create_sender() -> Result<Sender> {
     // Get the connection string
-    let conn_str = DB_CONN_STR
-        .get()
-        .ok_or_else(|| TsError::ConnectionNotInitialized)?;
+    // let conn_str = DB_CONN_STR
+    //     .get()
+    //     .ok_or_else(|| TsError::ConnectionNotInitialized)?;
+    let host_str = DEFAULT_HOST;
+    let http_port = DEFAULT_HTTP_PORT;
 
+    // Configure the QuestDB client using the recommended pattern for HTTP protocol
+    let conn_str = format!("http::addr={}:{};", host_str, http_port);
+
+    info!(
+        "Creating QuestDB sender with connection string: {}",
+        conn_str
+    );
     // Create a new sender from the configuration string
     // Each call gives us a fresh instance that can be used with mut
     Sender::from_conf(conn_str).map_err(|e| {

@@ -9,6 +9,7 @@ use crate::model::{Order, TimeSeriesDb, TimeSeriesModel, TimeSeriesQuery};
 use miette::Result;
 
 /// QuestDB client for time series operations
+#[derive(Debug)]
 pub struct QuestDb;
 
 impl QuestDb {
