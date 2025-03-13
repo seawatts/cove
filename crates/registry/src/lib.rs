@@ -114,6 +114,17 @@ impl Service for RegistryService {
                                 BusEvent::DeviceRemoved { id } => {
                                     self.device_registry.unregister_device(&id).await?;
                                 }
+                                BusEvent::SensorReading {
+                                    ts,
+                                    device_id,
+                                    sensor_id,
+                                    value,
+                                    unit,
+                                } => {
+                                    if let Some(device) = self.device_registry.get_device(&device_id).await {
+                                        // device.update_sensor_reading(sensor_id, value, unit).await?;
+                                    }
+                                }
                             }
                         }
                         Err(e) => {
@@ -125,7 +136,6 @@ impl Service for RegistryService {
                     }
                 }
                 _ = self.handle.wait_for_cancel() => {
-                    info!("Registry service shutting down");
                     break;
                 }
             }

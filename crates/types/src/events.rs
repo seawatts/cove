@@ -16,5 +16,11 @@ pub enum BusEvent {
     DeviceRemoved {
         id: String,
     },
-    // Add more event types as needed
+    SensorReading {
+        ts: chrono::DateTime<chrono::Utc>,
+        device_id: String,
+        sensor_id: String,
+        value: f64,
+        unit: Option<String>,
+    },
 }

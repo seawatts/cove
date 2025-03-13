@@ -6,7 +6,7 @@ use types::system_service::{Service, ServiceHandle};
 
 use crate::connection::initialize_client;
 use crate::db::QuestDb;
-use crate::model::TimeSeriesModel;
+use crate::model::{TimeSeriesDb, TimeSeriesModel};
 use crate::models::{DeviceStateReading, LogReading, SensorReading};
 use crate::EventReading;
 
@@ -50,6 +50,16 @@ impl TimeseriesDbService {
     /// Get a QuestDB client
     pub fn db_client(&self) -> QuestDb {
         QuestDb::new()
+    }
+
+    /// Inserts a timeseries record using the QuestDb client
+    pub async fn create_reading<T: TimeSeriesModel + Send + Sync + 'static>(
+        &self,
+        reading: T,
+    ) -> Result<()> {
+        let db = self.db_client();
+        info!("Creating reading {:?}", db);
+        <crate::db::QuestDb as TimeSeriesDb<T>>::create(&db, reading).await
     }
 }
 

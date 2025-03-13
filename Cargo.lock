@@ -600,6 +600,7 @@ dependencies = [
  "bus",
  "db",
  "discovery",
+ "integrations",
  "logging",
  "miette",
  "owo-colors",
@@ -1710,7 +1711,12 @@ name = "integrations"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bus",
+ "chrono",
+ "esphome",
  "miette",
+ "protocols",
+ "timeseries",
  "tokio",
  "tracing",
  "types",
