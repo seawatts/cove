@@ -49,7 +49,7 @@ impl DeviceCapability for ESPHomeSensor {
     }
 
     async fn get_state(&self) -> Result<CapabilityState> {
-        let state = self.state.read().await;
+        let state = *self.state.read().await;
         Ok(CapabilityState {
             timestamp: chrono::Utc::now(),
             value: json!({

@@ -182,7 +182,7 @@ mod tests {
         buffer.at(ts_nanos).unwrap();
 
         // Create a new sender and flush the buffer
-        let mut sender = QuestDb::get_sender().unwrap();
+        let sender = QuestDb::get_sender().unwrap();
         // Uncomment to actually send data
         // sender.flush(&mut buffer).unwrap();
     }

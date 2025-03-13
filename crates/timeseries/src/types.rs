@@ -1,4 +1,3 @@
-use crate::TsError;
 
 // Define our own ColumnType enum since it's not available in questdb
 #[derive(Debug, Clone, Copy)]

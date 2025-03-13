@@ -6,8 +6,8 @@ mod types;
 use std::sync::Arc;
 
 use ::types::{
-    Accessory, AccessoryEvent, CharacteristicType, Command, Format, Permissions, Protocol,
-    ProtocolHandler, ServiceType, Unit,
+    Accessory, Command,
+    ProtocolHandler,
 };
 use async_trait::async_trait;
 use miette::Result;
@@ -20,7 +20,6 @@ use url::Url;
 use self::{
     api::HueApi,
     config::HueConfig,
-    types::{HueLight, HueLightState},
 };
 use crate::error::ProtocolError;
 
@@ -68,122 +67,122 @@ impl HueProtocol {
         Ok(username)
     }
 
-    /// Converts a Hue light to our Accessory model
-    fn convert_light_to_accessory(&self, light: HueLight) -> Accessory {
-        let mut accessory = Accessory::new(
-            format!("hue_{}", light.id),
-            light.name,
-            ::types::protocols::Protocol::WiFi,
-        );
+    // Converts a Hue light to our Accessory model
+    // fn convert_light_to_accessory(&self, light: HueLight) -> Accessory {
+    //     let mut accessory = Accessory::new(
+    //         format!("hue_{}", light.id),
+    //         light.name,
+    //         ::types::protocols::Protocol::WiFi,
+    //     );
 
-        // Add manufacturer details
-        accessory.manufacturer = Some("Philips".to_string());
-        accessory.model = Some(light.model_id);
-        accessory.firmware_version = Some(light.software_version);
+    //     // Add manufacturer details
+    //     accessory.manufacturer = Some("Philips".to_string());
+    //     accessory.model = Some(light.model_id);
+    //     accessory.firmware_version = Some(light.software_version);
 
-        // Create the main light service
-        let mut light_service = ::types::services::Service::new(
-            "main".to_string(),
-            ServiceType::Lightbulb,
-            "Main Light".to_string(),
-        );
+    //     // Create the main light service
+    //     let mut light_service = ::types::services::Service::new(
+    //         "main".to_string(),
+    //         ServiceType::Lightbulb,
+    //         "Main Light".to_string(),
+    //     );
 
-        // Add power characteristic
-        light_service.add_characteristic(
-            ::types::characteristics::Characteristic::new(
-                "power".to_string(),
-                CharacteristicType::On,
-                Format::Bool,
-            )
-            .with_permissions(Permissions {
-                readable: true,
-                writable: true,
-                notify: true,
-            })
-            .with_value(json!(light.state.on)),
-        );
+    //     // Add power characteristic
+    //     light_service.add_characteristic(
+    //         ::types::characteristics::Characteristic::new(
+    //             "power".to_string(),
+    //             CharacteristicType::On,
+    //             Format::Bool,
+    //         )
+    //         .with_permissions(Permissions {
+    //             readable: true,
+    //             writable: true,
+    //             notify: true,
+    //         })
+    //         .with_value(json!(light.state.on)),
+    //     );
 
-        // Add brightness if supported
-        if light.state.bri.is_some() {
-            light_service.add_characteristic(
-                ::types::characteristics::Characteristic::new(
-                    "brightness".to_string(),
-                    CharacteristicType::Brightness,
-                    Format::Uint8,
-                )
-                .with_permissions(Permissions {
-                    readable: true,
-                    writable: true,
-                    notify: true,
-                })
-                .with_unit(Unit::Percentage)
-                .with_value(json!(light.state.bri.unwrap_or(0)))
-                .with_min_value(json!(0))
-                .with_max_value(json!(100))
-                .with_step_value(json!(1)),
-            );
-        }
+    //     // Add brightness if supported
+    //     if light.state.bri.is_some() {
+    //         light_service.add_characteristic(
+    //             ::types::characteristics::Characteristic::new(
+    //                 "brightness".to_string(),
+    //                 CharacteristicType::Brightness,
+    //                 Format::Uint8,
+    //             )
+    //             .with_permissions(Permissions {
+    //                 readable: true,
+    //                 writable: true,
+    //                 notify: true,
+    //             })
+    //             .with_unit(Unit::Percentage)
+    //             .with_value(json!(light.state.bri.unwrap_or(0)))
+    //             .with_min_value(json!(0))
+    //             .with_max_value(json!(100))
+    //             .with_step_value(json!(1)),
+    //         );
+    //     }
 
-        // Add color temperature if supported
-        if light.state.ct.is_some() {
-            light_service.add_characteristic(
-                ::types::characteristics::Characteristic::new(
-                    "color_temp".to_string(),
-                    CharacteristicType::ColorTemperature,
-                    Format::Uint16,
-                )
-                .with_permissions(Permissions {
-                    readable: true,
-                    writable: true,
-                    notify: true,
-                })
-                .with_value(json!(light.state.ct.unwrap_or(153)))
-                .with_min_value(json!(153)) // 6500K
-                .with_max_value(json!(500)) // 2000K
-                .with_step_value(json!(1)),
-            );
-        }
+    //     // Add color temperature if supported
+    //     if light.state.ct.is_some() {
+    //         light_service.add_characteristic(
+    //             ::types::characteristics::Characteristic::new(
+    //                 "color_temp".to_string(),
+    //                 CharacteristicType::ColorTemperature,
+    //                 Format::Uint16,
+    //             )
+    //             .with_permissions(Permissions {
+    //                 readable: true,
+    //                 writable: true,
+    //                 notify: true,
+    //             })
+    //             .with_value(json!(light.state.ct.unwrap_or(153)))
+    //             .with_min_value(json!(153)) // 6500K
+    //             .with_max_value(json!(500)) // 2000K
+    //             .with_step_value(json!(1)),
+    //         );
+    //     }
 
-        // Add color if supported
-        if light.state.hue.is_some() && light.state.sat.is_some() {
-            light_service.add_characteristic(
-                ::types::characteristics::Characteristic::new(
-                    "hue".to_string(),
-                    CharacteristicType::Hue,
-                    Format::Float,
-                )
-                .with_permissions(Permissions {
-                    readable: true,
-                    writable: true,
-                    notify: true,
-                })
-                .with_value(json!(light.state.hue.unwrap_or(0)))
-                .with_min_value(json!(0))
-                .with_max_value(json!(360))
-                .with_step_value(json!(1)),
-            );
+    //     // Add color if supported
+    //     if light.state.hue.is_some() && light.state.sat.is_some() {
+    //         light_service.add_characteristic(
+    //             ::types::characteristics::Characteristic::new(
+    //                 "hue".to_string(),
+    //                 CharacteristicType::Hue,
+    //                 Format::Float,
+    //             )
+    //             .with_permissions(Permissions {
+    //                 readable: true,
+    //                 writable: true,
+    //                 notify: true,
+    //             })
+    //             .with_value(json!(light.state.hue.unwrap_or(0)))
+    //             .with_min_value(json!(0))
+    //             .with_max_value(json!(360))
+    //             .with_step_value(json!(1)),
+    //         );
 
-            light_service.add_characteristic(
-                ::types::characteristics::Characteristic::new(
-                    "saturation".to_string(),
-                    CharacteristicType::Saturation,
-                    Format::Float,
-                )
-                .with_permissions(Permissions {
-                    readable: true,
-                    writable: true,
-                    notify: true,
-                })
-                .with_value(json!(light.state.sat.unwrap_or(0)))
-                .with_min_value(json!(0))
-                .with_max_value(json!(100))
-                .with_step_value(json!(1)),
-            );
-        }
+    //         light_service.add_characteristic(
+    //             ::types::characteristics::Characteristic::new(
+    //                 "saturation".to_string(),
+    //                 CharacteristicType::Saturation,
+    //                 Format::Float,
+    //             )
+    //             .with_permissions(Permissions {
+    //                 readable: true,
+    //                 writable: true,
+    //                 notify: true,
+    //             })
+    //             .with_value(json!(light.state.sat.unwrap_or(0)))
+    //             .with_min_value(json!(0))
+    //             .with_max_value(json!(100))
+    //             .with_step_value(json!(1)),
+    //         );
+    //     }
 
-        accessory.add_service(light_service);
-        accessory
-    }
+    //     accessory.add_service(light_service);
+    //     accessory
+    // }
 }
 
 #[async_trait]

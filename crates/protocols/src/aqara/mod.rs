@@ -5,8 +5,8 @@ mod types;
 use std::sync::Arc;
 
 use ::types::{
-    Accessory, AccessoryEvent, CharacteristicType, Command, Format, Permissions, Protocol,
-    ProtocolHandler, ServiceType, Unit,
+    Accessory, AccessoryEvent, Command,
+    ProtocolHandler,
 };
 use async_trait::async_trait;
 use miette::Result;
@@ -14,12 +14,10 @@ use reqwest::Client;
 use serde_json::json;
 use tokio::sync::{broadcast, RwLock};
 use tracing::{debug, error, info};
-use url::Url;
 
 use self::{
     api::AqaraApi,
     config::AqaraConfig,
-    types::{AqaraLock, AqaraLockState},
 };
 use crate::error::ProtocolError;
 
@@ -45,74 +43,71 @@ impl AqaraProtocol {
         })
     }
 
-    /// Converts an Aqara lock to our Accessory model
-    fn convert_lock_to_accessory(&self, lock: AqaraLock) -> Accessory {
-        let mut accessory = Accessory::new(format!("aqara_{}", lock.id), lock.name, Protocol::WiFi);
+    // Converts an Aqara lock to our Accessory model
+    // fn convert_lock_to_accessory(&self, lock: AqaraLock) -> Accessory {
+    //     let mut accessory = Accessory::new(format!("aqara_{}", lock.id), lock.name, Protocol::WiFi);
 
-        // Add manufacturer details
-        accessory.manufacturer = Some("Aqara".to_string());
-        accessory.model = Some("U100".to_string());
-        accessory.firmware_version = Some(lock.firmware_version);
+    //     // Add manufacturer details
+    //     accessory.manufacturer = Some("Aqara".to_string());
+    //     accessory.model = Some("U100".to_string());
+    //     accessory.firmware_version = Some(lock.firmware_version);
 
-        // Create the main lock service
-        let mut lock_service = ::types::services::Service::new(
-            "main".to_string(),
-            ServiceType::Lock,
-            "Main Lock".to_string(),
-        );
+    //     // Create the main lock service
+    //     let mut lock_service =
+    //         ::types::services::Service::new("main".to_string(), "Main Lock".to_string());
 
-        // Add lock state characteristic
-        lock_service.add_characteristic(
-            ::types::characteristics::Characteristic::new(
-                "lock_state".to_string(),
-                CharacteristicType::LockCurrentState,
-                Format::Uint8,
-            )
-            .with_permissions(Permissions {
-                readable: true,
-                writable: false,
-                notify: true,
-            })
-            .with_value(json!(lock.state.locked)),
-        );
+    //     // Add lock state characteristic
+    //     lock_service.add_characteristic(
+    //         ::types::characteristics::Characteristic::new(
+    //             "lock_state".to_string(),
+    //             CharacteristicType::LockCurrentState,
+    //             Format::Uint8,
+    //         )
+    //         .with_permissions(Permissions {
+    //             readable: true,
+    //             writable: false,
+    //             notify: true,
+    //         })
+    //         .with_value(json!(lock.state.locked)),
+    //     );
 
-        // Add target state characteristic
-        lock_service.add_characteristic(
-            ::types::characteristics::Characteristic::new(
-                "target_state".to_string(),
-                CharacteristicType::LockTargetState,
-                Format::Uint8,
-            )
-            .with_permissions(Permissions {
-                readable: true,
-                writable: true,
-                notify: true,
-            })
-            .with_value(json!(lock.state.target_state)),
-        );
+    //     // Add target state characteristic
+    //     lock_service.add_characteristic(
+    //         ::types::characteristics::Characteristic::new(
+    //             "target_state".to_string(),
+    //             CharacteristicType::LockTargetState,
+    //             Format::Uint8,
+    //         )
+    //         .with_permissions(Permissions {
+    //             readable: true,
+    //             writable: true,
+    //             notify: true,
+    //         })
+    //         .with_value(json!(lock.state.target_state)),
+    //     );
 
-        // Add battery level characteristic
-        lock_service.add_characteristic(
-            ::types::characteristics::Characteristic::new(
-                "battery".to_string(),
-                CharacteristicType::BatteryLevel,
-                Format::Uint8,
-            )
-            .with_permissions(Permissions {
-                readable: true,
-                writable: false,
-                notify: true,
-            })
-            .with_unit(Unit::Percentage)
-            .with_value(json!(lock.state.battery_level))
-            .with_min_value(json!(0))
-            .with_max_value(json!(100))
-            .with_step_value(json!(1)),
-        );
+    //     // Add battery level characteristic
+    //     lock_service.add_characteristic(
+    //         ::types::characteristics::Characteristic::new(
+    //             "battery".to_string(),
+    //             CharacteristicType::BatteryLevel,
+    //             Format::Uint8,
+    //         )
+    //         .with_permissions(Permissions {
+    //             readable: true,
+    //             writable: false,
+    //             notify: true,
+    //         })
+    //         .with_unit(Unit::Percentage)
+    //         .with_value(json!(lock.state.battery_level))
+    //         .with_min_value(json!(0))
+    //         .with_max_value(json!(100))
+    //         .with_step_value(json!(1)),
+    //     );
 
-        accessory.add_service(lock_service);
-        accessory
-    }
+    //     accessory.add_service(lock_service);
+    //     accessory
+    // }
 }
 
 #[async_trait]

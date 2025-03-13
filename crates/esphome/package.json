@@ -16,8 +16,7 @@
     "test:watch": "cargo watch -x test",
     "test:connection": "cargo run --example connection_test",
     "test:connection:verbose": "cargo test test_real_device_connection -- --nocapture",
-    "test:logging": "RUST_LOG=debug cargo run --example logging_test",
-    "typecheck": "cargo check"
+    "test:logging": "RUST_LOG=debug cargo run --example logging_test"
   },
   "type": "module",
   "version": "0.1.0",
