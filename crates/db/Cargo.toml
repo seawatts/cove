@@ -10,7 +10,8 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 async-trait = { workspace = true }
 thiserror = { workspace = true }
-cuid2 = "0.1.4"
+cuid2 = { workspace = true }
+getrandom = { workspace = true }
 miette = { workspace = true }
 chrono = { workspace = true }
 types = { path = "../types" }

@@ -17,7 +17,7 @@ pub use connection::{ESPHomeConnection, ESPHomeConnectionBuilder};
 pub use error::ESPHomeError;
 pub use protocol::ProtocolError;
 pub use traits::{ESPHomeApi, EntityManagement, LogManagement, StateManagement};
-pub use types::{ESPHomeConfig, Entity, StateResponse};
+// pub use types::{ESPHomeConfig, Entity, StateResponse};
 
 // Version info
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

@@ -10,7 +10,7 @@ miette = { workspace = true }
 tracing = { workspace = true }
 async-trait = { workspace = true }
 types = { path = "../types" }
-
+# protocols = { path = "../protocols" }
 [lib]
 name = "integrations"
 path = "src/lib.rs"

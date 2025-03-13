@@ -2,7 +2,6 @@ use async_trait::async_trait;
 use chrono::Utc;
 use esphome::connection::ESPHomeConnection;
 use esphome::traits::{ESPHomeApi, EntityManagement, StateManagement};
-use esphome::types::{Entity, StateResponse};
 use miette::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -11,6 +10,7 @@ use tokio::sync::mpsc;
 use types::capabilities::{
     AirQualityMetric, CapabilityEvent, CapabilityState, CapabilityType, SensorType,
 };
+use types::esphome::{Entity, StateResponse};
 
 mod capabilities;
 pub use capabilities::*;
@@ -35,7 +35,7 @@ impl ESPHomeProtocol {
 
     async fn handle_state_update(&self, entity: Entity, response: StateResponse) {
         match (&entity, response) {
-            (Entity::Sensor { key, name, .. }, StateResponse::Sensor { state, .. }) => {
+            (Entity::Sensor { key, name, .. }, StateResponse::Sensor { state }) => {
                 // Create a DeviceStateReading for timeseries storage
                 let device_state = DeviceStateReading {
                     ts: Utc::now(),

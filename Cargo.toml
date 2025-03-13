@@ -25,6 +25,12 @@ owo-colors = "4.2.0"
 
 # Utilities
 chrono = { version = "0.4.40", features = ["serde"] }
+cuid2 = "0.1.4"
+getrandom = { version = "0.2", features = ["js"] }
+
+# [patch.crates-io]
+# getrandom = { version = "0.2.15", features = ["js"] }
+# pnet_macros = { version = "0.25.0" }
 
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }

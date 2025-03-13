@@ -32,10 +32,6 @@
       "dependsOn": ["^topo", "^build"],
       "outputs": ["node_modules/.cache/tsbuildinfo.json"]
     },
-    "//#typecheck": {
-      "dependsOn": ["^topo", "^build"],
-      "cache": false
-    },
     "clean": {
       "cache": false
     },

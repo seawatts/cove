@@ -34,8 +34,8 @@ uuid = { version = "1.15", features = ["v4", "serde"] }
 url = "2.5"
 
 # HomeKit
-hap = "0.0.10"
-ed25519-dalek = "2.1"
+# hap = "0.0.10"
+# ed25519-dalek = "2.1"
 base64 = "0.22"
 rand = "0.9"
 
