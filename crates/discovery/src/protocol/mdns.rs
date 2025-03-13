@@ -2,23 +2,16 @@ use std::{
     collections::{HashMap, HashSet},
     net::IpAddr,
     sync::Arc,
-    time::Duration,
 };
 
 use async_trait::async_trait;
-use chrono::Utc;
-use mdns_sd::{Receiver, ServiceDaemon, ServiceEvent, TxtProperty};
+use mdns_sd::{Receiver, ServiceDaemon, ServiceEvent};
 use miette::{Report, Result};
 use once_cell::sync::Lazy;
-use serde_json::json;
 use tokio::sync::{broadcast, RwLock};
 use tracing::{debug, error, info};
-use types::{
-    devices::{Device, DeviceKind},
-    BusEvent,
-};
+use types::BusEvent;
 
-use crate::protocol::error::ProtocolError;
 use crate::service::DeviceProtocol;
 use bus::EventBus;
 

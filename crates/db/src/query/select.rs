@@ -3,7 +3,7 @@ use serde::de::DeserializeOwned;
 use std::marker::PhantomData;
 
 use crate::connection::get_conn;
-use crate::error::{DbError, DbResult};
+use crate::error::DbResult;
 
 /// Query builder for selecting data
 pub struct Select<T> {

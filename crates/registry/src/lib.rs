@@ -4,7 +4,6 @@ use miette::Result;
 use std::sync::Arc;
 use tracing::{error, info};
 use types::{
-    devices,
     events::BusEvent,
     system_service::{Service, ServiceHandle},
 };

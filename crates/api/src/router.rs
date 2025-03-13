@@ -89,7 +89,7 @@ mod tests {
     // It is highly recommended to unit test your rspc router by creating it
     // This will ensure it doesn't have any issues and also export updated Typescript types.
 
-    use std::path::PathBuf;
+    
 
     #[test]
     fn test_rspc_router() {
