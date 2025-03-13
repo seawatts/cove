@@ -24,7 +24,8 @@ serde_json = { workspace = true }
 chrono = { workspace = true }
 
 # Utilities
-cuid2 = "0.1.4"
+cuid2 = { workspace = true }
+getrandom = { workspace = true }
 tracing = { workspace = true }
 
 # Internal dependencies

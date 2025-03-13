@@ -105,7 +105,7 @@ impl Service for RegistryService {
                                     }
                                 }
                                 BusEvent::DeviceUpdated { id, metadata } => {
-                                    if let Some(mut device) = self.device_registry.get_device(&id).await {
+                                    if let Some(device) = self.device_registry.get_device(&id).await {
                                         // device.raw_details = serde_json::json!(metadata);
                                         // device.updated = chrono::Utc::now();
                                         // device.last_online = Some(chrono::Utc::now());

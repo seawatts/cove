@@ -12,7 +12,7 @@ owo-colors = { workspace = true }
 
 # Workspace
 logging = { path = "../logging" }
-integrations = { path = "../integrations" }
+# integrations = { path = "../integrations" }
 api = { path = "../api" }
 types = { path = "../types" }
 discovery = { path = "../discovery" }

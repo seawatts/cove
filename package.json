@@ -37,7 +37,7 @@
     "postinstall": "pnpm lint:ws",
     "prepare": "npx lefthook install",
     "test": "pnpm with-env vitest",
-    "typecheck:ws": "turbo run typecheck",
+    "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
     "with-env": "dotenv -e ./.env --"
   }
