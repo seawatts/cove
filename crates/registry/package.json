@@ -5,8 +5,6 @@
   "scripts": {
     "build": "cargo build",
     "build:release": "cargo build --release",
-    "dev": "cargo run",
-    "dev:release": "cargo run --release",
     "format": "cargo fmt",
     "format:check": "cargo fmt --check",
     "format:fix": "cargo fmt",
@@ -15,8 +13,5 @@
     "test:watch": "cargo watch -x test"
   },
   "type": "module",
-  "version": "0.1.0",
-  "turbo": {
-    "extends": ["#typecheck"]
-  }
+  "version": "0.1.0"
 }

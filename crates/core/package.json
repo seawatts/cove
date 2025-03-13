@@ -15,8 +15,5 @@
     "test:watch": "cargo watch -x test"
   },
   "type": "module",
-  "version": "0.1.0",
-  "turbo": {
-    "extends": ["#typecheck"]
-  }
+  "version": "0.1.0"
 }
