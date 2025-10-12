@@ -1,0 +1,15 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [4885725550624711673, "build_script_build", false, 8932874162954903412]
+  ],
+  "features": "",
+  "local": [{ "Precalculated": "1.8.1" }],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

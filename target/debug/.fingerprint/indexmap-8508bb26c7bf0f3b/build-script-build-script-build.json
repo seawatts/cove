@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"arbitrary\", \"quickcheck\", \"rayon\", \"rustc-rayon\", \"serde\", \"serde-1\", \"std\", \"test_debug\", \"test_low_transition_point\"]",
+  "deps": [[6229979215132119378, "autocfg", false, 3697603351720558752]],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/indexmap-8508bb26c7bf0f3b/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 9902095320416085782,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

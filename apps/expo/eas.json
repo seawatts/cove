@@ -1,0 +1,31 @@
+{
+  "build": {
+    "base": {
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "node": "18.16.1"
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "extends": "base"
+    },
+    "preview": {
+      "distribution": "internal",
+      "extends": "base",
+      "ios": {
+        "simulator": true
+      }
+    },
+    "production": {
+      "extends": "base"
+    }
+  },
+  "cli": {
+    "version": ">= 4.1.2"
+  },
+  "submit": {
+    "production": {}
+  }
+}

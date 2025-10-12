@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"backtrace\", \"default\", \"std\"]",
+  "deps": [],
+  "features": "[\"default\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/anyhow-b98d2ad25b851fd1/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 4744321393046635365,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

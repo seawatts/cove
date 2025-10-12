@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"compiletest_rs\", \"env_logger\", \"log\", \"logging\", \"nightlytests\", \"skeptic\", \"skeptic_tests\"]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/derive_builder-7a153536df32ec86/dep-build-script-build-script-mod"
+      }
+    }
+  ],
+  "path": 8002752030911723949,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 6298890305367513524
+}

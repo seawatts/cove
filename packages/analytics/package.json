@@ -1,41 +1,42 @@
 {
   "dependencies": {
-    "@clerk/chrome-extension": "2.2.15",
-    "@clerk/nextjs": "6.12.4",
-    "@sentry/nextjs": "9.5.0",
-    "@t3-oss/env-core": "0.12.0",
-    "@t3-oss/env-nextjs": "0.12.0",
+    "@clerk/chrome-extension": "2.7.3",
+    "@clerk/nextjs": "6.33.3",
+    "@seawatts/ui": "workspace:*",
+    "@sentry/nextjs": "10.19.0",
+    "@t3-oss/env-core": "0.13.8",
+    "@t3-oss/env-nextjs": "0.13.8",
     "@vercel/analytics": "1.5.0",
     "@vercel/speed-insights": "1.2.0",
     "nextjs-google-analytics": "2.3.7",
-    "posthog-js": "1.230.1",
-    "posthog-node": "4.10.1",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "zod": "3.24.2"
+    "posthog-js": "1.275.1",
+    "posthog-node": "5.9.5",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "zod": "4.1.12"
   },
   "devDependencies": {
-    "@acme/tsconfig": "workspace:*",
-    "@types/aws-lambda": "8.10.147",
-    "@types/chrome": "0.0.308",
-    "@types/react": "19.0.10",
-    "@types/react-dom": "19.0.4",
-    "next": "15.2.1",
-    "typescript": "5.8.2"
+    "@seawatts/tsconfig": "workspace:*",
+    "@types/aws-lambda": "8.10.155",
+    "@types/chrome": "0.1.24",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.1",
+    "next": "15.5.4",
+    "typescript": "5.9.3"
   },
   "exports": {
     ".": "./src/index.ts",
-    "./*": [
-      "./src/*.tsx",
-      "./src/*.ts"
-    ]
+    "./components": "./src/components/index.tsx",
+    "./posthog/chrome-extension": "./src/posthog/chrome-extension.tsx",
+    "./posthog/client": "./src/posthog/client.tsx",
+    "./posthog/server": "./src/posthog/server.ts",
+    "./posthog/vscode": "./src/posthog/vscode.ts"
   },
   "license": "MIT",
-  "name": "@acme/analytics",
+  "name": "@seawatts/analytics",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf .turbo node_modules dist",
+    "clean": "git clean -xdf .turbo node_modules dist",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },

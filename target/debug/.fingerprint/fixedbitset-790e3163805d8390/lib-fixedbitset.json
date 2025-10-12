@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"serde\", \"std\"]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/fixedbitset-790e3163805d8390/dep-lib-fixedbitset"
+      }
+    }
+  ],
+  "path": 14742500289943147932,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 1586632367936366909
+}

@@ -1,6 +1,6 @@
 ---
-description: Rules for building a dynamic, configuration-driven home automation core engine in Rust.
-globs:  *.rs,Cargo.toml,*.yaml,*.json
+description: 
+globs: *.rs,Cargo.toml,*.yaml,*.json
 ---
 # Rust Home Automation Platform Development Rules
 

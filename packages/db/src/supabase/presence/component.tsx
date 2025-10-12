@@ -3,14 +3,14 @@
 import { useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
 
-import { createClient } from '../client';
+import { useClient } from '../client';
 import { usePresenceStore } from './store-provider';
 
 export function Presence(props: { id: string }) {
   const setOnlineUsers = usePresenceStore((store) => store.setOnlineUsers);
   const { user } = useUser();
 
-  const supabase = createClient();
+  const supabase = useClient();
 
   useEffect(() => {
     if (!user || !props.id) return;
@@ -46,5 +46,5 @@ export function Presence(props: { id: string }) {
       void supabase.removeChannel(readingChannel);
     };
   }, [user, props.id, setOnlineUsers, supabase]);
-  return <></>;
+  return null;
 }

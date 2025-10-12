@@ -1,0 +1,27 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"compiletest_rs\", \"env_logger\", \"log\", \"logging\", \"nightlytests\", \"skeptic\", \"skeptic_tests\"]",
+  "deps": [
+    [1532335868101151914, "build_script_mod", false, 17278792925472444433],
+    [2713742371683562785, "syn", false, 7184635814328470461],
+    [5500575312701455591, "derive_builder_core", false, 13711829743489378057],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [14870434861910450296, "darling", false, 12899112899359106196],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/derive_builder-86f95139f17d060b/dep-lib-derive_builder"
+      }
+    }
+  ],
+  "path": 7307432173290229609,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 4644674895940100108
+}

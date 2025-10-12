@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/version_check-bbf5ab18e1d12d3a/dep-lib-version_check"
+      }
+    }
+  ],
+  "path": 13140749689194198600,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 18099224280402537651
+}

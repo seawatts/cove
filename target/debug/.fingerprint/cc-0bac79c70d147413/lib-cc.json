@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"jobserver\", \"parallel\"]",
+  "deps": [[8410525223747752176, "shlex", false, 3113950816744838983]],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/cc-0bac79c70d147413/dep-lib-cc"
+      }
+    }
+  ],
+  "path": 4151217665482015554,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 11042037588551934598
+}

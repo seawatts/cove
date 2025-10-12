@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@boundaryml/baml": "0.211.2"
+  },
+  "devDependencies": {
+    "@seawatts/tsconfig": "workspace:*",
+    "typescript": "5.9.3"
+  },
+  "exports": {
+    "./*": "./src/baml_client/*.ts",
+    "./react/*": "./src/baml_client/react/*.ts"
+  },
+  "license": "MIT",
+  "name": "@seawatts/ai",
+  "private": true,
+  "scripts": {
+    "build": "bun generate",
+    "clean": "git clean -xdf .turbo node_modules dist",
+    "dev": "bun generate && tsc --watch",
+    "generate": "bunx @boundaryml/baml@latest generate --from ./src/baml_src",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

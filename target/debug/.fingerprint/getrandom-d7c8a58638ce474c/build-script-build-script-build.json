@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"rustc-dep-of-std\", \"std\", \"wasm_js\"]",
+  "deps": [],
+  "features": "[\"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/getrandom-d7c8a58638ce474c/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 17133934257262918037,
+  "profile": 17522863583572766575,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

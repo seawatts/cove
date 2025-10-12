@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"alloc\", \"supports-color\", \"supports-colors\"]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/owo-colors-55b14d4df56099a2/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 5550111528555322005,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

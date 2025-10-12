@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"std\"]",
+  "deps": [],
+  "features": "[\"default\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/httparse-c58394f79fe86060/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 16817665030431665433,
+  "profile": 7951715458933780528,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

@@ -1,0 +1,22 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [6452682797676277333, "build_script_build", false, 7078530649487156337]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/objc-sys-0e064202ab767144/output",
+        "paths": ["build.rs"]
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

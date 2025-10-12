@@ -1,0 +1,22 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [12546824318118147037, "build_script_build", false, 15613190747136319492]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/getrandom-771c586685a89767/output",
+        "paths": ["build.rs"]
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

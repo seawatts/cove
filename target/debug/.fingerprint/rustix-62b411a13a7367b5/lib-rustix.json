@@ -1,0 +1,25 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"all-apis\", \"alloc\", \"compiler_builtins\", \"core\", \"default\", \"event\", \"fs\", \"io_uring\", \"libc\", \"libc_errno\", \"linux_4_11\", \"linux_5_1\", \"linux_5_11\", \"linux_latest\", \"mm\", \"mount\", \"net\", \"param\", \"pipe\", \"process\", \"pty\", \"rand\", \"runtime\", \"rustc-dep-of-std\", \"rustc-std-workspace-alloc\", \"shm\", \"std\", \"stdio\", \"system\", \"termios\", \"thread\", \"time\", \"try_close\", \"use-explicitly-provided-auxv\", \"use-libc\", \"use-libc-auxv\"]",
+  "deps": [
+    [6166349630582887940, "bitflags", false, 17623232234179407094],
+    [6216877310456499335, "build_script_build", false, 11418428402427015924],
+    [8194304432723500424, "libc", false, 3748264524818799611],
+    [16147699439045088695, "libc_errno", false, 8698564256455075665]
+  ],
+  "features": "[\"alloc\", \"default\", \"fs\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/rustix-62b411a13a7367b5/dep-lib-rustix"
+      }
+    }
+  ],
+  "path": 2750848311198745237,
+  "profile": 8638900119201268969,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 16221545317719767766
+}

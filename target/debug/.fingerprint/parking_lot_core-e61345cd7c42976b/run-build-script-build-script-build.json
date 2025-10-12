@@ -1,0 +1,22 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [11568354178493685438, "build_script_build", false, 14080999160879447598]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/parking_lot_core-e61345cd7c42976b/output",
+        "paths": ["build.rs"]
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

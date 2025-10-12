@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"all\", \"alloc\", \"archive\", \"build\", \"build_core\", \"cargo-all\", \"coff\", \"compiler_builtins\", \"compression\", \"core\", \"default\", \"doc\", \"elf\", \"macho\", \"pe\", \"read\", \"read_core\", \"rustc-dep-of-std\", \"std\", \"unaligned\", \"unstable\", \"unstable-all\", \"wasm\", \"write\", \"write_core\", \"write_std\", \"xcoff\"]",
+  "deps": [],
+  "features": "[\"archive\", \"coff\", \"elf\", \"macho\", \"pe\", \"read_core\", \"unaligned\", \"xcoff\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/object-5f7818e7ddb3a2ed/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 2407458918813134070,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

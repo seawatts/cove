@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"alloc\", \"default\", \"dev_urandom_fallback\", \"less-safe-getrandom-custom-or-rdrand\", \"less-safe-getrandom-espidf\", \"slow_tests\", \"std\", \"test_logging\", \"unstable-testing-arm-no-hw\", \"unstable-testing-arm-no-neon\", \"wasm32_unknown_unknown_js\"]",
+  "deps": [[13075896355434424484, "cc", false, 5890568570767855911]],
+  "features": "[\"alloc\", \"default\", \"dev_urandom_fallback\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/ring-35a837bd3eb84ab7/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 175140551361202418,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

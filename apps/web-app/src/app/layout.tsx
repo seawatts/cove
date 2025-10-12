@@ -1,30 +1,35 @@
-import { cn } from '@acme/ui/lib/utils';
-import { SidebarProvider } from '@acme/ui/sidebar';
-import { ThemeProvider } from '@acme/ui/theme';
-import { Toaster } from '@acme/ui/toast';
+import { ReactScan } from '@seawatts/ui/custom/react-scan';
+import { ThemeProvider } from '@seawatts/ui/custom/theme';
+import { cn } from '@seawatts/ui/lib/utils';
+import { Toaster } from '@seawatts/ui/sonner';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
-import '@acme/ui/globals.css';
+import '@seawatts/ui/globals.css';
 
-import { TRPCReactProvider } from '@acme/api/client';
+import { ClerkProvider } from '@clerk/nextjs';
+import { AnalyticsProviders } from '@seawatts/analytics/providers';
+import { TRPCReactProvider } from '@seawatts/api/react';
+import { StripeProvider } from '@seawatts/stripe/guards/client';
+import { Suspense } from 'react';
 import { env } from '~/env.server';
 
 export const metadata: Metadata = {
-  description: 'Cove is a powerful and flexible home automation platform',
+  description: 'Seawatts is a tool for developers to manage their webhooks',
   metadataBase: new URL(
     env.VERCEL_ENV === 'production'
-      ? 'https://cove.vercel.app'
+      ? 'https://seawatts.sh'
       : 'http://localhost:3000',
   ),
   openGraph: {
-    description: 'Cove is a powerful and flexible home automation platform',
-    siteName: 'Cove',
-    title: 'Cove',
-    url: 'https://cove.vercel.app',
+    description: 'Seawatts is a tool for developers to manage their webhooks',
+    siteName: 'Seawatts',
+    title: 'Seawatts',
+    url: 'https://seawatts.sh',
   },
-  title: 'Cove',
+  title: 'Seawatts',
   twitter: {
     card: 'summary_large_image',
     creator: '@seawatts',
@@ -39,34 +44,35 @@ export const viewport: Viewport = {
   ],
 };
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  // const cookieStore = await cookies()
-  // const defaultOpen = cookieStore.get('sidebar:state')?.value === 'true'
+const isDevelopment = process.env.NODE_ENV === 'development';
 
+export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          'relative min-h-screen bg-background font-sans text-foreground antialiased',
+          'bg-background text-foreground relative min-h-screen font-sans antialiased',
           GeistSans.variable,
           GeistMono.variable,
         )}
       >
-        {/* <NuqsAdapter> */}
-        <TRPCReactProvider>
-          {/* <ClerkProvider> */}
-          {/* <AnalyticsProviders identifyUser> */}
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <SidebarProvider defaultOpen={false}>
-              {/* <AppSidebar /> */}
-              <main className="flex-1">{props.children}</main>
-            </SidebarProvider>
-            <Toaster />
-          </ThemeProvider>
-          {/* </AnalyticsProviders> */}
-          {/* </ClerkProvider> */}
-        </TRPCReactProvider>
-        {/* </NuqsAdapter> */}
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          {isDevelopment && <ReactScan />}
+          <NuqsAdapter>
+            <TRPCReactProvider>
+              <Suspense>
+                <ClerkProvider>
+                  <AnalyticsProviders identifyUser>
+                    <StripeProvider>
+                      {props.children}
+                      <Toaster />
+                    </StripeProvider>
+                  </AnalyticsProviders>
+                </ClerkProvider>
+              </Suspense>
+            </TRPCReactProvider>
+          </NuqsAdapter>
+        </ThemeProvider>
       </body>
     </html>
   );

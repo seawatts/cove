@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"verbatim\"]",
+  "deps": [],
+  "features": "[\"verbatim\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/prettyplease-f1d4b9626f9f9687/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 4351721714796224696,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

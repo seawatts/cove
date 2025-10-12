@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"derive\", \"no-recursion-limit\", \"prost-derive\", \"std\"]",
+  "deps": [
+    [13923730284670848910, "prost_derive", false, 13798640174713688006],
+    [16066129441945555748, "bytes", false, 16752583662268097164]
+  ],
+  "features": "[\"derive\", \"prost-derive\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/prost-2b0f2dee4b546a5d/dep-lib-prost"
+      }
+    }
+  ],
+  "path": 10441463391507657748,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 11354245298608443161
+}

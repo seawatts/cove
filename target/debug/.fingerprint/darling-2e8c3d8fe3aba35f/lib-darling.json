@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"diagnostics\", \"suggestions\"]",
+  "deps": [
+    [14196716156172445059, "darling_macro", false, 3691088075838370314],
+    [18237315354678932508, "darling_core", false, 6058138774248470417]
+  ],
+  "features": "[\"default\", \"suggestions\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/darling-2e8c3d8fe3aba35f/dep-lib-darling"
+      }
+    }
+  ],
+  "path": 14644864537982052158,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 15817661549414626165
+}

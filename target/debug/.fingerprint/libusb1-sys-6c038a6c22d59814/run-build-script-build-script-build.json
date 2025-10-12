@@ -1,0 +1,172 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [9069838671608923642, "build_script_build", false, 16541900122097329017]
+  ],
+  "features": "",
+  "local": [
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBUSB_STATIC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBUSB_1.0_NO_PKG_CONFIG" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_aarch64_apple_darwin"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_PATH_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_PATH_aarch64_apple_darwin"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG_PATH" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_PATH" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_LIBDIR_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_LIBDIR_aarch64_apple_darwin"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG_LIBDIR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_LIBDIR" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_SYSROOT_DIR_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_SYSROOT_DIR_aarch64_apple_darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG_SYSROOT_DIR" }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_SYSROOT_DIR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBUDEV_NO_PKG_CONFIG" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_aarch64_apple_darwin"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBUDEV_STATIC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBUDEV_DYNAMIC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_ALL_STATIC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_ALL_DYNAMIC" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_PATH_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_PATH_aarch64_apple_darwin"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG_PATH" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_PATH" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_LIBDIR_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_LIBDIR_aarch64_apple_darwin"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG_LIBDIR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_LIBDIR" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_SYSROOT_DIR_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "PKG_CONFIG_SYSROOT_DIR_aarch64_apple_darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "HOST_PKG_CONFIG_SYSROOT_DIR" }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "PKG_CONFIG_SYSROOT_DIR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC_aarch64-apple-darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC_aarch64_apple_darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_CC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC_ENABLE_DEBUG_OUTPUT" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CRATE_CC_NO_DEFAULTS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "MACOSX_DEPLOYMENT_TARGET" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CFLAGS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_CFLAGS" } },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "CFLAGS_aarch64_apple_darwin" }
+    },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "CFLAGS_aarch64-apple-darwin" }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "AR_aarch64-apple-darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "AR_aarch64_apple_darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_AR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "AR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "ARFLAGS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_ARFLAGS" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "ARFLAGS_aarch64_apple_darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "ARFLAGS_aarch64-apple-darwin"
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

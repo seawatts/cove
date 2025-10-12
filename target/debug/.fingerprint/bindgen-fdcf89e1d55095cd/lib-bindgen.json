@@ -1,0 +1,37 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"__cli\", \"__testing_only_extra_assertions\", \"__testing_only_libclang_5\", \"__testing_only_libclang_9\", \"default\", \"experimental\", \"logging\", \"prettyplease\", \"runtime\", \"static\", \"which-rustfmt\"]",
+  "deps": [
+    [950716570147248582, "cexpr", false, 12744049343202502237],
+    [2004958070545769120, "lazycell", false, 8518430175299599723],
+    [2846752081260175975, "log", false, 5946434352383715874],
+    [4885725550624711673, "clang_sys", false, 10997068550956405858],
+    [6166349630582887940, "bitflags", false, 17623232234179407094],
+    [6243494903393190189, "which", false, 17454672890804195509],
+    [8410525223747752176, "shlex", false, 3113950816744838983],
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [9451456094439810778, "regex", false, 15890991560468132242],
+    [11863159202453368486, "peeking_take_while", false, 1206687255946227223],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [14018060396033203537, "build_script_build", false, 5835123482764743531],
+    [14451869005009427598, "prettyplease", false, 1458728764486886726],
+    [16055916053474393816, "rustc_hash", false, 18227674092944071763],
+    [17917672826516349275, "lazy_static", false, 2393032014872608456],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[\"default\", \"logging\", \"prettyplease\", \"runtime\", \"which-rustfmt\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/bindgen-fdcf89e1d55095cd/dep-lib-bindgen"
+      }
+    }
+  ],
+  "path": 5514896172672154039,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 15460903241111225995
+}

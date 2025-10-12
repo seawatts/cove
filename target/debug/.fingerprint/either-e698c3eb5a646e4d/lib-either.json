@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"serde\", \"std\", \"use_std\"]",
+  "deps": [],
+  "features": "[\"default\", \"std\", \"use_std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/either-e698c3eb5a646e4d/dep-lib-either"
+      }
+    }
+  ],
+  "path": 15805751048620503451,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17124342308084364240
+}

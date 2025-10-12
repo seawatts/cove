@@ -20,9 +20,10 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(['development', 'production', 'test'])
       .default('development'),
-    OPENAI_API_KEY: z.string(),
     POSTGRES_URL: z.string().url(),
     POSTHOG_KEY: z.string(),
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
   },
 
   skipValidation:

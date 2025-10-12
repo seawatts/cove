@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"arbitrary\", \"default\", \"std\"]",
+  "deps": [[9298649433536336071, "prost", false, 10844148949373756994]],
+  "features": "[\"default\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/prost-types-2ed045baa6c1931a/dep-lib-prost_types"
+      }
+    }
+  ],
+  "path": 9953435581404394787,
+  "profile": 14015556441653250765,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 9635722500656355479
+}

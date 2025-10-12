@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"aws_lc_rs\", \"default\", \"log\", \"logging\", \"read_buf\", \"ring\", \"rustversion\", \"tls12\"]",
+  "deps": [],
+  "features": "[\"default\", \"log\", \"logging\", \"ring\", \"tls12\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/rustls-872631a019650418/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 4761972326899324835,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

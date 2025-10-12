@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"logging\", \"pattern\", \"perf\", \"perf-backtrack\", \"perf-cache\", \"perf-dfa\", \"perf-dfa-full\", \"perf-inline\", \"perf-literal\", \"perf-onepass\", \"std\", \"unicode\", \"unicode-age\", \"unicode-bool\", \"unicode-case\", \"unicode-gencat\", \"unicode-perl\", \"unicode-script\", \"unicode-segment\", \"unstable\", \"use_std\"]",
+  "deps": [
+    [555019317135488525, "regex_automata", false, 13656430413422700756],
+    [9408802513701742484, "regex_syntax", false, 39359819032606873]
+  ],
+  "features": "[\"std\", \"unicode\", \"unicode-age\", \"unicode-bool\", \"unicode-case\", \"unicode-gencat\", \"unicode-perl\", \"unicode-script\", \"unicode-segment\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/regex-3a1d51e4205381fd/dep-lib-regex"
+      }
+    }
+  ],
+  "path": 9665331651901860208,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5796931310894148030
+}

@@ -1,0 +1,22 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [9689903380558560274, "build_script_build", false, 4192359756062522165]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/serde-4ba0d4ad57075d9e/output",
+        "paths": ["build.rs"]
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

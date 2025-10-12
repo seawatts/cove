@@ -1,0 +1,44 @@
+{
+  "commitlint": {
+    "extends": ["@acme/commitlint-config"]
+  },
+  "devDependencies": {
+    "@acme/commitlint-config": "workspace:*",
+    "@biomejs/biome": "1.9.4",
+    "@iarna/toml": "2.2.5",
+    "@turbo/gen": "2.4.4",
+    "lefthook": "1.11.3",
+    "turbo": "2.4.4",
+    "typescript": "5.8.2",
+    "vitest": "3.0.8"
+  },
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "name": "acme",
+  "packageManager": "pnpm@10.2.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "cargo clean && git clean -xdf node_modules",
+    "clean:ws": "turbo run clean",
+    "db:gen-migration": "turbo -F @acme/db gen-migration",
+    "db:migrate": "turbo -F @acme/db migrate",
+    "db:push": "turbo -F @acme/db push",
+    "db:seed": "turbo -F @acme/db seed",
+    "db:studio": "turbo -F @acme/db studio",
+    "dev": "pnpm docker && turbo watch dev --concurrency 30",
+    "dev:next": "turbo watch dev -F @acme/web-app...",
+    "docker": "docker compose up -d",
+    "format": "turbo run format && biome check",
+    "format:ci": "biome ci",
+    "format:fix": "biome check --write",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "postinstall": "pnpm lint:ws",
+    "prepare": "npx lefthook install",
+    "test": "pnpm with-env vitest",
+    "typecheck": "turbo run typecheck",
+    "ui-add": "turbo run ui-add",
+    "with-env": "dotenv -e ./.env --"
+  }
+}

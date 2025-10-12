@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/zeroconf-macros-f82fadea5f5da85e/dep-lib-zeroconf_macros"
+      }
+    }
+  ],
+  "path": 417448072287384641,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5112254788594684428
+}

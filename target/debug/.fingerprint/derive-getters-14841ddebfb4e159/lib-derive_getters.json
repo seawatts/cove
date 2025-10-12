@@ -1,0 +1,24 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [2713742371683562785, "syn", false, 7184635814328470461],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/derive-getters-14841ddebfb4e159/dep-lib-derive_getters"
+      }
+    }
+  ],
+  "path": 11173073358558685182,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 3203808915849684700
+}

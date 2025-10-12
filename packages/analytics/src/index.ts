@@ -1,1 +1,2 @@
-export const name = 'analytics';
+export * from './components';
+export * from './providers';

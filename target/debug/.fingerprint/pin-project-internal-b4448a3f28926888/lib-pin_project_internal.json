@@ -1,0 +1,24 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/pin-project-internal-b4448a3f28926888/dep-lib-pin_project_internal"
+      }
+    }
+  ],
+  "path": 6546067002200951038,
+  "profile": 16777289720659070603,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 777236694398023488
+}

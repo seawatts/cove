@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [[6502365400774175331, "nom", false, 6716176811166087514]],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/cexpr-eaa949f431d03de5/dep-lib-cexpr"
+      }
+    }
+  ],
+  "path": 14697056136464017557,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 18139931998865716051
+}

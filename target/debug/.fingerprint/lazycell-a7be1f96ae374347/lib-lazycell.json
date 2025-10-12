@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"clippy\", \"nightly\", \"nightly-testing\", \"serde\"]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/lazycell-a7be1f96ae374347/dep-lib-lazycell"
+      }
+    }
+  ],
+  "path": 16046160335561118264,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 6702215603095050318
+}

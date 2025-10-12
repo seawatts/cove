@@ -1,0 +1,27 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"cleanup-markdown\", \"default\", \"prost\", \"prost-build\", \"transport\"]",
+  "deps": [
+    [2739579679802620019, "prost_build", false, 7626503876340868974],
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [14451869005009427598, "prettyplease", false, 1458728764486886726],
+    [16470553738848018267, "prost_types", false, 12956786860692891412],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[\"default\", \"prost\", \"prost-build\", \"transport\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/tonic-build-ecb0ff1e0a44d77a/dep-lib-tonic_build"
+      }
+    }
+  ],
+  "path": 10967761163777720842,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 9025750215440372010
+}

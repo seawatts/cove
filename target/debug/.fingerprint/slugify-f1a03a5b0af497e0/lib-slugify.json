@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [[3184623857468114619, "unidecode", false, 16089472342596096895]],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/slugify-f1a03a5b0af497e0/dep-lib-slugify"
+      }
+    }
+  ],
+  "path": 15698394307695783209,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 16802861975839553618
+}

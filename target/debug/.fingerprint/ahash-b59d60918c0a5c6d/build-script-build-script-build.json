@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"atomic-polyfill\", \"compile-time-rng\", \"const-random\", \"default\", \"getrandom\", \"nightly-arm-aes\", \"no-rng\", \"runtime-rng\", \"serde\", \"std\"]",
+  "deps": [[5398981501050481332, "version_check", false, 17775092250384098759]],
+  "features": "[\"default\", \"getrandom\", \"runtime-rng\", \"serde\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/ahash-b59d60918c0a5c6d/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 17656671961202819561,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

@@ -1,0 +1,25 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"log\", \"logging\"]",
+  "deps": [
+    [2713742371683562785, "syn", false, 7184635814328470461],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [14870434861910450296, "darling", false, 12899112899359106196],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/derive_builder_core-8db51c8a085488a9/dep-lib-derive_builder_core"
+      }
+    }
+  ],
+  "path": 17479657926206697845,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 1014347520819163996
+}

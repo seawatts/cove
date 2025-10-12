@@ -1,0 +1,22 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"backtrace\", \"default\", \"std\"]",
+  "deps": [
+    [18396545099218507036, "build_script_build", false, 12853437396134951494]
+  ],
+  "features": "[\"default\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/anyhow-e6ccea6b0cdaef3a/dep-lib-anyhow"
+      }
+    }
+  ],
+  "path": 17166754501010009402,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 16100955855663461252
+}

@@ -1,0 +1,24 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [2713742371683562785, "syn", false, 7184635814328470461],
+    [17990358020177143287, "quote", false, 6153313489869360746],
+    [18237315354678932508, "darling_core", false, 6058138774248470417]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/darling_macro-c6c62c91d72f7757/dep-lib-darling_macro"
+      }
+    }
+  ],
+  "path": 4730057311577871824,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 8242757303326324499
+}

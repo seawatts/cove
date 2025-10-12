@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"heavyweight\", \"lazy_static\", \"regex\", \"unstable\"]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/Inflector-679b27ab5d0773c3/dep-lib-inflector"
+      }
+    }
+  ],
+  "path": 15376332350313539035,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 4519538469024279193
+}

@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"compiler_builtins\", \"core\", \"rustc-dep-of-std\"]",
+  "deps": [],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/cfg-if-4b80b63c69664a25/dep-lib-cfg_if"
+      }
+    }
+  ],
+  "path": 12250762561909779448,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 14691992093392644261
+}

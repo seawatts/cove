@@ -1,0 +1,17 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [1911198838511991465, "build_script_build", false, 5707806235606478744]
+  ],
+  "features": "",
+  "local": [
+    { "Precalculated": "1741847066.364241379s (tests/connection_test.rs)" }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

@@ -1,0 +1,25 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [8255984149445737001, "synstructure", false, 18182555576409357671],
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [17990358020177143287, "quote", false, 6153313489869360746]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/zerofrom-derive-ae497f953928a3dd/dep-lib-zerofrom_derive"
+      }
+    }
+  ],
+  "path": 892364680713678833,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 1753304412232254384
+}

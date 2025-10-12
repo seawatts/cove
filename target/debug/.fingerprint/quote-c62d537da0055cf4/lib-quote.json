@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"proc-macro\"]",
+  "deps": [[12410540580958238005, "proc_macro2", false, 10336764199039970469]],
+  "features": "[\"default\", \"proc-macro\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/quote-c62d537da0055cf4/dep-lib-quote"
+      }
+    }
+  ],
+  "path": 8992491755154331570,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 3570458776599611685
+}

@@ -1,0 +1,25 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"chrono\", \"chrono_timestamp\", \"default\", \"ilp-over-http\", \"insecure-skip-verify\", \"json_tests\", \"tls-native-certs\", \"tls-webpki-certs\"]",
+  "deps": [
+    [629381703529241162, "indoc", false, 4921187774560861969],
+    [4483728947444869209, "slugify", false, 1863780197893579601],
+    [9689903380558560274, "serde", false, 16858435196598472147],
+    [15367738274754116744, "serde_json", false, 4304593008418140365]
+  ],
+  "features": "[\"chrono\", \"chrono_timestamp\", \"default\", \"ilp-over-http\", \"tls-webpki-certs\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/questdb-rs-bfd6963e19cf2dd9/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 5350345430576143991,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

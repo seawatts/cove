@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"__cli\", \"__testing_only_extra_assertions\", \"__testing_only_libclang_16\", \"__testing_only_libclang_9\", \"default\", \"experimental\", \"logging\", \"prettyplease\", \"runtime\", \"static\", \"which-rustfmt\"]",
+  "deps": [],
+  "features": "[\"default\", \"logging\", \"prettyplease\", \"runtime\", \"which-rustfmt\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/bindgen-83aa4c29d553c926/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 17879742526821494707,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

@@ -1,0 +1,14 @@
+/Users/seawatts/src/github.com/seawatts/cove/target/debug/deps/clang_sys-db2e586d2f6faffb.d: /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/macros.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/common.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/dynamic.rs
+
+/Users/seawatts/src/github.com/seawatts/cove/target/debug/deps/libclang_sys-db2e586d2f6faffb.rlib: /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/macros.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/common.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/dynamic.rs
+
+/Users/seawatts/src/github.com/seawatts/cove/target/debug/deps/libclang_sys-db2e586d2f6faffb.rmeta: /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs /Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/macros.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/common.rs /Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/dynamic.rs
+
+/Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs:
+/Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs:
+/Users/seawatts/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs:
+/Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/macros.rs:
+/Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/common.rs:
+/Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out/dynamic.rs:
+
+# env-dep:OUT_DIR=/Users/seawatts/src/github.com/seawatts/cove/target/debug/build/clang-sys-328d305c0e3ba238/out

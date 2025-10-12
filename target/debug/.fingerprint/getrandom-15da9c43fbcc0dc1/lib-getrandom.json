@@ -1,0 +1,24 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"rustc-dep-of-std\", \"std\", \"wasm_js\"]",
+  "deps": [
+    [8194304432723500424, "libc", false, 3748264524818799611],
+    [10411997081178400487, "cfg_if", false, 2900738229985720104],
+    [12546824318118147037, "build_script_build", false, 3090872449169572584]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/getrandom-15da9c43fbcc0dc1/dep-lib-getrandom"
+      }
+    }
+  ],
+  "path": 166898944099164486,
+  "profile": 17522863583572766575,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 11669924403970522481
+}

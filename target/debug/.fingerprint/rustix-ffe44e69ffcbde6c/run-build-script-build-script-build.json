@@ -1,0 +1,39 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [3430646239657634944, "build_script_build", false, 13856550391686283190]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/rustix-ffe44e69ffcbde6c/output",
+        "paths": ["build.rs"]
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "CARGO_CFG_RUSTIX_USE_EXPERIMENTAL_ASM"
+      }
+    },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "CARGO_CFG_RUSTIX_USE_LIBC" }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "CARGO_FEATURE_USE_LIBC" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "CARGO_FEATURE_RUSTC_DEP_OF_STD"
+      }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "CARGO_CFG_MIRI" } }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

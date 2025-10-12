@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"serde\", \"std\"]",
+  "deps": [[6229979215132119378, "autocfg", false, 3697603351720558752]],
+  "features": "[\"default\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/slab-175bbc5685898f5c/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 17159372611833331587,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

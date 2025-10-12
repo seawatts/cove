@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"arbitrary\", \"borsh\", \"default\", \"quickcheck\", \"rayon\", \"serde\", \"std\", \"test_debug\"]",
+  "deps": [
+    [5230392855116717286, "equivalent", false, 2157099680144587079],
+    [17286916485753290591, "hashbrown", false, 16804250929745066054]
+  ],
+  "features": "[\"default\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/indexmap-0e922be734f81806/dep-lib-indexmap"
+      }
+    }
+  ],
+  "path": 6473797683348362071,
+  "profile": 8948574731377336545,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 10391229881554802429
+}

@@ -1,0 +1,24 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"verbatim\"]",
+  "deps": [
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [14451869005009427598, "build_script_build", false, 7124490966011658019]
+  ],
+  "features": "[\"verbatim\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/prettyplease-54bcee2607f0c747/dep-lib-prettyplease"
+      }
+    }
+  ],
+  "path": 17369426082256084842,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 18426667244755495939
+}

@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [[6095238760671403940, "tonic_build", false, 3105607874304253362]],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/esphome-7bb39dabb6a50589/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 17415253531052996372,
+  "profile": 502103643719580362,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

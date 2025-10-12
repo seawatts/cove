@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"i128\", \"libm\", \"std\"]",
+  "deps": [[6229979215132119378, "autocfg", false, 3697603351720558752]],
+  "features": "[\"i128\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/num-traits-0243d81f3e143de9/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 10081385815539215619,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

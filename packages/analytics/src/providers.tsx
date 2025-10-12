@@ -2,26 +2,19 @@
 
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import dynamic from 'next/dynamic';
-import { GoogleAnalytics } from 'nextjs-google-analytics';
 import type { PropsWithChildren } from 'react';
 
 import { env } from './env.client';
-import { WebVitals } from './nextjs/web-vitals';
-import {
-  PostHogIdentifyUser,
-  PostHogProvider,
-  PosthogWebVitals,
-} from './posthog/client';
+import { PostHogIdentifyUser } from './posthog/client';
+import { WebVitals } from './web-vitals';
 
-const isProduction = env.NEXT_PUBLIC_APP_ENV === 'production';
-
-const PostHogPageView = dynamic(
-  () => import('./posthog/client').then((module_) => module_.PostHogPageView),
-  {
-    ssr: false,
-  },
-);
+// Build-time prod check
+const isBuildProduction = env.NODE_ENV === 'production';
+// Runtime environment hint from Vercel
+const vercelEnv = env.NEXT_PUBLIC_VERCEL_ENV;
+const isVercelProduction = vercelEnv === 'production';
+// Final: enable analytics in real production builds only
+const isProduction = isBuildProduction && isVercelProduction;
 
 export function AnalyticsProviders(
   props: PropsWithChildren & { identifyUser?: boolean },
@@ -29,16 +22,13 @@ export function AnalyticsProviders(
   return (
     <>
       {isProduction && (
-        <PostHogProvider>
-          <GoogleAnalytics trackPageViews />
-          <PosthogWebVitals />
-          <PostHogPageView />
+        <>
           {props.identifyUser && <PostHogIdentifyUser />}
           <WebVitals />
           {props.children}
           <Analytics />
           <SpeedInsights />
-        </PostHogProvider>
+        </>
       )}
       {!isProduction && props.children}
     </>

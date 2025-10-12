@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"vendored\"]",
+  "deps": [
+    [3214373357989284387, "pkg_config", false, 17228636915501326419],
+    [13075896355434424484, "cc", false, 5890568570767855911]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/libusb1-sys-e8aeaf896abae916/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 9274361425803825740,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 17883862002600103897
+}

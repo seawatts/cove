@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"nightly\", \"proc-macro\", \"span-locations\"]",
+  "deps": [
+    [1988483478007900009, "unicode_ident", false, 8612422229392519848],
+    [12410540580958238005, "build_script_build", false, 12782918595824799826]
+  ],
+  "features": "[\"default\", \"proc-macro\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/proc-macro2-f05441af88758d6a/dep-lib-proc_macro2"
+      }
+    }
+  ],
+  "path": 11904483265888120863,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 369203346396300798
+}

@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"aws-lc-rs\", \"aws_lc_rs\", \"brotli\", \"custom-provider\", \"default\", \"fips\", \"hashbrown\", \"log\", \"logging\", \"prefer-post-quantum\", \"read_buf\", \"ring\", \"rustversion\", \"std\", \"tls12\", \"zlib\"]",
+  "deps": [],
+  "features": "[\"log\", \"logging\", \"ring\", \"std\", \"tls12\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/rustls-4e26d673e35fb992/dep-build-script-build-script-build"
+      }
+    }
+  ],
+  "path": 9226528227157194729,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 5408242616063297496
+}

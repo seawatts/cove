@@ -1,0 +1,34 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [14018060396033203537, "build_script_build", false, 8369401884057544544],
+    [4885725550624711673, "build_script_build", false, 14952237050933029318],
+    [14451869005009427598, "build_script_build", false, 7124490966011658019]
+  ],
+  "features": "",
+  "local": [
+    { "RerunIfEnvChanged": { "val": null, "var": "LLVM_CONFIG_PATH" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBCLANG_PATH" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBCLANG_STATIC_PATH" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "BINDGEN_EXTRA_CLANG_ARGS" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "BINDGEN_EXTRA_CLANG_ARGS_aarch64-apple-darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "BINDGEN_EXTRA_CLANG_ARGS_aarch64_apple_darwin"
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

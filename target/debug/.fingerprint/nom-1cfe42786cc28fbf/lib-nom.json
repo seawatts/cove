@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"alloc\", \"default\", \"docsrs\", \"std\"]",
+  "deps": [
+    [3129130049864710036, "memchr", false, 14253686128930539412],
+    [4917998273308230437, "minimal_lexical", false, 16111408169500574316]
+  ],
+  "features": "[\"alloc\", \"std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/nom-1cfe42786cc28fbf/dep-lib-nom"
+      }
+    }
+  ],
+  "path": 71053279155501991,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 15126381483855761411
+}

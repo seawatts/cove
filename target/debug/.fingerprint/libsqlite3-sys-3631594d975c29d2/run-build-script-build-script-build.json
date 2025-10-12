@@ -1,0 +1,67 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [10267916864704343110, "build_script_build", false, 2020043902722328168]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/libsqlite3-sys-3631594d975c29d2/output",
+        "paths": ["sqlite3/sqlite3.c", "sqlite3/wasm32-wasi-vfs.c"]
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "LIBSQLITE3_SYS_USE_PKG_CONFIG"
+      }
+    },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "SQLITE_MAX_VARIABLE_NUMBER" }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "SQLITE_MAX_EXPR_DEPTH" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "SQLITE_MAX_COLUMN" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "LIBSQLITE3_FLAGS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC_aarch64-apple-darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC_aarch64_apple_darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_CC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CC_ENABLE_DEBUG_OUTPUT" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CRATE_CC_NO_DEFAULTS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "MACOSX_DEPLOYMENT_TARGET" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "CFLAGS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_CFLAGS" } },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "CFLAGS_aarch64_apple_darwin" }
+    },
+    {
+      "RerunIfEnvChanged": { "val": null, "var": "CFLAGS_aarch64-apple-darwin" }
+    },
+    { "RerunIfEnvChanged": { "val": null, "var": "AR_aarch64-apple-darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "AR_aarch64_apple_darwin" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_AR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "AR" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "ARFLAGS" } },
+    { "RerunIfEnvChanged": { "val": null, "var": "HOST_ARFLAGS" } },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "ARFLAGS_aarch64_apple_darwin"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "ARFLAGS_aarch64-apple-darwin"
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

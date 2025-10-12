@@ -1,0 +1,26 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [8986759836770526006, "syn", false, 5971432219628213749],
+    [12410540580958238005, "proc_macro2", false, 10336764199039970469],
+    [16326338539882746041, "itertools", false, 10085595656411974551],
+    [17990358020177143287, "quote", false, 6153313489869360746],
+    [18396545099218507036, "anyhow", false, 2013625754388126809]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/prost-derive-fca2a43fc9f1ce07/dep-lib-prost_derive"
+      }
+    }
+  ],
+  "path": 414014462129927989,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 16137267380696548196
+}

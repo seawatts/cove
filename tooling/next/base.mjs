@@ -1,22 +1,30 @@
-// @ts-check
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { withPostHogConfig } from '@posthog/nextjs-config';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // compiler: {
-  // removeConsole: true,
-  // },
-  reactStrictMode: true,
+  // dynamicIO: true,
   eslint: { ignoreDuringBuilds: true },
   experimental: {
+    // Forward browser logs to the terminal for easier debugging
+    browserDebugInfoInTerminal: true,
+
+    // cacheLife: true,
+    // cacheComponents: true,
+    // Activate new client-side router improvements
+    clientSegmentCache: true, // will be renamed to cacheComponents in Next.js 16
+
+    // Explore route composition and segment overrides via DevTools
+    devtoolSegmentExplorer: true,
+    // Enable new caching and pre-rendering behavior
+
+    enablePrerenderSourceMaps: true,
+    // Enable support for `global-not-found`, which allows you to more easily define a global 404 page.
+    globalNotFound: true,
     scrollRestoration: true,
-    typedRoutes: true,
-    // dynamicIO: true,
-    serverActions: {
-      bodySizeLimit: '20mb',
-    },
+    // turbopackPersistentCaching: true,
+    useCache: true,
   },
-  serverExternalPackages: ['@boundaryml/baml'],
   images: {
     remotePatterns: [
       { hostname: 'images.unsplash.com' },
@@ -28,6 +36,9 @@ const nextConfig = {
       { hostname: 'img.clerk.com' },
       { hostname: 'image.tmdb.org' },
       { hostname: 'picsum.photos' },
+      { hostname: 'seawatts.sh' },
+      { hostname: 'randomuser.me' },
+      { hostname: 'cdn.brandfetch.io' },
     ],
   },
   logging: {
@@ -36,23 +47,41 @@ const nextConfig = {
     },
   },
   poweredByHeader: false,
+  // compiler: {
+  // removeConsole: true,
+  // },
+  reactStrictMode: true,
+  transpilePackages: [
+    '@seawatts/analytics',
+    '@seawatts/api',
+    '@seawatts/db',
+    '@seawatts/id',
+    '@seawatts/ui',
+    '@seawatts/logger',
+    '@seawatts/stripe',
+  ],
   typescript: { ignoreBuildErrors: true },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.node$/,
-      use: [
-        {
-          loader: 'nextjs-node-loader',
-          options: {
-            outputPath: config.output.path,
-          },
-        },
-      ],
-    });
-    return config;
-  },
 };
 
-export default withBundleAnalyzer({
-  enabled: process.env.NEXT_ANALYZE === 'true',
-})(nextConfig);
+const withPlugins = [
+  process.env.WITH_BUNDLE_ANALYZER === 'true'
+    ? withBundleAnalyzer({ enabled: true })
+    : null,
+].filter((plugin) => plugin !== null);
+
+const configWithPlugins = withPlugins.reduce(
+  (acc, plugin) => plugin(acc),
+  nextConfig,
+);
+
+/** @type {import('next').NextConfig} */
+const finalConfig =
+  process.env.POSTHOG_PERSONAL_API_KEY && process.env.POSTHOG_ENV_ID
+    ? withPostHogConfig(configWithPlugins, {
+        envId: process.env.POSTHOG_ENV_ID, // Environment ID
+        host: process.env.NEXT_PUBLIC_POSTHOG_HOST, // (optional), defaults to https://us.posthog.com
+        personalApiKey: process.env.POSTHOG_PERSONAL_API_KEY, // Personal API Key
+      })
+    : configWithPlugins;
+
+export default finalConfig;

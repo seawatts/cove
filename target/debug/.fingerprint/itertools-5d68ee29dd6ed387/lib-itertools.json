@@ -1,0 +1,20 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"default\", \"use_alloc\", \"use_std\"]",
+  "deps": [[12170264697963848012, "either", false, 12546085607422236195]],
+  "features": "[\"default\", \"use_alloc\", \"use_std\"]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/itertools-5d68ee29dd6ed387/dep-lib-itertools"
+      }
+    }
+  ],
+  "path": 1769926692195043659,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 4043370049547609272
+}

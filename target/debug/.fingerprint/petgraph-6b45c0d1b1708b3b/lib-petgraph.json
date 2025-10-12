@@ -1,0 +1,23 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[\"all\", \"default\", \"generate\", \"graphmap\", \"matrix_graph\", \"quickcheck\", \"rayon\", \"serde\", \"serde-1\", \"serde_derive\", \"stable_graph\", \"unstable\"]",
+  "deps": [
+    [769836618969650812, "indexmap", false, 10587617236408285537],
+    [6234078840545730324, "fixedbitset", false, 5994552363355229706]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/petgraph-6b45c0d1b1708b3b/dep-lib-petgraph"
+      }
+    }
+  ],
+  "path": 10825710690175106536,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 16670801973687532141
+}

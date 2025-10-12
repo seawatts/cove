@@ -1,0 +1,34 @@
+{
+  "compile_kind": 0,
+  "config": 0,
+  "declared_features": "",
+  "deps": [
+    [8194304432723500424, "build_script_build", false, 2626482629727717511]
+  ],
+  "features": "",
+  "local": [
+    {
+      "RerunIfChanged": {
+        "output": "debug/build/libc-8d4cd4920e8b7cda/output",
+        "paths": ["build.rs"]
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "RUST_LIBC_UNSTABLE_FREEBSD_VERSION"
+      }
+    },
+    {
+      "RerunIfEnvChanged": {
+        "val": null,
+        "var": "RUST_LIBC_UNSTABLE_LINUX_TIME_BITS64"
+      }
+    }
+  ],
+  "path": 0,
+  "profile": 0,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 0
+}

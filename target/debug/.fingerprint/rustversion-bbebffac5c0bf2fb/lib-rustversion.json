@@ -1,0 +1,22 @@
+{
+  "compile_kind": 0,
+  "config": 2069994364910194474,
+  "declared_features": "[]",
+  "deps": [
+    [1999399154011168049, "build_script_build", false, 2894894666322775334]
+  ],
+  "features": "[]",
+  "local": [
+    {
+      "CheckDepInfo": {
+        "checksum": false,
+        "dep_info": "debug/.fingerprint/rustversion-bbebffac5c0bf2fb/dep-lib-rustversion"
+      }
+    }
+  ],
+  "path": 12404031013375798231,
+  "profile": 3033921117576893,
+  "rustc": 17575471286409424799,
+  "rustflags": [],
+  "target": 179193587114931863
+}
