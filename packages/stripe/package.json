@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "@seawatts/analytics": "workspace:*",
+    "@t3-oss/env-core": "0.13.8",
+    "next": "15.5.4",
+    "stripe": "19.1.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@seawatts/tsconfig": "workspace:*",
+    "typescript": "5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./guards/client": "./src/guards/client.tsx",
+    "./guards/server": "./src/guards/server.ts"
+  },
+  "license": "MIT",
+  "name": "@seawatts/stripe",
+  "private": true,
+  "scripts": {
+    "build": "bun run populate-ids",
+    "clean": "git clean -xdf .turbo node_modules dist",
+    "delete-subscriptions": "bun run ./scripts/delete-customer-subscriptions.ts",
+    "dev": "bun run build && tsc --watch",
+    "populate-ids": "bun run ./scripts/populate-ids.ts",
+    "push": "bun run ./scripts/create-stripe-entities.ts",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

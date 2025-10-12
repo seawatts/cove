@@ -1,16 +1,28 @@
 {
-  "extends": "@acme/tsconfig/base.json",
   "compilerOptions": {
-    "lib": ["es2022", "dom", "dom.iterable"],
-    "jsx": "preserve",
     "baseUrl": ".",
+    "incremental": true,
     "paths": {
+      "@seawatts/analytics/*": ["../../packages/analytics/src/*"],
+      "@seawatts/stripe/*": ["../../packages/stripe/src/*"],
+      "@seawatts/ui/*": ["../../packages/ui/src/*"],
+      "@seawatts/zustand/*": ["../../packages/zustand/src/*"],
       "~/*": ["./src/*"]
     },
-    "plugins": [{ "name": "next" }],
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "module": "esnext"
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
-  "include": [".", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next"],
+  "extends": "@seawatts/tsconfig/nextjs.json",
+  "include": [
+    "next-env.d.ts",
+    "next.config.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ]
 }

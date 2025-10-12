@@ -1,0 +1,32 @@
+# Seawatts Webhook Configuration
+#
+# For more information, visit: https://docs.seawatts.sh/configuration
+#
+# Copy the following URL in your services:
+# https://seawatts.sh/my-org/my-webhook
+#
+# Optionally, you can attach ?source=Clerk to the URL.
+# Clerk: https://seawatts.sh/my-org/my-webhook?source=clerk
+# Stripe: https://seawatts.sh/my-org/my-webhook?source=stripe
+# etc...
+#
+# Schema:
+#   webhookUrl: string                   # Full webhook URL (e.g., https://seawatts.sh/my-org/my-webhook)
+#   destination:                         # Array of destination endpoints
+#     - name: string                     # Name of the endpoint
+#       url: string|URL|RemotePattern    # URL to forward webhooks to
+#       ping?: boolean|string|URL        # Optional ping configuration
+#   delivery:                             # Array of delivery rules
+#     - source?: string                  # Optional source filter (default: *)
+#       destination: string              # Name of the destination from 'destination' array
+
+# Test Curl:
+# curl -X POST https://seawatts.sh/my-org/my-webhook?source=test -H "Content-Type: application/json" -d '{"type": "test.command", "data": { "message": "Hello, world!" }}'
+
+webhookUrl: https://seawatts.sh/my-org/my-webhook
+destination:
+  - name: local
+    url: http://localhost:3000/api/webhooks
+delivery:
+  - source: '*'
+    destination: local

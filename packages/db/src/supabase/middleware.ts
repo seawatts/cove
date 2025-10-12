@@ -1,7 +1,7 @@
+import { auth } from '@clerk/nextjs/server';
 import { createServerClient } from '@supabase/ssr';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-
 import { env } from '../env.client';
 
 export async function updateSession(request: NextRequest) {
@@ -13,6 +13,9 @@ export async function updateSession(request: NextRequest) {
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
+      async accessToken() {
+        return (await auth()).getToken();
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();

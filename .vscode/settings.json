@@ -1,14 +1,26 @@
 {
-  "[rust]": {
-    "editor.defaultFormatter": "rust-lang.rust-analyzer",
-    "editor.formatOnSave": true
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "cSpell.words": ["Omni", "openai"],
   "editor.codeActionsOnSave": {
-    "quickfix.biome": "explicit",
-    "source.organizeImports.biome": "explicit"
+    "source.fixAll.biome": "explicit"
   },
   "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/build": false,
+    "tooling/github/cli/build": false
+  },
+  "files.watcherExclude": {
+    "**/build": false,
+    "tooling/github/cli/build": false
+  },
+  "search.exclude": {
+    "**/build": false,
+    "tooling/github/cli/build": false
+  },
+  "svg.preview.background": "editor",
   "tailwindCSS.experimental.classRegex": [
     ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
@@ -28,12 +40,10 @@
     ["twx\\.[^`]+\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
     ["twx\\(.*?\\).*?\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
-  "cSpell.words": ["Omni", "openai"],
-  "rust-analyzer.checkOnSave": true
-  // "yaml.schemas": {
-  //   "./packages/backend/config/schemas/cove.schema.json": [
-  //     "packages/backend/config/cove.yaml"
-  //   ]
-  // },
-  // "yaml.customTags": ["!include scalar", "!include sequence"]
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#000000",
+    "titleBar.activeForeground": "#ffffff",
+    "titleBar.inactiveBackground": "#000000",
+    "titleBar.inactiveForeground": "#ffffff"
+  }
 }

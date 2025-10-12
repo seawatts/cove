@@ -50,11 +50,10 @@ posthog.init(process.env.PLASMO_PUBLIC_POSTHOG_KEY || '', {
   },
   persistence: 'localStorage',
 });
+
 // }, []);
 
 // return <Provider client={posthog as unknown as PostHog}>{children}</Provider>;
 // }
-
-// export { usePostHog } from "posthog-js/react";
 
 export { default as posthog } from 'posthog-js/dist/module.full.no-external';

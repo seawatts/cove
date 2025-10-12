@@ -1,44 +1,135 @@
 {
-  "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
-      "request": "launch",
+      "command": "infisical run -- bun test ${relativeFile}",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "INFISICAL_RUN": "true"
+      },
       "name": "Debug Current Test File",
-      "autoAttachChildProcesses": true,
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
-      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
-      "args": ["run", "${relativeFile}"],
-      "envFile": "${workspaceFolder}/.env",
-      "smartStep": true,
-      "console": "integratedTerminal"
+      "request": "launch",
+      "type": "node-terminal"
+      // "envFile": "${workspaceFolder}/.env",
+      // "smartStep": true,
+      // "console": "integratedTerminal"
     },
     {
-      "name": "Next.js",
-      "type": "node-terminal",
-      "request": "launch",
-      "command": "pnpm dev",
+      "command": "bun dev",
       "cwd": "${workspaceFolder}/apps/nextjs/",
-      "skipFiles": ["<node_internals>/**"]
+      "name": "Next.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node-terminal"
     },
     {
-      "type": "lldb",
-      "request": "launch",
-      "name": "Debug unit tests in library",
-      "cargo": {
-        "args": ["test", "--no-run", "--lib"]
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/apps/vscode-extension"
+      ],
+      "cwd": "${workspaceFolder}/apps/vscode-extension",
+      "env": {
+        "DEBUG": "*",
+        "NODE_ENV": "development"
+        // "VSCODE_DEV": "true"
       },
-      "args": [],
-      "cwd": "${workspaceFolder}/packages/backend"
+      "name": "Run VSCode Extension",
+      "outFiles": ["${workspaceFolder}/apps/vscode-extension/dist/**/*.js"],
+      // "preLaunchTask": "prepare-extension",
+      "request": "launch",
+      "type": "extensionHost"
     },
     {
-      "type": "lldb",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/apps/vscode-extension",
+        "--extensionTestsPath=${workspaceFolder}/apps/vscode-extension/dist/test/integ/utils/test-runner.js"
+      ],
+      "name": "Extension Tests",
+      "outFiles": [
+        // "${workspaceFolder}/apps/vscode-extension/dist/**/*.js",
+        "${workspaceFolder}/**/dist/**/*.js"
+      ],
+      "preLaunchTask": "vscode-extension:build:test",
       "request": "launch",
-      "name": "Debug specific test",
-      "cargo": {
-        "args": ["test", "--no-run", "--test=integration_test"]
+      "runtimeExecutable": "${execPath}",
+      "type": "extensionHost"
+    },
+    {
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_OPTIONS": "--unhandled-rejections=strict"
       },
-      "args": []
+      "name": "Debug cli.js",
+      "program": "${workspaceFolder}/apps/cli/bin/cli.js",
+      "request": "launch",
+      "runtimeArgs": ["--inspect-brk"],
+      "stopOnEntry": false,
+      "type": "node"
+    },
+    {
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/packages/mcp-server",
+      "env": {
+        "DEBUG": "*",
+        "NODE_ENV": "development"
+      },
+      "name": "Debug MCP Server",
+      "program": "${workspaceFolder}/packages/mcp-server/src/dev-server.ts",
+      "request": "launch",
+      "stopOnEntry": false,
+      "type": "bun"
+    },
+    {
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/packages/mcp-server",
+      "env": {
+        "DEBUG": "*",
+        "NODE_ENV": "development"
+      },
+      "name": "Debug MCP Inspector",
+      "program": "${workspaceFolder}/packages/mcp-server/src/dev-inspector.ts",
+      "request": "launch",
+      "stopOnEntry": false,
+      "type": "bun"
+    },
+    {
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/packages/mcp-server",
+      "env": {
+        "DEBUG": "*",
+        "NODE_ENV": "development"
+      },
+      "name": "Debug MCP Debug Server",
+      "program": "${workspaceFolder}/packages/mcp-server/src/debug-server.ts",
+      "request": "launch",
+      "stopOnEntry": false,
+      "type": "bun"
+    },
+    {
+      "args": ["src/test/mcp-server.test.ts"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/packages/mcp-server",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "name": "Test MCP Server",
+      "program": "test",
+      "request": "launch",
+      "stopOnEntry": false,
+      "type": "bun"
+    },
+    {
+      "command": "infisical run -- bun run src/dev-server.ts",
+      "cwd": "${workspaceFolder}/packages/mcp-server",
+      "env": {
+        "DEBUG": "*",
+        "INFISICAL_RUN": "true",
+        "NODE_ENV": "development"
+      },
+      "name": "MCP Server with Infisical",
+      "request": "launch",
+      "type": "node-terminal"
     }
-  ]
+  ],
+  "version": "0.2.0"
 }

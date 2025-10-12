@@ -1,5 +1,11 @@
 import { init } from '@paralleldrive/cuid2';
 import { ulid } from 'ulid';
+import {
+  adjectives,
+  animals,
+  colors,
+  uniqueNamesGenerator,
+} from 'unique-names-generator';
 
 export function createId(props?: {
   prefix?: string;
@@ -34,4 +40,31 @@ export const generateRandomSlug = ({ length }: { length: number }): string => {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
+};
+
+export const generateRandomName = (): string => {
+  return uniqueNamesGenerator({
+    dictionaries: [adjectives, animals, colors],
+    length: 3,
+    seed: Date.now(),
+    separator: '-',
+    style: 'lowerCase',
+  });
+};
+
+export const generateUniqueOrgName = (): string => {
+  // Generate a more unique name with additional randomness
+  const timestamp = Date.now().toString(36);
+  const randomSuffix = Math.random().toString(36).substring(2, 6);
+
+  return (
+    // biome-ignore lint/style/useTemplate: don't remove this
+    uniqueNamesGenerator({
+      dictionaries: [adjectives, animals],
+      length: 2,
+      seed: Date.now() + Math.random(),
+      separator: '-',
+      style: 'lowerCase',
+    }) + `-${timestamp}-${randomSuffix}`
+  );
 };

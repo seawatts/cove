@@ -1,3 +1,4 @@
 {
-  "name": "@acme/github"
+  "name": "@seawatts/github",
+  "private": true
 }

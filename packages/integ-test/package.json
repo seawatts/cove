@@ -1,0 +1,43 @@
+{
+  "dependencies": {
+    "@seawatts/api": "workspace:*",
+    "@seawatts/db": "workspace:*",
+    "@seawatts/id": "workspace:*",
+    "@seawatts/utils": "workspace:*",
+    "@supabase/supabase-js": "2.75.0",
+    "drizzle-orm": "0.44.6",
+    "postgres": "3.4.7",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "10.0.0",
+    "@seawatts/tsconfig": "workspace:*",
+    "@testcontainers/postgresql": "11.7.1",
+    "@types/node": "24.7.2",
+    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/ui": "3.2.4",
+    "dotenv": "17.2.3",
+    "testcontainers": "11.7.1",
+    "tsup": "8.5.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  },
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "name": "@seawatts/integ-test",
+  "private": true,
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules dist coverage",
+    "test": "vitest",
+    "test:ci": "CI=true vitest run --coverage",
+    "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "version": "0.0.22"
+}
