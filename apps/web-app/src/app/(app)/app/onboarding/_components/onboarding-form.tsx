@@ -1,16 +1,15 @@
 'use client';
 
 import { useOrganization, useOrganizationList, useUser } from '@clerk/nextjs';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { api } from '@seawatts/api/react';
+import { api } from '@cove/api/react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { Button } from '@seawatts/ui/components/button';
+} from '@cove/ui/card';
+import { Button } from '@cove/ui/components/button';
 import {
   Form,
   FormControl,
@@ -19,11 +18,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@seawatts/ui/components/form';
-import { Input } from '@seawatts/ui/components/input';
-import { Icons } from '@seawatts/ui/custom/icons';
-import { cn } from '@seawatts/ui/lib/utils';
-import { toast } from '@seawatts/ui/sonner';
+} from '@cove/ui/components/form';
+import { Input } from '@cove/ui/components/input';
+import { Icons } from '@cove/ui/custom/icons';
+import { cn } from '@cove/ui/lib/utils';
+import { toast } from '@cove/ui/sonner';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';

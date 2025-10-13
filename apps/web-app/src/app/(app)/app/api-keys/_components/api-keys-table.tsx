@@ -1,13 +1,13 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
-import { api } from '@seawatts/api/react';
-import { CopyButton } from '@seawatts/ui/custom/copy-button';
-import { TimezoneDisplay } from '@seawatts/ui/custom/timezone-display';
-import * as Editable from '@seawatts/ui/diceui/editable-input';
-import { Input } from '@seawatts/ui/input';
-import { Skeleton } from '@seawatts/ui/skeleton';
-import { toast } from '@seawatts/ui/sonner';
+import { MetricButton } from '@cove/analytics/components';
+import { api } from '@cove/api/react';
+import { CopyButton } from '@cove/ui/custom/copy-button';
+import { TimezoneDisplay } from '@cove/ui/custom/timezone-display';
+import * as Editable from '@cove/ui/diceui/editable-input';
+import { Input } from '@cove/ui/input';
+import { Skeleton } from '@cove/ui/skeleton';
+import { toast } from '@cove/ui/sonner';
 import {
   Table,
   TableBody,
@@ -15,8 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@seawatts/ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@seawatts/ui/tooltip';
+} from '@cove/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@cove/ui/tooltip';
 import { IconEye, IconEyeOff, IconPencil } from '@tabler/icons-react';
 import posthog from 'posthog-js';
 import { useState } from 'react';

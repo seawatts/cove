@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@seawatts/ui/lib/utils';
+import { cn } from '@cove/ui/lib/utils';
 import { motion } from 'motion/react';
 import posthog from 'posthog-js';
 

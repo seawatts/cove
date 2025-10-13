@@ -1,23 +1,23 @@
 'use client';
 
 import { useOrganization } from '@clerk/nextjs';
-import { MetricButton } from '@seawatts/analytics/components';
-import { useIsEntitled } from '@seawatts/stripe/guards/client';
+import { MetricButton } from '@cove/analytics/components';
+import { useIsEntitled } from '@cove/stripe/guards/client';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { Icons } from '@seawatts/ui/custom/icons';
-import { Progress } from '@seawatts/ui/progress';
+} from '@cove/ui/card';
+import { Icons } from '@cove/ui/custom/icons';
+import { Progress } from '@cove/ui/progress';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@seawatts/ui/tooltip';
+} from '@cove/ui/tooltip';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useMemo } from 'react';

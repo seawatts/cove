@@ -5,14 +5,14 @@
     "unique-names-generator": "4.7.1"
   },
   "devDependencies": {
-    "@seawatts/tsconfig": "workspace:*",
+    "@cove/tsconfig": "workspace:*",
     "typescript": "5.9.3"
   },
   "exports": {
     ".": "./src/index.ts"
   },
   "license": "MIT",
-  "name": "@seawatts/id",
+  "name": "@cove/id",
   "private": true,
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist",

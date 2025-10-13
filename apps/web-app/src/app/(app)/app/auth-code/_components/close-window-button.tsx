@@ -1,5 +1,5 @@
 'use client';
-import { MetricButton } from '@seawatts/analytics/components';
+import { MetricButton } from '@cove/analytics/components';
 
 export function CloseWindowButton() {
   return (

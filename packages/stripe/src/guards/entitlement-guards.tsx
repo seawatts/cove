@@ -1,6 +1,6 @@
 'use client';
 
-import { MetricLink } from '@seawatts/analytics';
+import { MetricLink } from '@cove/analytics';
 import type { ReactNode } from 'react';
 import { useEntitlements } from './entitlement-hooks';
 import type { EntitlementKey } from './entitlement-types';

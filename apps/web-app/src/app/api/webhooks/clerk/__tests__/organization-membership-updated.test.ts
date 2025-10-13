@@ -1,6 +1,6 @@
 import type { OrganizationMembershipWebhookEvent } from '@clerk/nextjs/server';
-import { db } from '@seawatts/db/client';
-import { OrgMembers, Orgs, Users } from '@seawatts/db/schema';
+import { db } from '@cove/db/client';
+import { OrgMembers, Orgs, Users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { handleOrganizationMembershipUpdated } from '../organization-membership-updated';
 

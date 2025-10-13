@@ -1,15 +1,15 @@
 'use client';
 
-import { api } from '@seawatts/api/react';
+import { api } from '@cove/api/react';
 import {
   Card,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { CopyButton } from '@seawatts/ui/custom/copy-button';
-import { Skeleton } from '@seawatts/ui/skeleton';
+} from '@cove/ui/card';
+import { CopyButton } from '@cove/ui/custom/copy-button';
+import { Skeleton } from '@cove/ui/skeleton';
 import { env } from '~/env.client';
 import { maskApiKey } from '~/lib/mask-api-key';
 
@@ -226,11 +226,11 @@ delivery:
             <div className="flex items-center gap-2">
               <span className="font-mono bg-muted px-2 py-1 rounded text-xs select-all">
                 env seawatts_API_KEY=
-                {maskedApiKey} npx -y @seawatts/mcp
+                {maskedApiKey} npx -y @cove/mcp
               </span>
               <CopyButton
                 size="sm"
-                text={`env seawatts_API_KEY=${apiKey?.key} npx -y @seawatts/mcp`}
+                text={`env seawatts_API_KEY=${apiKey?.key} npx -y @cove/mcp`}
                 variant="outline"
               />
             </div>

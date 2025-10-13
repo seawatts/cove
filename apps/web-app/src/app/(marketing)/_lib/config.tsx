@@ -1,4 +1,4 @@
-import { cn } from '@seawatts/ui/lib/utils';
+import { cn } from '@cove/ui/lib/utils';
 import { Globe } from 'lucide-react';
 import { FirstBentoAnimation } from '~/app/(marketing)/_components/first-bento-animation';
 import { FourthBentoAnimation } from '~/app/(marketing)/_components/fourth-bento-animation';
@@ -44,58 +44,58 @@ export const siteConfig = {
     {
       id: 1,
       image: '/Device-6.png',
-      text: 'Test webhooks locally without exposing your development environment.',
+      text: 'Control all your smart home devices from a single, beautiful interface.',
     },
     {
       id: 2,
       image: '/Device-7.png',
-      text: 'Share webhook URLs across your team while maintaining individual environments.',
+      text: 'Self-hosted on Raspberry Pi with optional cloud sync for remote access.',
     },
     {
       id: 3,
       image: '/Device-8.png',
-      text: 'Debug faster with real-time monitoring and payload inspection.',
+      text: 'Support for ESPHome, Matter, Zigbee, and dozens of protocols.',
     },
     {
       id: 4,
       image: '/Device-1.png',
-      text: 'Collaborate with your team seamlessly.',
+      text: 'Privacy-first design with complete control over your data.',
     },
   ],
   bentoSection: {
     description:
-      'Test webhooks locally, share URLs with your team, and monitor everything in real-time.',
+      'Discover devices automatically, control them from anywhere, and automate your home with ease.',
     items: [
       {
         content: <FirstBentoAnimation />,
         description:
-          'Inspect webhook events in real-time. Inspect payloads, headers, and routing information.',
+          'Automatically discover compatible devices on your network. ESPHome, Matter, HomeKit, and more.',
         id: 1,
-        title: 'Inspect Webhook Events',
+        title: 'Auto Device Discovery',
       },
       {
         content: <SecondBentoAnimation />,
         description:
-          'Built-in support for major webhook providers like Stripe, GitHub, and Clerk. Easy to extend for custom providers.',
+          'Control lights, sensors, thermostats, locks, and more from a unified interface.',
         id: 2,
-        title: 'Provider Integrations',
+        title: 'Universal Device Control',
       },
       {
         content: <ThirdBentoAnimation />,
         description:
-          'Automatically route webhooks to local development environments based on routing rules.',
+          'Real-time sensor data, historical charts, and instant state updates across all your devices.',
         id: 3,
-        title: 'Local Event Routing',
+        title: 'Real-Time Monitoring',
       },
       {
         content: <FourthBentoAnimation once={false} />,
         description:
-          'Replay webhook events to test your webhooks in different scenarios.',
+          'Create powerful automations with triggers, conditions, and actions. One-tap scenes for common scenarios.',
         id: 4,
-        title: 'Replay Webhook Events',
+        title: 'Smart Automations',
       },
     ],
-    title: 'Empower Your Webhook Development',
+    title: 'Everything You Need for Home Automation',
   },
   companyShowcase: {
     companyLogos: [
@@ -180,71 +180,72 @@ export const siteConfig = {
   ctaSection: {
     backgroundImage: '/agent-cta-background.png',
     button: {
-      href: '/app/onboarding?utm_source=marketing-site&utm_medium=cta-button',
-      text: 'Install Extension Today',
+      href: '/app/dashboard?utm_source=marketing-site&utm_medium=cta-button',
+      text: 'Start Building Your Smart Home',
     },
     id: 'cta',
-    subtext: 'Start testing webhooks in minutes',
-    title: 'Test AI Agent Workflows Locally',
+    subtext: 'Setup takes less than 10 minutes',
+    title: 'Ready to Take Control?',
   },
-  description: 'Secure webhook testing and development platform.',
+  description:
+    'Self-hosted home automation platform with privacy and extensibility.',
   faqSection: {
     description:
-      "Answers to common questions about Seawatts and its features. If you have any other questions, please don't hesitate to contact us.",
+      "Answers to common questions about Cove and its features. If you have any other questions, please don't hesitate to contact us.",
     faQitems: [
       {
         answer:
-          'Seawatts is a modern webhook development platform that enables teams to test webhooks locally while sharing URLs across the team. It provides real-time monitoring, payload inspection, and team collaboration features to streamline the webhook testing process.',
+          'Cove is an open-source, self-hosted home automation platform that runs on Raspberry Pi. It automatically discovers and controls smart devices like ESPHome sensors, Matter devices, Zigbee lights, and more—all from a beautiful web interface with optional cloud sync for remote access.',
         id: 1,
-        question: 'What is Seawatts?',
+        question: 'What is Cove?',
       },
       {
         answer:
-          'Seawatts works by creating shareable webhook URLs that route to your local development environment. Team members can then test these webhooks by sending requests to these URLs. Seawatts provides a web dashboard for real-time monitoring and payload inspection, allowing you to see who is accessing your webhooks and what data is being sent.',
+          'Cove runs on your Raspberry Pi and uses mDNS to discover devices on your network. Once discovered, you can control them through the web app, mobile app, or automations. All device data stays local on your hub, with optional encrypted cloud sync for remote access and backup.',
         id: 2,
-        question: 'How does Seawatts work?',
+        question: 'How does Cove work?',
       },
       {
         answer:
-          'Yes, Seawatts uses end-to-end encryption for all webhook traffic. We do not store webhook payload data permanently, and all data is encrypted in transit. Your API keys and sensitive information are protected with industry-standard security measures.',
+          'Absolutely. Cove is privacy-first by design. All device control happens locally on your Raspberry Pi. Cloud sync is completely optional—you can run Cove 100% offline. If you enable cloud sync, all data is encrypted in transit and at rest.',
         id: 3,
-        question: 'Is my data secure?',
+        question: 'Is my data private and secure?',
       },
       {
         answer:
-          'Simply click on any webhook event in the Seawatts sidebar, then use the "Replay Event" button. The extension will resend the webhook to your local development server, making it easy to test and debug.',
+          "Cove supports ESPHome (native API), Matter, Zigbee, Z-Wave, WiFi devices (via mDNS), Bluetooth, MQTT, and HTTP-based devices. We're continuously adding support for more protocols and devices.",
         id: 4,
-        question: 'How do I replay webhook events from VS Code?',
+        question: 'What devices does Cove support?',
       },
       {
         answer:
-          'Yes, the VS Code extension is completely free to use. You can view webhook events, replay requests, and collaborate with your team at no cost. Premium features like advanced analytics are available with paid plans.',
+          'Flash the Cove image to an SD card, insert it into your Raspberry Pi, power it on, and connect via the web app. The hub will automatically appear on your network. The entire setup process takes about 10 minutes.',
         id: 5,
-        question: 'Is the extension free to use?',
+        question: 'How do I set up Cove?',
       },
       {
         answer:
-          'Seawatts is perfect for testing webhooks triggered by AI agents using MCP (Model Context Protocol) servers. When your AI agent calls an MCP tool that triggers a webhook, Seawatts captures it for inspection and replay. This helps you debug AI workflows and validate that your agentic systems are working correctly.',
+          'Yes! Cove is 100% free and open source. You can run it entirely offline on your Raspberry Pi with no subscription required. The optional cloud sync service ($5/month) adds remote access and backup features, but core functionality is always free.',
         id: 6,
-        question: 'How can I test AI calls with MCP servers?',
+        question: 'Is Cove really free?',
       },
       {
         answer:
-          'MCP (Model Context Protocol) is a standard for connecting AI models to external data sources and tools. Many MCP servers trigger webhooks when AI agents perform actions. Seawatts helps you test these AI-triggered webhooks, making it easier to debug agentic systems and validate AI-driven automations.',
+          "Absolutely. Cove runs on inexpensive Raspberry Pi hardware (starting at $35) and supports thousands of affordable devices from brands like ESPHome, IKEA, Philips Hue, and more. Many smart home devices work with standard protocols, so you're not locked into expensive ecosystems.",
         id: 7,
-        question: 'What is MCP and how does it relate to webhook testing?',
+        question: 'Can I build a smart home on a budget?',
       },
       {
         answer:
-          'Yes! Seawatts provides one shared webhook URL that your entire team can use across all services like Stripe, GitHub, and Clerk. The same URL intelligently routes webhooks to the active developer, eliminating the need for individual URLs.',
+          'Unlike Apple Home and Google Home, you own all your data and can customize everything. Unlike Home Assistant, Cove has a beautiful, simple interface that non-technical family members can use. You get the best of both worlds: simplicity + power.',
         id: 8,
-        question: 'Can my entire team use the same webhook URL?',
+        question: 'How is Cove different from Apple Home or Home Assistant?',
       },
       {
         answer:
-          'Create an seawatts.config.json file in your repository with your shared webhook URLs. When team members check out the code, they automatically get access to the same webhook configuration. No more manual URL sharing or setup for new team members.',
+          'Yes! Cove supports multi-hub setups. You can run hubs in different locations (home, vacation house, office) and control them all from one app with cloud sync enabled.',
         id: 9,
-        question: 'How do I share webhook configuration with my team?',
+        question: 'Can I run multiple hubs?',
       },
     ],
     title: 'Frequently Asked Questions',
@@ -324,7 +325,7 @@ export const siteConfig = {
         {
           id: 15,
           title: 'Seawatts CLI',
-          url: 'https://www.npmjs.com/package/@seawatts/cli',
+          url: 'https://www.npmjs.com/package/@cove/cli',
         },
       ],
       title: 'Products',
@@ -383,14 +384,14 @@ export const siteConfig = {
   ],
   growthSection: {
     description:
-      'Where advanced security meets team collaboration—designed to protect your webhooks and empower your development.',
+      'Where privacy meets extensibility—designed to give you complete control while staying simple and powerful.',
     items: [
       {
         content: <SecurityShieldBackground />,
         description:
-          'Debug webhooks without leaving your editor. Keep your focus on code while monitoring webhook events in real-time.',
+          'All device data stays on your hardware. Optional cloud sync for remote access, but you own everything.',
         id: 1,
-        title: 'Seamless Workflow Integration',
+        title: 'Privacy First',
       },
       {
         content: (
@@ -399,66 +400,66 @@ export const siteConfig = {
           </div>
         ),
         description:
-          'Works with VS Code, JetBrains IDEs, Cursor, and other editors. Compatible with all major webhook providers and development environments.',
+          'Support for ESPHome, Matter, Zigbee, Z-Wave, and more. Works with thousands of devices out of the box.',
         id: 2,
-        title: 'Universal Compatibility',
+        title: 'Universal Protocol Support',
       },
     ],
-    title: 'Built for Secure Development',
+    title: 'Built for Your Privacy',
   },
   hero: {
-    badge: 'Free During Beta',
-    badgeIcon: <span>🔥</span>,
-    badgeUrl:
-      // 'https://marketplace.visualstudio.com/items?itemName=seawatts.seawatts-vscode',
-      'https://seawatts.sh/app/onboarding?utm_source=marketing-site&utm_medium=hero-cta',
+    badge: 'Open Source',
+    badgeIcon: <span>🏠</span>,
+    badgeUrl: '/app/dashboard?utm_source=marketing-site&utm_medium=hero-cta',
     cta: {
       primary: {
-        href: '/app/onboarding?utm_source=marketing-site&utm_medium=hero-cta',
-        text: 'Install Extension',
+        href: '/app/dashboard?utm_source=marketing-site&utm_medium=hero-cta',
+        text: 'Get Started',
       },
       secondary: {
-        href: 'https://docs.seawatts.sh',
-        text: 'View Docs',
+        href: 'https://github.com/seawatts/cove',
+        text: 'View on GitHub',
       },
     },
     description:
-      'Open source toolkit for webhook development. Install the extension in your editor to test, debug, and monitor webhooks with your team - all from your local environment.',
-    title: 'AI-Powered Webhook Development',
+      'Self-hosted home automation platform combining the simplicity of Apple Home with the power of Home Assistant. Control ESPHome, Matter, Zigbee, and more from a beautiful interface.',
+    title: 'Your Home, Your Control',
   },
   keywords: [
-    'Webhook Testing',
-    'Local Development',
-    'Team Collaboration',
-    'API Testing',
+    'Home Automation',
+    'Smart Home',
+    'ESPHome',
+    'Matter',
+    'Zigbee',
+    'Self-Hosted',
   ],
   links: {
-    discord: 'https://discord.gg/seawattssh',
-    email: 'chris.watts.t@gmail.com',
-    github: 'https://github.com/seawatts-sh',
-    twitter: 'https://twitter.com/seawattssh',
+    discord: 'https://discord.gg/cove',
+    email: 'hello@cove.sh',
+    github: 'https://github.com/seawatts/cove',
+    twitter: 'https://twitter.com/cove_home',
   },
-  name: 'Seawatts',
+  name: 'Cove',
   nav: {
     links: [
       { href: '#hero', id: 1, name: 'Home' },
       {
-        href: 'https://marketplace.visualstudio.com/items?itemName=seawatts.seawatts-vscode',
+        href: '#features',
+        id: 2,
+        name: 'Features',
+      },
+      {
+        href: 'https://github.com/seawatts/cove',
         id: 3,
-        name: 'VS Code Extension',
+        name: 'GitHub',
       },
       {
-        href: 'https://plugins.jetbrains.com/plugin/24002-seawatts',
+        href: '#faq',
         id: 4,
-        name: 'JetBrains Plugin',
+        name: 'FAQ',
       },
       {
-        href: 'https://docs.seawatts.sh/mcp-integration',
-        id: 5,
-        name: 'MCP Server',
-      },
-      {
-        href: 'https://www.npmjs.com/package/@seawatts/cli',
+        href: 'https://www.npmjs.com/package/@cove/cli',
         id: 6,
         name: 'Seawatts CLI',
       },
@@ -468,75 +469,68 @@ export const siteConfig = {
   },
   pricing: {
     description:
-      'Start for free and upgrade as your team grows. No credit card required.',
+      'Free and open source. Host it yourself or use our cloud sync service.',
     pricingItems: [
       {
         buttonColor: 'bg-accent text-primary',
-        buttonText: 'Install Extension',
-        description: 'Perfect for individual developers',
+        buttonText: 'Download Hub',
+        description: 'Self-hosted on your hardware',
         features: [
-          'CLI & Editor extension access',
-          '50 webhook events per day',
-          '1 webhook URL',
-          'Basic webhook monitoring',
-          'Local event routing',
-          'Single developer',
-          'Public webhook URLs',
+          'Unlimited devices',
+          'Unlimited automations',
+          'All protocol support',
+          'ESPHome, Matter, Zigbee',
+          'Web & mobile apps',
+          'Local-only (no cloud)',
           'Community support',
+          'Open source',
         ],
-        href: '/app/onboarding?utm_source=marketing-site&utm_medium=pricing-cta-free',
-        isPopular: false,
-        name: 'Free',
-        period: 'month',
+        href: 'https://github.com/seawatts/cove/releases',
+        isPopular: true,
+        name: 'Self-Hosted',
+        period: 'forever',
         price: '$0',
         yearlyPrice: '$0',
       },
       {
         betaFree: false,
         buttonColor: 'bg-secondary text-white',
-        buttonText: 'Start Trial',
-        description: 'Ideal for development teams',
+        buttonText: 'Get Started',
+        description: 'With optional cloud sync',
         features: [
-          'AI-Powered debugging with MCP Server',
-          'Trace AI Agent Workflows',
-          'Unlimited webhook events',
-          'Unlimited webhook URLs',
-          'Team webhook sharing',
-          'Unlimited developers',
-          'Private webhook URLs',
-          'Custom webhook transformations',
-          'Custom webhook subdomains',
-          'Advanced monitoring & analytics',
-          'Route to external integrations',
-          // 'Advanced monitoring',
-          // 'Usage analytics',
-          // 'Route to external integrations',
-          // 'Priority support',
+          'Everything in Self-Hosted',
+          'Cloud sync & backup',
+          'Remote access from anywhere',
+          'Multi-hub support',
+          'Historical data storage',
+          'Push notifications',
+          'Voice assistant integrations',
+          'Priority support',
         ],
-        href: '/app/onboarding?utm_source=marketing-site&utm_medium=pricing-cta-team',
-        isPopular: true,
-        name: 'Team',
+        href: '/app/dashboard?utm_source=marketing-site&utm_medium=pricing-cta-cloud',
+        isPopular: false,
+        name: 'Cloud Sync',
         period: 'month',
-        price: '$30',
-        yearlyPrice: '$24',
+        price: '$5',
+        yearlyPrice: '$4',
       },
       {
         buttonColor: 'bg-primary text-primary-foreground',
-        buttonText: 'Schedule a call',
-        description: 'For large organizations with custom needs',
+        buttonText: 'Contact Us',
+        description: 'For smart home professionals',
         features: [
-          'On-premise deployment',
-          'SSO & SAML integration',
-          'Custom API rate limits',
-          'Audit logs & compliance',
-          '99.9% uptime SLA',
-          'Dedicated account manager',
-          'Priority support',
-          'Custom training & onboarding',
+          'Everything in Cloud Sync',
+          'Multi-location support',
+          'White-label options',
+          'Custom integrations',
+          'Professional installation',
+          'Dedicated support',
+          'SLA guarantees',
+          'Custom feature development',
         ],
-        href: 'https://cal.com/seawatts/30min',
+        href: 'mailto:hello@cove.sh',
         isPopular: false,
-        name: 'Enterprise',
+        name: 'Professional',
         period: 'month',
         price: 'Custom',
         yearlyPrice: 'Custom',
@@ -548,10 +542,10 @@ export const siteConfig = {
     author: {
       image: 'https://randomuser.me/api/portraits/women/12.jpg',
       name: 'Sarah Chen',
-      role: 'Lead Developer, TechFlow',
+      role: 'Smart Home Enthusiast',
     },
     quote:
-      'Seawatts has transformed our webhook development process. What used to be a complex coordination effort is now seamless collaboration.',
+      'Cove combines the simplicity I loved about Apple Home with the power of Home Assistant. Finally, a system that just works!',
   },
   testimonials: [
     {

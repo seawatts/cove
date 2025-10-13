@@ -1,9 +1,9 @@
 'use client';
 
 import { useAuth, useOrganizationList, useUser } from '@clerk/nextjs';
-import { MetricLink } from '@seawatts/analytics/components';
-import { api } from '@seawatts/api/react';
-import { Avatar, AvatarFallback, AvatarImage } from '@seawatts/ui/avatar';
+import { MetricLink } from '@cove/analytics/components';
+import { api } from '@cove/api/react';
+import { Avatar, AvatarFallback, AvatarImage } from '@cove/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,13 +11,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@seawatts/ui/dropdown-menu';
+} from '@cove/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@seawatts/ui/sidebar';
-import { ToggleGroup, ToggleGroupItem } from '@seawatts/ui/toggle-group';
+} from '@cove/ui/sidebar';
+import { ToggleGroup, ToggleGroupItem } from '@cove/ui/toggle-group';
 import {
   IconBuilding,
   IconCheck,

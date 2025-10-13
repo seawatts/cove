@@ -1,8 +1,0 @@
-{
-  "name": "@acme/ios",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "build": "xcodebuild -workspace ios/project.yml -scheme ios -configuration Release -sdk iphoneos -derivedDataPath build"
-  }
-}

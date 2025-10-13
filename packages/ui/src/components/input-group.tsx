@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@seawatts/ui/components/button';
-import { Input } from '@seawatts/ui/components/input';
-import { Textarea } from '@seawatts/ui/components/textarea';
-import { cn } from '@seawatts/ui/lib/utils';
+import { Button } from '@cove/ui/components/button';
+import { Input } from '@cove/ui/components/input';
+import { Textarea } from '@cove/ui/components/textarea';
+import { cn } from '@cove/ui/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 

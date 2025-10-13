@@ -1,5 +1,5 @@
-import { createOrg } from '@seawatts/db';
-import { ApiKeys, OrgMembers, Orgs } from '@seawatts/db/schema';
+import { createOrg } from '@cove/db';
+import { ApiKeys, OrgMembers, Orgs } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';

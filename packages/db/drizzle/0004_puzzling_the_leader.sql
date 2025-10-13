@@ -1,1 +1,0 @@
-ALTER TABLE "webhooks" ADD COLUMN "lastRequestAt" timestamp with time zone;

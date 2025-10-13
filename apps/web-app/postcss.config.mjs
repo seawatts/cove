@@ -1,1 +1,1 @@
-export { default } from '@seawatts/ui/postcss.config';
+export { default } from '@cove/ui/postcss.config';

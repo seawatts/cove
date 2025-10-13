@@ -1,17 +1,17 @@
 'use client';
 
 import { useOrganization, useUser } from '@clerk/nextjs';
-import { MetricButton } from '@seawatts/analytics/components';
-import { Card, CardContent, CardHeader, CardTitle } from '@seawatts/ui/card';
+import { MetricButton } from '@cove/analytics/components';
+import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@seawatts/ui/select';
-import { Skeleton } from '@seawatts/ui/skeleton';
-import { toast } from '@seawatts/ui/sonner';
+} from '@cove/ui/select';
+import { Skeleton } from '@cove/ui/skeleton';
+import { toast } from '@cove/ui/sonner';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { removeMemberAction, updateMemberRoleAction } from '../actions';

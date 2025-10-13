@@ -1,2 +1,2 @@
-import baseConfig from '@seawatts/next-config/base';
+import baseConfig from '@cove/next-config/base';
 export default baseConfig;

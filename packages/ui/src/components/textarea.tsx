@@ -1,4 +1,4 @@
-import { cn } from '@seawatts/ui/lib/utils';
+import { cn } from '@cove/ui/lib/utils';
 import type * as React from 'react';
 
 function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {

@@ -1,13 +1,13 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
+import { MetricButton } from '@cove/analytics/components';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
+} from '@cove/ui/card';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { deleteTeamAction } from '../actions';

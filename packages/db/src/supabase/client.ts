@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/nextjs';
-import { debug } from '@seawatts/logger';
+import { debug } from '@cove/logger';
 import { createBrowserClient } from '@supabase/ssr';
 import { useEffect, useMemo } from 'react';
 import { env } from '../env.client';

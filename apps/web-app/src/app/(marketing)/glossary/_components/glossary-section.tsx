@@ -1,17 +1,17 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
-import { Badge } from '@seawatts/ui/badge';
+import { MetricButton } from '@cove/analytics/components';
+import { Badge } from '@cove/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { H1, H2, P } from '@seawatts/ui/custom/typography';
-import { Input } from '@seawatts/ui/input';
-import { MagicCard } from '@seawatts/ui/magicui/magic-card';
+} from '@cove/ui/card';
+import { H1, H2, P } from '@cove/ui/custom/typography';
+import { Input } from '@cove/ui/input';
+import { MagicCard } from '@cove/ui/magicui/magic-card';
 import { Search, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';

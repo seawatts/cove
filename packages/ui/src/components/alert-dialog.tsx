@@ -1,9 +1,8 @@
 'use client';
 
+import { buttonVariants } from '@cove/ui/components/button';
+import { cn } from '@cove/ui/lib/utils';
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
-import { buttonVariants } from '@seawatts/ui/components/button';
-
-import { cn } from '@seawatts/ui/lib/utils';
 import type * as React from 'react';
 
 function AlertDialog({

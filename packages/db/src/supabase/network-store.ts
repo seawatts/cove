@@ -1,5 +1,5 @@
-import { debug } from '@seawatts/logger';
-import { createSelectors } from '@seawatts/zustand';
+import { debug } from '@cove/logger';
+import { createSelectors } from '@cove/zustand';
 import { createStore } from 'zustand';
 
 const log = debug('seawatts:lib:network-store');

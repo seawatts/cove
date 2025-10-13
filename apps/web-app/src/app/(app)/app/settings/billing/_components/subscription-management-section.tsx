@@ -1,17 +1,17 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
-import { api } from '@seawatts/api/react';
-import { useHasActiveSubscription } from '@seawatts/stripe/guards/client';
+import { MetricButton } from '@cove/analytics/components';
+import { api } from '@cove/api/react';
+import { useHasActiveSubscription } from '@cove/stripe/guards/client';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { Icons } from '@seawatts/ui/custom/icons';
-import { P } from '@seawatts/ui/custom/typography';
+} from '@cove/ui/card';
+import { Icons } from '@cove/ui/custom/icons';
+import { P } from '@cove/ui/custom/typography';
 import { IconAlertTriangle, IconCheck, IconRefresh } from '@tabler/icons-react';
 import { toast } from 'sonner';
 

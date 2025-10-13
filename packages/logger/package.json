@@ -2,7 +2,7 @@
   "dependencies": {
     "bun": "1.3.0",
     "debug": "4.4.3",
-    "node-inspect-extracted": "3.2.1"
+    "node-inspect-extracted": "3.2.2"
   },
   "devDependencies": {
     "@types/bun": "1.3.0",
@@ -18,7 +18,7 @@
     "./destinations/vscode-output": "./src/destinations/vscode-output.ts"
   },
   "license": "MIT",
-  "name": "@seawatts/logger",
+  "name": "@cove/logger",
   "private": true,
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist",

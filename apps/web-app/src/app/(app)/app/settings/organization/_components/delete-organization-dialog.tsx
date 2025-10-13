@@ -10,8 +10,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@seawatts/ui/alert-dialog';
-import { toast } from '@seawatts/ui/sonner';
+} from '@cove/ui/alert-dialog';
+import { toast } from '@cove/ui/sonner';
 
 interface DeleteOrganizationDialogProps {
   isOpen: boolean;

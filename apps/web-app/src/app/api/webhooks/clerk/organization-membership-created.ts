@@ -2,9 +2,9 @@ import type {
   OrganizationMembershipJSON,
   WebhookEvent,
 } from '@clerk/nextjs/server';
-import { posthog } from '@seawatts/analytics/posthog/server';
-import { db } from '@seawatts/db/client';
-import { OrgMembers, Orgs, Users } from '@seawatts/db/schema';
+import { posthog } from '@cove/analytics/posthog/server';
+import { db } from '@cove/db/client';
+import { OrgMembers, Orgs, Users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function handleOrganizationMembershipCreated(event: WebhookEvent) {

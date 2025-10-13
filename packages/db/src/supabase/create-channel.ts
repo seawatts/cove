@@ -1,4 +1,4 @@
-import { debug } from '@seawatts/logger';
+import { debug } from '@cove/logger';
 import type {
   REALTIME_SUBSCRIBE_STATES,
   RealtimeChannel,

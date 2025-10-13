@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@seawatts/ui/lib/utils';
+import { cn } from '@cove/ui/lib/utils';
 import { GripVerticalIcon } from 'lucide-react';
 import type * as React from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';

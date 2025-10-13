@@ -3,12 +3,12 @@
     "baseUrl": ".",
     "outDir": "dist",
     "paths": {
-      "@seawatts/ui/*": ["./src/*"]
+      "@cove/ui/*": ["./src/*"]
     },
     "rootDir": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
   "exclude": ["node_modules"],
-  "extends": "@seawatts/tsconfig/react-library.json",
+  "extends": "@cove/tsconfig/react-library.json",
   "include": ["src"]
 }

@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
+} from '@cove/ui/card';
 import { useState } from 'react';
 import { AuthCodeLoginButton } from './auth-code-login-button';
 import { CloseWindowCard } from './close-wind-card';

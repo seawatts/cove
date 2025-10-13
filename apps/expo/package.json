@@ -1,10 +1,10 @@
 {
   "dependencies": {
     "@bacons/text-decoder": "0.0.0",
+    "@cove/api": "workspace:*",
     "@expo/metro-config": "54.0.6",
-    "@seawatts/api": "workspace:*",
     "@shopify/flash-list": "2.1.0",
-    "@tanstack/react-query": "5.90.2",
+    "@tanstack/react-query": "5.90.3",
     "@trpc/client": "11.6.0",
     "@trpc/react-query": "11.6.0",
     "@trpc/server": "11.6.0",
@@ -30,14 +30,14 @@
     "@babel/core": "7.28.4",
     "@babel/preset-env": "7.28.3",
     "@babel/runtime": "7.28.4",
-    "@seawatts/tsconfig": "workspace:*",
+    "@cove/tsconfig": "workspace:*",
     "@types/babel__core": "7.20.5",
     "@types/react": "19.2.2",
     "tailwindcss": "4.1.14",
     "typescript": "5.9.3"
   },
   "main": "expo-router/entry",
-  "name": "@seawatts/expo",
+  "name": "@cove/expo",
   "private": true,
   "scripts": {
     "android": "expo run:android",

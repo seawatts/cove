@@ -59,7 +59,7 @@ mock.module('@clerk/nextjs/server', () => ({
 }));
 
 // Mock Stripe module before it gets imported
-mock.module('@seawatts/stripe', () => ({
+mock.module('@cove/stripe', () => ({
   BILLING_INTERVALS: { MONTHLY: 'month' },
   createSubscription: mockCreateSubscription,
   getFreePlanPriceId: mockGetFreePlanPriceId,
@@ -68,7 +68,7 @@ mock.module('@seawatts/stripe', () => ({
 }));
 
 // Mock the stripe env module
-mock.module('@seawatts/stripe/src/env.server', () => ({
+mock.module('@cove/stripe/src/env.server', () => ({
   env: {
     STRIPE_PUBLISHABLE_KEY: 'pk_test_mock',
     STRIPE_SECRET_KEY: 'sk_test_mock',
@@ -76,7 +76,7 @@ mock.module('@seawatts/stripe/src/env.server', () => ({
   },
 }));
 
-mock.module('@seawatts/id', () => ({
+mock.module('@cove/id', () => ({
   generateRandomName: mockGenerateRandomName,
 }));
 

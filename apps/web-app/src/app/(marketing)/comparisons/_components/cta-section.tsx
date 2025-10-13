@@ -1,7 +1,7 @@
 'use client';
 
-import { MetricButton, MetricLink } from '@seawatts/analytics/components';
-import { MagicCard } from '@seawatts/ui/magicui/magic-card';
+import { MetricButton, MetricLink } from '@cove/analytics/components';
+import { MagicCard } from '@cove/ui/magicui/magic-card';
 import { motion } from 'motion/react';
 
 export function CTASection() {

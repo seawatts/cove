@@ -1,201 +1,192 @@
-# SeaWatts - AI-Powered Full-Stack Startup Template
+# Cove - Self-Hosted Home Automation Platform
 
-> A production-ready monorepo template optimized for AI code generation workflows
+> Combining the simplicity of Google Home with the extensibility of Home Assistant
 
-## Why This Template?
+## What is Cove?
 
-### 🤖 AI-First Architecture
-- **BAML Integration**: Structured AI templates for consistent LLM interactions
-- **Type-Safe APIs**: End-to-end TypeScript ensures AI generates correct code
-- **Shared Context**: Monorepo structure helps AI understand your entire codebase
-- **Cross-Platform**: Generate code for web, mobile, desktop, and browser extensions
+Cove is a modern, self-hosted home automation platform that brings together:
 
-### 🚀 Production Ready
-- **6 Applications**: Web app, mobile (Expo), CLI, Chrome extension, VS Code extension, iOS
-- **12 Shared Packages**: Database, API, UI, AI, analytics, payments, and more
-- **Modern Stack**: Next.js 15, React 19, tRPC v11, Drizzle ORM, Supabase
-- **Developer Experience**: Bun, Turborepo, Biome, comprehensive tooling
+- **Simple Setup**: HomeKit-style onboarding and intuitive device pairing
+- **Powerful Control**: Beautiful web and mobile interfaces for all your devices
+- **Full Customization**: Matter, Zigbee, ESPHome, and custom integrations
+- **Privacy First**: Runs on your own hardware with optional cloud sync
+
+## Architecture
+
+### Hub (Raspberry Pi)
+- **Bun Runtime**: Fast, modern TypeScript execution
+- **Device Discovery**: Automatic mDNS scanning for compatible devices
+- **Protocol Support**: ESPHome, Matter, Zigbee, Z-Wave, and more
+- **Local API**: WebSocket and REST for real-time control
+
+### Cloud (Supabase)
+- **Device Sync**: Keep device states synchronized across clients
+- **User Management**: Secure authentication with Clerk
+- **Real-time Updates**: Instant device state changes
+- **Optional**: Works offline, cloud enhances experience
+
+### Apps
+- **Web PWA** (`apps/web-app`): Next.js 15 control panel
+- **iOS App** (`apps/ios`): Native Swift application
+- **Mobile** (`apps/expo`): React Native for Android (coming soon)
 
 ## Quick Start
 
-### 1. Clone and Install
+### 1. Install Dependencies
 ```bash
-git clone [your-repo-url] my-startup
-cd my-startup
 bun install
 ```
 
 ### 2. Environment Setup
 ```bash
 cp .env.example .env
-# Configure your environment variables
-bun with-env -- bun db:push
+# Configure your Supabase and Clerk credentials
+bun db:push
 ```
 
 ### 3. Start Development
-```bash
-# Start all apps
-bun dev
 
-# Or start specific apps
-bun dev:next          # Web app only
-bun dev:vscode        # VS Code extension
+#### Run the Hub Daemon
+```bash
+bun dev:hub
 ```
 
-## Architecture Overview
-
-### Apps
-- **Web App** (`apps/web-app`): Next.js 15 with App Router
-- **Mobile** (`apps/expo`): React Native with Expo SDK 51
-- **CLI** (`apps/cli`): Cross-platform command-line tool
-- **Chrome Extension** (`apps/chrome-extension`): Browser extension
-- **VS Code Extension** (`apps/vscode-extension`): Editor extension
-- **iOS** (`apps/ios`): Native iOS app
-
-### Packages
-- **API** (`packages/api`): tRPC v11 router with end-to-end type safety
-- **Database** (`packages/db`): Drizzle ORM with Supabase
-- **UI** (`packages/ui`): shadcn/ui components shared across apps
-- **AI** (`packages/ai`): BAML templates for structured LLM interactions
-- **Analytics** (`packages/analytics`): PostHog integration
-- **Payments** (`packages/stripe`): Stripe integration
-- **Email** (`packages/email`): Resend email service
-- **State** (`packages/zustand`): Global state management
-
-## AI Code Generation Benefits
-
-### 1. **Contextual Understanding**
-The monorepo structure allows AI to understand:
-- How your API routes connect to database schemas
-- Which UI components are available across platforms
-- How authentication flows through all apps
-- The relationship between packages and their dependencies
-
-### 2. **Consistent Patterns**
-- Shared TypeScript configurations
-- Unified code formatting with Biome
-- Consistent API patterns with tRPC
-- Reusable UI components across platforms
-
-### 3. **Rapid Development**
-- Generate code for multiple platforms simultaneously
-- AI understands your existing patterns and can extend them
-- Type safety ensures generated code works correctly
-- Shared packages mean changes propagate everywhere
-
-## Development Workflow
-
-### Adding New Features
-1. **Define API** in `packages/api/src/router`
-2. **Update Database** schema in `packages/db/src/schema`
-3. **Generate Types** with `bun db:push`
-4. **Create UI** components in `packages/ui`
-5. **Implement** across all apps with full type safety
-
-### AI-Assisted Development
+#### Run the Web App
 ```bash
-# Add new UI component
-bun ui-add
-
-# Generate database migration
-bun db:gen-migration
-
-# Type check everything
-bun typecheck
-
-# Format code
-bun format:fix
-```
-
-## Essential Commands
-
-### Development
-```bash
-# Install dependencies
-bun install
-
-# Start development for all packages
-bun dev
-
-# Start only the web app
 bun dev:next
-
-# Run tests
-bun test
-
-# Type check everything
-bun typecheck
-
-# Format code
-bun format:fix
-
-# Clean all workspaces
-bun clean:ws
 ```
 
-### Database Operations
-```bash
-# Open database studio
-bun db:studio
+## Project Structure
 
-# Push schema changes
-bun db:push
+```
+apps/
+  web-app/          # Next.js 15 PWA control panel
+  expo/             # React Native mobile app (future)
+  ios/              # Native iOS app
 
-# Generate migrations
-bun db:gen-migration
-
-# Run migrations
-bun db:migrate
-
-# Seed database
-bun db:seed
+packages/
+  hub/              # Core hub daemon (Bun runtime)
+  device-protocols/ # ESPHome, Matter, Zigbee adapters
+  discovery/        # mDNS device discovery
+  types/            # Shared TypeScript types
+  db/               # Drizzle ORM + Supabase schemas
+  api/              # tRPC API layer
+  ui/               # shadcn/ui components
 ```
 
-### Building & Publishing
+## Supported Devices
+
+### Current Support
+- ✅ **ESPHome**: Full native API support
+- ✅ **mDNS Discovery**: Automatic device scanning
+- 🚧 **Matter**: In development
+- 🚧 **Zigbee**: In development
+
+### Device Types
+- Lights (on/off, brightness, color)
+- Switches and outlets
+- Sensors (temperature, humidity, motion, CO₂)
+- Thermostats
+- Locks
+- Cameras (streaming)
+- Speakers and media players
+
+## Development Commands
+
+### Hub Development
 ```bash
-# Build all packages
-bun build
+bun dev:hub              # Start hub daemon
+bun build:hub            # Build hub for deployment
+```
 
-# Publish CLI and client packages
-bun publish
+### Database
+```bash
+bun db:studio            # Open Drizzle Studio
+bun db:push              # Push schema changes
+bun db:gen-migration     # Generate migration
+bun db:migrate           # Run migrations
+```
 
-# Add UI components
-bun ui-add
+### Code Quality
+```bash
+bun format:fix           # Format code with Biome
+bun typecheck            # Type check all packages
+bun test                 # Run tests
+bun test:integ           # Run integration tests
 ```
 
 ## Deployment
 
+### Hub (Raspberry Pi)
+1. Build the hub daemon:
+   ```bash
+   bun build:hub
+   ```
+2. Deploy to Raspberry Pi (instructions coming soon)
+
 ### Web App (Vercel)
 ```bash
-# Deploy to Vercel
 vercel --prod
 ```
 
-### Mobile (EAS)
-```bash
-cd apps/expo
-eas build --platform all
-eas submit --platform all
-```
+## Roadmap
 
-### CLI (NPM)
-```bash
-bun publish
-```
+### Phase 1 (Current)
+- [x] Project structure and architecture
+- [x] Database schemas
+- [ ] Hub daemon core
+- [ ] mDNS discovery
+- [ ] ESPHome integration
+- [ ] Web UI basics
 
-## Key Features
+### Phase 2
+- [ ] Device control UI
+- [ ] Hub pairing flow
+- [ ] Real-time updates
+- [ ] Raspberry Pi image
 
-- ✅ **End-to-End Type Safety** with tRPC
-- ✅ **AI Integration** with BAML templates
-- ✅ **Cross-Platform** development
-- ✅ **Modern Stack** (Next.js 15, React 19)
-- ✅ **Production Ready** with comprehensive tooling
-- ✅ **Developer Experience** optimized for AI workflows
+### Phase 3
+- [ ] Matter protocol support
+- [ ] Zigbee integration
+- [ ] Automation engine
+- [ ] Scene management
+
+### Phase 4
+- [ ] Voice control
+- [ ] Mobile apps
+- [ ] Advanced automations
+- [ ] Community integrations
+
+## Technology Stack
+
+- **Runtime**: Bun (hub daemon)
+- **Framework**: Next.js 15, React 19
+- **Database**: Supabase (PostgreSQL + Realtime)
+- **ORM**: Drizzle
+- **API**: tRPC v11
+- **Auth**: Clerk
+- **UI**: shadcn/ui + Tailwind CSS
+- **Monorepo**: Turborepo + Bun workspaces
 
 ## Contributing
 
-This template is designed for rapid startup development with AI assistance. The monorepo structure ensures consistency and enables powerful AI code generation workflows.
+We welcome contributions! Cove is designed to be extensible:
+
+1. **New Device Protocols**: Implement the `DeviceProtocol` interface
+2. **Device Adapters**: Add support for specific device types
+3. **UI Components**: Contribute to the component library
+4. **Documentation**: Help others get started
 
 ## License
 
 MIT
+
+## Community
+
+- **Documentation**: Coming soon
+- **Discord**: Coming soon
+- **GitHub Discussions**: Open an issue or discussion
+
+---
+
+Built with ❤️ for the smart home community

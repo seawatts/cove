@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@seawatts/ui/button';
-import { H2, P } from '@seawatts/ui/custom/typography';
+import { Button } from '@cove/ui/button';
+import { H2, P } from '@cove/ui/custom/typography';
 import { useEffect } from 'react';
 
 export default function ErrorPage({

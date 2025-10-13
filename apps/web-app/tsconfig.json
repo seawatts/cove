@@ -3,10 +3,10 @@
     "baseUrl": ".",
     "incremental": true,
     "paths": {
-      "@seawatts/analytics/*": ["../../packages/analytics/src/*"],
-      "@seawatts/stripe/*": ["../../packages/stripe/src/*"],
-      "@seawatts/ui/*": ["../../packages/ui/src/*"],
-      "@seawatts/zustand/*": ["../../packages/zustand/src/*"],
+      "@cove/analytics/*": ["../../packages/analytics/src/*"],
+      "@cove/stripe/*": ["../../packages/stripe/src/*"],
+      "@cove/ui/*": ["../../packages/ui/src/*"],
+      "@cove/zustand/*": ["../../packages/zustand/src/*"],
       "~/*": ["./src/*"]
     },
     "plugins": [
@@ -17,7 +17,7 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
   "exclude": ["node_modules", ".next"],
-  "extends": "@seawatts/tsconfig/nextjs.json",
+  "extends": "@cove/tsconfig/nextjs.json",
   "include": [
     "next-env.d.ts",
     "next.config.ts",

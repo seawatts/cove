@@ -10,9 +10,9 @@
     "zod": "4.1.12"
   },
   "devDependencies": {
-    "@seawatts/tsconfig": "workspace:*",
+    "@cove/tsconfig": "workspace:*",
     "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.1",
+    "@types/react-dom": "19.2.2",
     "typescript": "5.9.3"
   },
   "exports": {
@@ -20,7 +20,7 @@
     "./templates": "./src/templates/index.ts"
   },
   "license": "MIT",
-  "name": "@seawatts/email",
+  "name": "@cove/email",
   "private": true,
   "scripts": {
     "clean": "git clean -xdf dist node_modules .turbo",

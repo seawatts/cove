@@ -1,7 +1,7 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
-import { api } from '@seawatts/api/react';
+import { MetricButton } from '@cove/analytics/components';
+import { api } from '@cove/api/react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,8 +12,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@seawatts/ui/alert-dialog';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@seawatts/ui/tooltip';
+} from '@cove/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@cove/ui/tooltip';
 import { IconLoader2, IconTrash } from '@tabler/icons-react';
 import posthog from 'posthog-js';
 import { useState } from 'react';

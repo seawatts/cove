@@ -1,4 +1,4 @@
-# @seawatts/stripe
+# @cove/stripe
 
 Type-safe Stripe integration for Seawatts.
 
