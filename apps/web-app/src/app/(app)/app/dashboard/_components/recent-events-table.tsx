@@ -1,16 +1,16 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
+import { MetricButton } from '@cove/analytics/components';
 
 // TODO: Re-enable when client utils are re-implemented
-// import { extractEventName } from '@seawatts/client/utils/extract-event-name';
-// import { getSourceDisplayText } from '@seawatts/client/utils/source-display';
+// import { extractEventName } from '@cove/client/utils/extract-event-name';
+// import { getSourceDisplayText } from '@cove/client/utils/source-display';
 const extractEventName = (_event: unknown) => 'Event';
 const getSourceDisplayText = (source: string) => source;
 
-import { Badge } from '@seawatts/ui/badge';
-import { TimezoneDisplay } from '@seawatts/ui/custom/timezone-display';
-import { Skeleton } from '@seawatts/ui/skeleton';
+import { Badge } from '@cove/ui/badge';
+import { TimezoneDisplay } from '@cove/ui/custom/timezone-display';
+import { Skeleton } from '@cove/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -18,8 +18,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@seawatts/ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@seawatts/ui/tooltip';
+} from '@cove/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@cove/ui/tooltip';
 import { Eye, Play } from 'lucide-react';
 import posthog from 'posthog-js';
 

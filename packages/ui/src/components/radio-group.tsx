@@ -1,7 +1,7 @@
 'use client';
 
+import { cn } from '@cove/ui/lib/utils';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
-import { cn } from '@seawatts/ui/lib/utils';
 import { CircleIcon } from 'lucide-react';
 import type * as React from 'react';
 

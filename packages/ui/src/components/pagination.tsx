@@ -1,5 +1,5 @@
-import { type Button, buttonVariants } from '@seawatts/ui/components/button';
-import { cn } from '@seawatts/ui/lib/utils';
+import { type Button, buttonVariants } from '@cove/ui/components/button';
+import { cn } from '@cove/ui/lib/utils';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,

@@ -1,8 +1,8 @@
 'use client';
 
-import { MetricButton } from '@seawatts/analytics/components';
-import { api } from '@seawatts/api/react';
-import { Icons } from '@seawatts/ui/custom/icons';
+import { MetricButton } from '@cove/analytics/components';
+import { api } from '@cove/api/react';
+import { Icons } from '@cove/ui/custom/icons';
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@seawatts/ui/dialog';
-import { Input } from '@seawatts/ui/input';
+} from '@cove/ui/dialog';
+import { Input } from '@cove/ui/input';
 import { IconPlus } from '@tabler/icons-react';
 import posthog from 'posthog-js';
 import { useState } from 'react';

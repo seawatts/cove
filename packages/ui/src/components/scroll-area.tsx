@@ -1,7 +1,7 @@
 'use client';
 
+import { cn } from '@cove/ui/lib/utils';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
-import { cn } from '@seawatts/ui/lib/utils';
 import type * as React from 'react';
 
 function ScrollArea({

@@ -85,11 +85,11 @@ bun ui-add
 
 1. **Type Safety**: End-to-end type safety with tRPC. API types are automatically inferred from server to client.
 
-2. **Database Access**: All database operations go through the `@seawatts/db` package using Drizzle ORM.
+2. **Database Access**: All database operations go through the `@cove/db` package using Drizzle ORM.
 
 3. **Environment Variables**: Use `bun with-env` to load environment variables from Infisical.
 
-4. **UI Components**: Shared components in `@seawatts/ui` package. Use `bun ui-add` to add new shadcn components.
+4. **UI Components**: Shared components in `@cove/ui` package. Use `bun ui-add` to add new shadcn components.
 
 5. **API Routes**: Define tRPC routers in `packages/api/src/router`. Routes are automatically type-safe across all apps.
 

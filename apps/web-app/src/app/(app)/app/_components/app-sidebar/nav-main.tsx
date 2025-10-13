@@ -1,13 +1,13 @@
 'use client';
 
-import { MetricLink } from '@seawatts/analytics';
+import { MetricLink } from '@cove/analytics';
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@seawatts/ui/sidebar';
+} from '@cove/ui/sidebar';
 import type { Icon } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 

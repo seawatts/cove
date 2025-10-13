@@ -2,7 +2,7 @@
   "dependencies": {
     "@clerk/chrome-extension": "2.7.3",
     "@clerk/nextjs": "6.33.3",
-    "@seawatts/ui": "workspace:*",
+    "@cove/ui": "workspace:*",
     "@sentry/nextjs": "10.19.0",
     "@t3-oss/env-core": "0.13.8",
     "@t3-oss/env-nextjs": "0.13.8",
@@ -16,12 +16,12 @@
     "zod": "4.1.12"
   },
   "devDependencies": {
-    "@seawatts/tsconfig": "workspace:*",
+    "@cove/tsconfig": "workspace:*",
     "@types/aws-lambda": "8.10.155",
     "@types/chrome": "0.1.24",
     "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.1",
-    "next": "15.5.4",
+    "@types/react-dom": "19.2.2",
+    "next": "15.5.5",
     "typescript": "5.9.3"
   },
   "exports": {
@@ -33,7 +33,7 @@
     "./posthog/vscode": "./src/posthog/vscode.ts"
   },
   "license": "MIT",
-  "name": "@seawatts/analytics",
+  "name": "@cove/analytics",
   "private": true,
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist",

@@ -1,6 +1,6 @@
 'use client';
 
-import { MetricLink } from '@seawatts/analytics/components';
+import { MetricLink } from '@cove/analytics/components';
 import {
   Card,
   CardContent,
@@ -8,9 +8,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { Button } from '@seawatts/ui/components/button';
-import { cn } from '@seawatts/ui/lib/utils';
+} from '@cove/ui/card';
+import { Button } from '@cove/ui/components/button';
+import { cn } from '@cove/ui/lib/utils';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';

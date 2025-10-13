@@ -1,0 +1,89 @@
+name: Build Hub Daemon
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/hub/**'
+      - 'packages/discovery/**'
+      - 'packages/types/**'
+      - '.github/workflows/build-hub.yml'
+  pull_request:
+    paths:
+      - 'packages/hub/**'
+      - 'packages/discovery/**'
+      - 'packages/types/**'
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: Build Hub for ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x64
+            artifact: cove-hub-linux-x64
+          - os: ubuntu-latest
+            target: linux-arm64
+            artifact: cove-hub-linux-arm64
+          - os: macos-latest
+            target: darwin-x64
+            artifact: cove-hub-darwin-x64
+          - os: macos-latest
+            target: darwin-arm64
+            artifact: cove-hub-darwin-arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build hub daemon
+        run: |
+          cd packages/hub
+          bun build ./src/index.ts --compile --target=bun-${{ matrix.target }} --outfile ${{ matrix.artifact }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: packages/hub/${{ matrix.artifact }}
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: packages/hub/${{ matrix.artifact }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Test Hub Daemon
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run format:ci
+

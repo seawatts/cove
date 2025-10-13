@@ -2,10 +2,10 @@ import type {
   OrganizationMembershipJSON,
   WebhookEvent,
 } from '@clerk/nextjs/server';
-import { posthog } from '@seawatts/analytics/posthog/server';
-import { db } from '@seawatts/db/client';
-import { Orgs } from '@seawatts/db/schema';
-import { PLAN_TYPES, stripe } from '@seawatts/stripe';
+import { posthog } from '@cove/analytics/posthog/server';
+import { db } from '@cove/db/client';
+import { Orgs } from '@cove/db/schema';
+import { PLAN_TYPES, stripe } from '@cove/stripe';
 import { eq } from 'drizzle-orm';
 
 export async function handleOrganizationInvitationAccepted(

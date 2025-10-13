@@ -1,21 +1,21 @@
 'use client';
 
-import { Alert, AlertDescription } from '@seawatts/ui/alert';
-import { Badge } from '@seawatts/ui/badge';
+import { Alert, AlertDescription } from '@cove/ui/alert';
+import { Badge } from '@cove/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { Button } from '@seawatts/ui/components/button';
-import { CopyButton } from '@seawatts/ui/custom/copy-button';
-import { Icons } from '@seawatts/ui/custom/icons';
-import { H3, H4, P } from '@seawatts/ui/custom/typography';
-import { Separator } from '@seawatts/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@seawatts/ui/tabs';
-import { Textarea } from '@seawatts/ui/textarea';
+} from '@cove/ui/card';
+import { Button } from '@cove/ui/components/button';
+import { CopyButton } from '@cove/ui/custom/copy-button';
+import { Icons } from '@cove/ui/custom/icons';
+import { H3, H4, P } from '@cove/ui/custom/typography';
+import { Separator } from '@cove/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
+import { Textarea } from '@cove/ui/textarea';
 import { BookOpen, FileText, HelpCircle, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -216,11 +216,11 @@ delivery:
                         className="font-mono text-xs resize-none"
                         readOnly
                         rows={1}
-                        value="npx @seawatts/cli listen"
+                        value="npx @cove/cli listen"
                       />
                       <CopyButton
                         size="sm"
-                        text="npx @seawatts/cli listen"
+                        text="npx @cove/cli listen"
                         variant="outline"
                       />
                     </div>

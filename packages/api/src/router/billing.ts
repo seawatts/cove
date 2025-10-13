@@ -1,4 +1,4 @@
-import { Orgs } from '@seawatts/db/schema';
+import { Orgs } from '@cove/db/schema';
 import {
   BILLING_INTERVALS,
   createBillingPortalSession,
@@ -6,7 +6,7 @@ import {
   getOrCreateCustomer,
   PLAN_TYPES,
   stripe,
-} from '@seawatts/stripe';
+} from '@cove/stripe';
 import { eq } from 'drizzle-orm';
 import type Stripe from 'stripe';
 import { z } from 'zod';

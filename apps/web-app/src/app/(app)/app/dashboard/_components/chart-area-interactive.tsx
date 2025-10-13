@@ -7,17 +7,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@seawatts/ui/card';
-import { type ChartConfig, ChartContainer } from '@seawatts/ui/chart';
-import { useIsMobile } from '@seawatts/ui/hooks/use-mobile';
+} from '@cove/ui/card';
+import { type ChartConfig, ChartContainer } from '@cove/ui/chart';
+import { useIsMobile } from '@cove/ui/hooks/use-mobile';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@seawatts/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@seawatts/ui/toggle-group';
+} from '@cove/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@cove/ui/toggle-group';
 import { format } from 'date-fns';
 import * as React from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';

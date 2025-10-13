@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@seawatts/ui/lib/utils';
+import { cn } from '@cove/ui/lib/utils';
 import type * as React from 'react';
 
 function Table({ className, ...props }: React.ComponentProps<'table'>) {

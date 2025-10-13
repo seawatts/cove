@@ -1,25 +1,25 @@
 'use client';
 
-import { Slot } from '@radix-ui/react-slot';
-import { Button } from '@seawatts/ui/components/button';
-import { Input } from '@seawatts/ui/components/input';
-import { Separator } from '@seawatts/ui/components/separator';
+import { Button } from '@cove/ui/components/button';
+import { Input } from '@cove/ui/components/input';
+import { Separator } from '@cove/ui/components/separator';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@seawatts/ui/components/sheet';
-import { Skeleton } from '@seawatts/ui/components/skeleton';
+} from '@cove/ui/components/sheet';
+import { Skeleton } from '@cove/ui/components/skeleton';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@seawatts/ui/components/tooltip';
-import { useIsMobile } from '@seawatts/ui/hooks/use-mobile';
-import { cn } from '@seawatts/ui/lib/utils';
+} from '@cove/ui/components/tooltip';
+import { useIsMobile } from '@cove/ui/hooks/use-mobile';
+import { cn } from '@cove/ui/lib/utils';
+import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 import * as React from 'react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { SidebarProvider } from '@seawatts/ui/sidebar';
+import { SidebarProvider } from '@cove/ui/sidebar';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

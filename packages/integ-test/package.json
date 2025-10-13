@@ -1,17 +1,17 @@
 {
   "dependencies": {
-    "@seawatts/api": "workspace:*",
-    "@seawatts/db": "workspace:*",
-    "@seawatts/id": "workspace:*",
-    "@seawatts/utils": "workspace:*",
+    "@cove/api": "workspace:*",
+    "@cove/db": "workspace:*",
+    "@cove/id": "workspace:*",
+    "@cove/utils": "workspace:*",
     "@supabase/supabase-js": "2.75.0",
     "drizzle-orm": "0.44.6",
     "postgres": "3.4.7",
     "zod": "4.1.12"
   },
   "devDependencies": {
+    "@cove/tsconfig": "workspace:*",
     "@faker-js/faker": "10.0.0",
-    "@seawatts/tsconfig": "workspace:*",
     "@testcontainers/postgresql": "11.7.1",
     "@types/node": "24.7.2",
     "@vitest/coverage-v8": "3.2.4",
@@ -26,7 +26,7 @@
   "engines": {
     "node": ">=20.12.0"
   },
-  "name": "@seawatts/integ-test",
+  "name": "@cove/integ-test",
   "private": true,
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist coverage",

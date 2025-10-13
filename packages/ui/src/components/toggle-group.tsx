@@ -1,8 +1,8 @@
 'use client';
 
+import { toggleVariants } from '@cove/ui/components/toggle';
+import { cn } from '@cove/ui/lib/utils';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
-import { toggleVariants } from '@seawatts/ui/components/toggle';
-import { cn } from '@seawatts/ui/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 

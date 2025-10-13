@@ -20,8 +20,8 @@ await db.delete(AuthCodes);
 await db.delete(ApiKeyUsage);
 await db.delete(ApiKeys);
 
-const userId = 'user_30oVYOGDYUTdXqB6HImz3XbRyTs';
-const orgId = 'org_30oVYhhebEP3q4dSFlxo8DyAxhr';
+const userId = 'user_2sq7bbL6xgQPxOAJ8fYMKPUOpRC';
+const orgId = 'org_341hWtox3ptsziJKdRggCdhMWzc';
 const orgName = 'seawatts';
 const apiKeyId = 'ak_seawatts';
 const stripeCustomerId = 'cus_Snv28tYxHudPzx';

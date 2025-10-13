@@ -1,9 +1,9 @@
 'use server';
 
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { upsertOrg } from '@seawatts/db';
-import { db } from '@seawatts/db/client';
-import { Orgs } from '@seawatts/db/schema';
+import { upsertOrg } from '@cove/db';
+import { db } from '@cove/db/client';
+import { Orgs } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { createSafeActionClient } from 'next-safe-action';
 import { z } from 'zod';

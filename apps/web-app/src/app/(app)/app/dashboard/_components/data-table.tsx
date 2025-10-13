@@ -1,5 +1,52 @@
 'use client';
 
+import { MetricButton } from '@cove/analytics/components';
+import { Badge } from '@cove/ui/badge';
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@cove/ui/chart';
+import { Checkbox } from '@cove/ui/checkbox';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@cove/ui/drawer';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@cove/ui/dropdown-menu';
+import { useIsMobile } from '@cove/ui/hooks/use-mobile';
+import { Input } from '@cove/ui/input';
+import { Label } from '@cove/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@cove/ui/select';
+import { Separator } from '@cove/ui/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@cove/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
 import {
   closestCenter,
   DndContext,
@@ -19,53 +66,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MetricButton } from '@seawatts/analytics/components';
-import { Badge } from '@seawatts/ui/badge';
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@seawatts/ui/chart';
-import { Checkbox } from '@seawatts/ui/checkbox';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@seawatts/ui/drawer';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@seawatts/ui/dropdown-menu';
-import { useIsMobile } from '@seawatts/ui/hooks/use-mobile';
-import { Input } from '@seawatts/ui/input';
-import { Label } from '@seawatts/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@seawatts/ui/select';
-import { Separator } from '@seawatts/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@seawatts/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@seawatts/ui/tabs';
 import {
   IconChevronDown,
   IconChevronLeft,

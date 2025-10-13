@@ -15,12 +15,12 @@
     "VERCEL_TOKEN"
   ],
   "tasks": {
-    "@seawatts/stripe#build": {
+    "@cove/stripe#build": {
       "cache": false,
       "env": ["STRIPE_*"]
     },
-    "@seawatts/web-app#build": {
-      "dependsOn": ["@seawatts/stripe#build"],
+    "@cove/web-app#build": {
+      "dependsOn": ["@cove/stripe#build"],
       "env": [
         "NEXT_PUBLIC_*",
         "CLERK_*",
@@ -62,6 +62,14 @@
     },
     "clean": {
       "cache": false
+    },
+    "cove-vscode#dev:extension": {
+      "cache": false,
+      "persistent": true
+    },
+    "cove-vscode#dev:webview": {
+      "cache": false,
+      "persistent": true
     },
     "dev": {
       "cache": false,
@@ -120,14 +128,6 @@
         "NODE_ENV"
       ],
       "interactive": true
-    },
-    "seawatts-vscode#dev:extension": {
-      "cache": false,
-      "persistent": true
-    },
-    "seawatts-vscode#dev:webview": {
-      "cache": false,
-      "persistent": true
     },
     "seed": {
       "cache": false,

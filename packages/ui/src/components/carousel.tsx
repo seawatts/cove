@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@seawatts/ui/components/button';
-import { cn } from '@seawatts/ui/lib/utils';
+import { Button } from '@cove/ui/components/button';
+import { cn } from '@cove/ui/lib/utils';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react';

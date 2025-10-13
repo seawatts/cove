@@ -1,7 +1,7 @@
 'use client';
 
+import { cn } from '@cove/ui/lib/utils';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { cn } from '@seawatts/ui/lib/utils';
 import { CheckIcon } from 'lucide-react';
 import type * as React from 'react';
 

@@ -1,4 +1,4 @@
-# @seawatts/email
+# @cove/email
 
 Email sending package for Seawatts using Resend and React Email.
 
@@ -12,7 +12,7 @@ Email sending package for Seawatts using Resend and React Email.
 ## Installation
 
 ```bash
-bun add @seawatts/email
+bun add @cove/email
 ```
 
 ## Configuration
@@ -30,8 +30,8 @@ EMAIL_REPLY_TO=support@seawatts.sh # Optional
 ### Basic Email Sending
 
 ```typescript
-import { createEmailClient } from '@seawatts/email';
-import { WebhookAccessRequestEmail } from '@seawatts/email/templates';
+import { createEmailClient } from '@cove/email';
+import { WebhookAccessRequestEmail } from '@cove/email/templates';
 
 const emailClient = createEmailClient({
   apiKey: process.env.RESEND_API_KEY!,

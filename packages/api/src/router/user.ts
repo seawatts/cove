@@ -1,11 +1,11 @@
-import { eq } from '@seawatts/db';
-import { CreateUserSchema, Users } from '@seawatts/db/schema';
+import { eq } from '@cove/db';
+import { CreateUserSchema, Users } from '@cove/db/schema';
 import type { TRPCRouterRecord } from '@trpc/server';
 import { z } from 'zod';
 
-import { protectedProcedure, publicProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
-export const userRouter = {
+export const userRouter = createTRPCRouter({
   all: publicProcedure.query(({ ctx }) => {
     return ctx.db.query.Users.findMany({
       limit: 10,
@@ -31,4 +31,4 @@ export const userRouter = {
   delete: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
     return ctx.db.delete(Users).where(eq(Users.id, input));
   }),
-} satisfies TRPCRouterRecord;
+});

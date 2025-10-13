@@ -1,15 +1,15 @@
 'use client';
 
 import { useOrganizationList, useUser } from '@clerk/nextjs';
-import { MetricButton, MetricLink } from '@seawatts/analytics/components';
-import { api } from '@seawatts/api/react';
+import { MetricButton, MetricLink } from '@cove/analytics/components';
+import { api } from '@cove/api/react';
 import {
   Entitled,
   NotEntitled,
   useIsEntitled,
-} from '@seawatts/stripe/guards/client';
-import { Button } from '@seawatts/ui/components/button';
-import { P } from '@seawatts/ui/custom/typography';
+} from '@cove/stripe/guards/client';
+import { Button } from '@cove/ui/components/button';
+import { P } from '@cove/ui/custom/typography';
 import {
   Dialog,
   DialogClose,
@@ -17,9 +17,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@seawatts/ui/dialog';
-import { Input } from '@seawatts/ui/input';
-import { Label } from '@seawatts/ui/label';
+} from '@cove/ui/dialog';
+import { Input } from '@cove/ui/input';
+import { Label } from '@cove/ui/label';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { env } from '~/env.client';

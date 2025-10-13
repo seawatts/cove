@@ -5,12 +5,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@seawatts/ui/components/table';
+} from '@cove/ui/components/table';
 import {
   AnimatedSpan,
   Terminal,
   TypingAnimation,
-} from '@seawatts/ui/magicui/terminal';
+} from '@cove/ui/magicui/terminal';
 import { Clock, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

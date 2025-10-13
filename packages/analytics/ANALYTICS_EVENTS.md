@@ -138,7 +138,7 @@ All events follow a consistent pattern:
 
 ### Using MetricLink for Navigation
 ```tsx
-import { MetricLink } from '@seawatts/analytics';
+import { MetricLink } from '@cove/analytics';
 
 <MetricLink
   href="/app/dashboard"

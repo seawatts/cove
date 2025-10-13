@@ -1,7 +1,7 @@
 'use client';
 
+import { cn } from '@cove/ui/lib/utils';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { cn } from '@seawatts/ui/lib/utils';
 import type * as React from 'react';
 
 function TooltipProvider({

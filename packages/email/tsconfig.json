@@ -5,6 +5,6 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
   "exclude": ["node_modules"],
-  "extends": "@seawatts/tsconfig/node.json",
+  "extends": "@cove/tsconfig/node.json",
   "include": ["*.ts", "*.tsx", "src"]
 }

@@ -1,8 +1,8 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@seawatts/db/client';
-import { Orgs } from '@seawatts/db/schema';
+import { db } from '@cove/db/client';
+import { Orgs } from '@cove/db/schema';
 import {
   BILLING_INTERVALS,
   createBillingPortalSession,
@@ -10,7 +10,7 @@ import {
   getOrCreateCustomer,
   PLAN_TYPES,
   stripe,
-} from '@seawatts/stripe';
+} from '@cove/stripe';
 import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';

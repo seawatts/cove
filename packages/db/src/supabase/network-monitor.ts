@@ -1,6 +1,6 @@
 import { lookup } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
-import { debug } from '@seawatts/logger';
+import { debug } from '@cove/logger';
 
 const log = debug('seawatts:lib:network-monitor');
 

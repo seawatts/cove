@@ -1,7 +1,7 @@
 'use client';
 
 import { useClerk } from '@clerk/nextjs';
-import { MetricButton } from '@seawatts/analytics/components';
+import { MetricButton } from '@cove/analytics/components';
 import { useSearchParams } from 'next/navigation';
 
 export function SignInDifferentAccountButton() {

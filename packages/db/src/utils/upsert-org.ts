@@ -3,14 +3,14 @@ import {
   type Organization,
   type User,
 } from '@clerk/nextjs/server';
-import { generateRandomName, generateUniqueOrgName } from '@seawatts/id';
+import { generateRandomName, generateUniqueOrgName } from '@cove/id';
 import {
   BILLING_INTERVALS,
   createSubscription,
   getFreePlanPriceId,
   PLAN_TYPES,
   upsertStripeCustomer,
-} from '@seawatts/stripe';
+} from '@cove/stripe';
 import { eq } from 'drizzle-orm';
 import type Stripe from 'stripe';
 import { db } from '../client';

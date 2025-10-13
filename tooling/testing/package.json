@@ -1,7 +1,7 @@
 {
   "devDependencies": {
+    "@cove/tsconfig": "workspace:*",
     "@happy-dom/global-registrator": "20.0.0",
-    "@seawatts/tsconfig": "workspace:*",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.0",
@@ -11,7 +11,7 @@
     ".": "./src/index.ts"
   },
   "license": "MIT",
-  "name": "@seawatts/tooling-testing",
+  "name": "@cove/tooling-testing",
   "private": true,
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist",

@@ -1,7 +1,7 @@
 import { clerkClient } from '@clerk/nextjs/server';
-import { upsertOrg } from '@seawatts/db';
-import { db } from '@seawatts/db/client';
-import { AuthCodes } from '@seawatts/db/schema';
+import { upsertOrg } from '@cove/db';
+import { db } from '@cove/db/client';
+import { AuthCodes } from '@cove/db/schema';
 import { TRPCError } from '@trpc/server';
 import { and, eq, gte, isNull } from 'drizzle-orm';
 import { z } from 'zod';

@@ -1,9 +1,9 @@
 'use client';
 
+import { Label } from '@cove/ui/components/label';
+import { cn } from '@cove/ui/lib/utils';
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
-import { Label } from '@seawatts/ui/components/label';
-import { cn } from '@seawatts/ui/lib/utils';
 import * as React from 'react';
 import {
   Controller,

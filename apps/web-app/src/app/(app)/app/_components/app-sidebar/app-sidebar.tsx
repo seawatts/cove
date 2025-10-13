@@ -1,6 +1,6 @@
 'use client';
 
-import { MetricLink } from '@seawatts/analytics';
+import { MetricLink } from '@cove/analytics';
 import {
   Sidebar,
   SidebarContent,
@@ -9,19 +9,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@seawatts/ui/sidebar';
+} from '@cove/ui/sidebar';
 import {
   IconBrandGithub,
-  IconCamera,
   IconCodeDots,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconKey,
-  IconReport,
+  IconDevices,
+  IconLayout,
+  IconServer,
   IconSettings,
+  IconSparkles,
 } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 import type * as React from 'react';
@@ -29,103 +26,37 @@ import { Icons } from '~/app/(marketing)/_components/icons';
 import { NavMain } from './nav-main';
 import { NavSecondary } from './nav-secondary';
 import { NavUser } from './nav-user';
-import { UsageCard } from './usage-card';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const isOnboarding = pathname?.startsWith('/app/onboarding');
 
   const data = {
-    documents: [
-      {
-        icon: IconDatabase,
-        name: 'Data Library',
-        url: '#',
-      },
-      {
-        icon: IconReport,
-        name: 'Reports',
-        url: '#',
-      },
-      {
-        icon: IconFileWord,
-        name: 'Word Assistant',
-        url: '#',
-      },
-    ],
-    navClouds: [
-      {
-        icon: IconCamera,
-        isActive: true,
-        items: [
-          {
-            title: 'Active Proposals',
-            url: '#',
-          },
-          {
-            title: 'Archived',
-            url: '#',
-          },
-        ],
-        title: 'Capture',
-        url: '#',
-      },
-      {
-        icon: IconFileDescription,
-        items: [
-          {
-            title: 'Active Proposals',
-            url: '#',
-          },
-          {
-            title: 'Archived',
-            url: '#',
-          },
-        ],
-        title: 'Proposal',
-        url: '#',
-      },
-      {
-        icon: IconFileAi,
-        items: [
-          {
-            title: 'Active Proposals',
-            url: '#',
-          },
-          {
-            title: 'Archived',
-            url: '#',
-          },
-        ],
-        title: 'Prompts',
-        url: '#',
-      },
-    ],
     navMain: [
       {
         icon: IconDashboard,
         title: 'Dashboard',
         url: '/app/dashboard',
       },
-      // {
-      //   icon: IconWebhook,
-      //   title: 'Webhooks',
-      //   url: '/app/webhooks',
-      // },
       {
-        icon: IconDatabase,
-        title: 'Events',
-        url: '/app/events',
+        icon: IconDevices,
+        title: 'Devices',
+        url: '/app/devices',
       },
-      // {
-      //   icon: IconPlayerPlay,
-      //   title: 'Playground',
-      //   url: '/app/playground',
-      // },
       {
-        icon: IconKey,
-        title: 'API Keys',
-        url: '/app/api-keys',
+        icon: IconLayout,
+        title: 'Rooms',
+        url: '/app/rooms',
+      },
+      {
+        icon: IconSparkles,
+        title: 'Automations',
+        url: '/app/automations',
+      },
+      {
+        icon: IconServer,
+        title: 'Hub',
+        url: '/app/hub',
       },
       {
         icon: IconSettings,
@@ -137,18 +68,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         icon: IconBrandGithub,
         title: 'GitHub',
-        url: 'https://github.com/seawatts-sh/seawatts',
+        url: 'https://github.com/seawatts/cove',
       },
       {
         icon: IconCodeDots,
         title: 'Docs',
-        url: 'https://docs.seawatts.sh',
+        url: 'https://cove.sh/docs',
       },
-      // {
-      //   icon: IconSearch,
-      //   title: 'Search',
-      //   url: '#',
-      // },
     ],
     user: {
       avatar: '/avatars/shadcn.jpg',
@@ -171,7 +97,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 metric="navigation_logo_clicked"
               >
                 <Icons.logo className="size-10" />
-                <span className="text-base font-semibold">seawatts AI</span>
+                <span className="text-base font-semibold">Cove</span>
               </MetricLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -179,9 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         {!isOnboarding && <NavMain items={data.navMain} />}
-        {/* <NavDocuments items={data.documents} /> */}
         <div className="mt-auto">
-          {!isOnboarding && <UsageCard />}
           <NavSecondary items={data.navSecondary} />
         </div>
       </SidebarContent>

@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@seawatts/ui/alert-dialog';
+} from '@cove/ui/alert-dialog';
 
 interface RemoveMemberDialogProps {
   isOpen: boolean;

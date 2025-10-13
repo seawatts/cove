@@ -20,7 +20,9 @@ export const originalConsole: Record<ConsoleMethod, typeof console.log> = {
   warn: console.warn,
 };
 
-const isBrowser = typeof window !== 'undefined';
+const isBrowser =
+  typeof globalThis !== 'undefined' &&
+  typeof (globalThis as { window?: unknown }).window !== 'undefined';
 
 function formatMessage(message: string, ...args: unknown[]): string {
   if (args.length === 0) return message;
@@ -45,7 +47,7 @@ interface BufferedLogMessage extends LogMessage {
   sequence: number;
 }
 
-export class SeawattsLogger {
+export class Logger {
   private enabledNamespaces: Set<string>;
   private defaultNamespace: string;
   private useColors: boolean;
@@ -147,7 +149,7 @@ export class SeawattsLogger {
   private isNamespaceEnabled(namespace: string): boolean {
     if (this.enabledNamespaces.has('*')) return true;
 
-    // Support wildcard patterns like 'seawatts:*'
+    // Support wildcard patterns like 'cove:*'
     for (const pattern of this.enabledNamespaces) {
       if (pattern.endsWith('*') && namespace.startsWith(pattern.slice(0, -1))) {
         return true;

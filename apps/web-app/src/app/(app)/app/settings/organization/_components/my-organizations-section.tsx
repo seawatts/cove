@@ -1,10 +1,10 @@
 'use client';
 
 import { useOrganization, useOrganizationList } from '@clerk/nextjs';
-import { MetricButton } from '@seawatts/analytics/components';
-import { Badge } from '@seawatts/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@seawatts/ui/card';
-import { Skeleton } from '@seawatts/ui/skeleton';
+import { MetricButton } from '@cove/analytics/components';
+import { Badge } from '@cove/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
+import { Skeleton } from '@cove/ui/skeleton';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { leaveOrganizationAction } from '../actions';

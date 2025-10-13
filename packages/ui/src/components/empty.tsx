@@ -1,4 +1,4 @@
-import { cn } from '@seawatts/ui/lib/utils';
+import { cn } from '@cove/ui/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 function Empty({ className, ...props }: React.ComponentProps<'div'>) {

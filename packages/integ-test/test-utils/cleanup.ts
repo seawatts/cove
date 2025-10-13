@@ -1,4 +1,4 @@
-import * as schema from '@seawatts/db/schema';
+import * as schema from '@cove/db/schema';
 import { sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 

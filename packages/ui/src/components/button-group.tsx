@@ -1,7 +1,6 @@
+import { Separator } from '@cove/ui/components/separator';
+import { cn } from '@cove/ui/lib/utils';
 import { Slot } from '@radix-ui/react-slot';
-import { Separator } from '@seawatts/ui/components/separator';
-
-import { cn } from '@seawatts/ui/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const buttonGroupVariants = cva(

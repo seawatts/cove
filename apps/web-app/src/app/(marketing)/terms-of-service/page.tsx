@@ -1,4 +1,4 @@
-import { SphereMask } from '@seawatts/ui/magicui/sphere-mask';
+import { SphereMask } from '@cove/ui/magicui/sphere-mask';
 
 import { CTASection } from '../_components/sections/cta-section';
 import { FooterSection } from '../_components/sections/footer-section';

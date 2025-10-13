@@ -5,7 +5,7 @@ import { cleanup } from '@testing-library/react';
 expect.extend(matchers);
 
 // Global mocks to prevent environment variable errors during test loading
-mock.module('@seawatts/stripe', () => ({
+mock.module('@cove/stripe', () => ({
   BILLING_INTERVALS: { MONTHLY: 'month' },
   createSubscription: () =>
     Promise.resolve({ id: 'sub_123', status: 'active' }),

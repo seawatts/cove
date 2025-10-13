@@ -9,7 +9,7 @@ export const onRequestError: Instrumentation.onRequestError = async (
   request,
 ) => {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    const { posthog } = await import('@seawatts/analytics/posthog/server');
+    const { posthog } = await import('@cove/analytics/posthog/server');
     let distinctId = null;
 
     if (request.headers.cookie) {
