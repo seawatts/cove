@@ -47,6 +47,10 @@ export class ESPHomeSSEAdapter {
       throw new Error('ESPHome device requires IP address');
     }
 
+    if (!device.id) {
+      throw new Error('ESPHome device requires ID');
+    }
+
     const controller = new AbortController();
 
     this.connections.set(device.id, {
@@ -63,6 +67,10 @@ export class ESPHomeSSEAdapter {
     device: Device,
     signal: AbortSignal,
   ): Promise<void> {
+    if (!device.id) {
+      throw new Error('Device ID is required');
+    }
+
     const url = `http://${device.ipAddress}/events`;
 
     try {
@@ -121,9 +129,11 @@ export class ESPHomeSSEAdapter {
         throw error;
       }
     } finally {
-      const connection = this.connections.get(device.id);
-      if (connection) {
-        connection.connected = false;
+      if (device.id) {
+        const connection = this.connections.get(device.id);
+        if (connection) {
+          connection.connected = false;
+        }
       }
     }
   }
@@ -146,6 +156,11 @@ export class ESPHomeSSEAdapter {
   }
 
   private handleSensorUpdate(device: Device, event: ESPHomeSSEEvent): void {
+    if (!device.id) {
+      log('Device ID is required for sensor updates');
+      return;
+    }
+
     // Map ESPHome sensor IDs to metric types
     const metricType = this.mapSensorToMetricType(event.id);
 
@@ -203,6 +218,10 @@ export class ESPHomeSSEAdapter {
 
   async disconnect(device: Device): Promise<void> {
     log(`Disconnecting from ESPHome device: ${device.name}`);
+
+    if (!device.id) {
+      return;
+    }
 
     const connection = this.connections.get(device.id);
     if (connection) {

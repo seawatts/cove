@@ -162,8 +162,7 @@ const onboardingSchema = z.object({
     .regex(
       VALIDATION_REGEX,
       'Organization name can only contain lowercase letters, numbers, hyphens, and underscores',
-    )
-    .transform((val) => val.toLowerCase().trim()),
+    ),
   webhookName: z
     .string()
     .min(1, 'Webhook name is required')
@@ -171,8 +170,7 @@ const onboardingSchema = z.object({
     .regex(
       VALIDATION_REGEX,
       'Webhook name can only contain lowercase letters, numbers, hyphens, and underscores',
-    )
-    .transform((val) => val.toLowerCase().trim()),
+    ),
 });
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
@@ -200,6 +198,7 @@ export function OnboardingForm({
       webhookName: '',
     },
     mode: 'onChange',
+    // @ts-expect-error - Zod version compatibility issue with @hookform/resolvers
     resolver: zodResolver(onboardingSchema),
   });
 
@@ -262,6 +261,12 @@ export function OnboardingForm({
       return;
     }
 
+    // Normalize the data
+    const normalizedData = {
+      orgName: data.orgName.toLowerCase().trim(),
+      webhookName: data.webhookName.toLowerCase().trim(),
+    };
+
     // Check validation status before submitting
     if (orgNameValidation.available === false) {
       toast.error('Please fix organization name validation errors');
@@ -292,10 +297,10 @@ export function OnboardingForm({
         );
 
         // Update existing organization name if it's different
-        if (organization.name !== data.orgName) {
+        if (organization.name !== normalizedData.orgName) {
           try {
             await organization.update({
-              name: data.orgName,
+              name: normalizedData.orgName,
             });
             console.log('Organization name updated in Clerk successfully');
             await organization.reload();
@@ -306,19 +311,19 @@ export function OnboardingForm({
         }
 
         // Redirect to webhook creation since organization already exists
-        router.push(`/app/webhooks/create?orgName=${data.orgName}`);
+        router.push(`/app/webhooks/create?orgName=${normalizedData.orgName}`);
         return;
       }
 
       console.log('Creating new organization for user:', {
-        orgName: data.orgName,
+        orgName: normalizedData.orgName,
         userEmail: user.emailAddresses?.[0]?.emailAddress,
         userId: user.id,
       });
 
       // Create organization with Stripe integration
       const orgResult = await createOrganization({
-        name: data.orgName,
+        name: normalizedData.orgName,
       });
 
       if (!orgResult) {
@@ -374,8 +379,8 @@ export function OnboardingForm({
 
       // Redirect to local setup page
       const params = new URLSearchParams({
-        orgName: data.orgName,
-        webhookName: data.webhookName,
+        orgName: normalizedData.orgName,
+        webhookName: normalizedData.webhookName,
       });
 
       if (redirectTo) {

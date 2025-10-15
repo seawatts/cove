@@ -2,7 +2,6 @@ import { createClerkClient } from '@clerk/backend';
 import { db } from '@cove/db/client';
 import { ApiKeys, AuthCodes, Orgs, Users } from '@cove/db/schema';
 import { createId } from '@cove/id';
-import { eq } from 'drizzle-orm';
 import { env } from './env';
 
 export interface TestUser {
@@ -267,17 +266,17 @@ export async function createTestSetup(
           console.warn('Failed to revoke Clerk session:', error);
         }
 
-        await db.delete(AuthCodes).where(eq(AuthCodes.id, authCode.id));
+        // await db.delete(AuthCodes).where(eq(AuthCodes.id, authCode.id));
       }
 
       // Clean up API key from database
-      await db.delete(ApiKeys).where(eq(ApiKeys.id, apiKey.id));
+      // await db.delete(ApiKeys).where(eq(ApiKeys.id, apiKey.id));
 
       // Clean up organization from database
-      await db.delete(Orgs).where(eq(Orgs.id, org.id));
+      // await db.delete(Orgs).where(eq(Orgs.id, org.id));
 
       // Clean up user from database
-      await db.delete(Users).where(eq(Users.id, user.id));
+      // await db.delete(Users).where(eq(Users.id, user.id));
 
       // Clean up organization from Clerk
       try {

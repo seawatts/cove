@@ -13,5 +13,8 @@ export const env = createEnv({
     CLERK_SECRET_KEY: z.string(),
     POSTGRES_URL: z.string().url(),
   },
-  skipValidation: !!process.env.CI,
+  skipValidation:
+    !!process.env.CI ||
+    process.env.SKIP_ENV_VALIDATION === 'true' ||
+    process.env.NODE_ENV === 'development',
 });

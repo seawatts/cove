@@ -109,9 +109,23 @@ export class MDNSDiscoveryService implements DiscoveryService {
     const protocol = this.mapServiceTypeToProtocol(service.type);
     const ipAddress = service.addresses?.[0] || service.host;
 
+    // Extract MAC address from TXT records if available
+    // Common keys: mac, MAC, macaddress, mac_address
+    let macAddress: string | undefined;
+    if (service.txt) {
+      const txtRecord = service.txt as Record<string, string>;
+      macAddress =
+        txtRecord.mac ||
+        txtRecord.MAC ||
+        txtRecord.macaddress ||
+        txtRecord.mac_address ||
+        txtRecord.device_mac;
+    }
+
     const discovery: DeviceDiscovery = {
       discovered_at: new Date(),
       ipAddress,
+      macAddress,
       metadata: {
         addresses: service.addresses,
         host: service.host,
@@ -152,6 +166,7 @@ export class MDNSDiscoveryService implements DiscoveryService {
     if (serviceType.includes('esphome')) return 'esphome' as ProtocolType;
     if (serviceType.includes('hue')) return 'hue' as ProtocolType;
     if (serviceType.includes('matter')) return 'matter' as ProtocolType;
+    if (serviceType.includes('sonos')) return 'sonos' as ProtocolType;
     if (serviceType.includes('homekit') || serviceType.includes('hap'))
       return 'wifi' as ProtocolType;
     if (serviceType.includes('mqtt')) return 'mqtt' as ProtocolType;

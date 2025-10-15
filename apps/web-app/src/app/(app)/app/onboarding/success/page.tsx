@@ -11,7 +11,7 @@ import {
 } from '@cove/ui/card';
 import { Button } from '@cove/ui/components/button';
 import { cn } from '@cove/ui/lib/utils';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { env } from '~/env.client';

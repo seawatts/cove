@@ -4,12 +4,14 @@ import { authRouter } from './router/auth';
 import { automationRouter, sceneRouter } from './router/automation';
 import { billingRouter } from './router/billing';
 import { deviceRouter } from './router/device';
+import { esphomeRouter } from './router/esphome';
 import { hubRouter } from './router/hub';
 import { hueRouter } from './router/hue';
 import { orgRouter } from './router/org';
 import { orgMembersRouter } from './router/org-members';
 import { roomRouter } from './router/room';
 import { userRouter } from './router/user';
+import { widgetRouter } from './router/widget';
 import { createTRPCRouter } from './trpc';
 
 export const appRouter = createTRPCRouter({
@@ -19,6 +21,7 @@ export const appRouter = createTRPCRouter({
   automation: automationRouter,
   billing: billingRouter,
   device: deviceRouter,
+  esphome: esphomeRouter,
   hub: hubRouter,
   hue: hueRouter,
   org: orgRouter,
@@ -26,6 +29,7 @@ export const appRouter = createTRPCRouter({
   room: roomRouter,
   scene: sceneRouter,
   user: userRouter,
+  widget: widgetRouter,
 });
 
 // export type definition of API

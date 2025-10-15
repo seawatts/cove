@@ -38,7 +38,7 @@ await seed(db, {
     columns: {
       id: funcs.default({ defaultValue: apiKeyId }),
       key: funcs.default({
-        defaultValue: 'usk-live-300nYp2JItCuoiHhaioQv82QHwo',
+        defaultValue: apiKeyId,
       }),
       orgId: funcs.default({ defaultValue: orgId }),
     },

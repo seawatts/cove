@@ -1,0 +1,36 @@
+{
+  "bin": {
+    "cove-hub": "./cove-hub"
+  },
+  "dependencies": {
+    "@cove/db": "workspace:*",
+    "@cove/discovery": "workspace:*",
+    "@cove/id": "workspace:*",
+    "@cove/logger": "workspace:*",
+    "@cove/protocols": "workspace:*",
+    "@cove/types": "workspace:*",
+    "@supabase/supabase-js": "catalog:",
+    "@t3-oss/env-core": "catalog:",
+    "zod": "catalog:"
+  },
+  "description": "Cove Hub - Core daemon for home automation",
+  "devDependencies": {
+    "@cove/tsconfig": "workspace:*",
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  },
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "name": "@cove/hub",
+  "private": false,
+  "scripts": {
+    "build": "bun build ./src/index.ts --compile --outfile cove-hub",
+    "build:linux-arm64": "bun build ./src/index.ts --compile --target=bun-linux-arm64 --outfile cove-hub-linux-arm64",
+    "clean": "git clean -xdf .turbo node_modules dist cove-hub*",
+    "dev": "infisical run --env=dev -- bun --watch src/index.ts",
+    "start": "infisical run --env=dev -- bun src/index.ts",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

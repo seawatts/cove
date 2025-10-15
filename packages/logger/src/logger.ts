@@ -150,7 +150,7 @@ export class Logger {
     if (this.enabledNamespaces.has('*')) return true;
 
     // Support wildcard patterns like 'cove:*'
-    for (const pattern of this.enabledNamespaces) {
+    for (const pattern of Array.from(this.enabledNamespaces)) {
       if (pattern.endsWith('*') && namespace.startsWith(pattern.slice(0, -1))) {
         return true;
       }

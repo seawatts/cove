@@ -352,7 +352,7 @@ export async function checkEntitySubscriptionRoles(entity: string) {
 export async function getRealtimeSubscriptionsByWebhookId(
   webhookId: string,
 ): Promise<RealtimeSubscription[]> {
-  const result = await db.execute<RealtimeSubscription>(sql`
+  const result = (await db.execute<RealtimeSubscription>(sql`
     SELECT
       id,
       subscription_id,
@@ -364,7 +364,7 @@ export async function getRealtimeSubscriptionsByWebhookId(
     FROM realtime.subscription
     WHERE filters::text LIKE ${`%${webhookId}%`}
     ORDER BY created_at DESC
-  `);
+  `)) as RealtimeSubscription[];
 
-  return result.rows;
+  return result;
 }

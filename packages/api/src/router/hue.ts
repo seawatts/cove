@@ -3,8 +3,8 @@
  * Handles bridge pairing, discovery, and light control
  */
 
+import { and, eq } from '@cove/db';
 import { DeviceCommands, Devices } from '@cove/db/schema';
-import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 

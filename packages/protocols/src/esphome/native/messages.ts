@@ -15,10 +15,10 @@ import type {
  */
 export function buildHelloRequest(clientInfo: string): Buffer {
   return Buffer.concat([
-    encodeField(1, clientInfo), // client_info
-    encodeField(2, 1), // api_version_major
-    encodeField(3, 10), // api_version_minor (1.10)
-  ]);
+    encodeField(1, clientInfo) as unknown as Uint8Array, // client_info
+    encodeField(2, 1) as unknown as Uint8Array, // api_version_major
+    encodeField(3, 10) as unknown as Uint8Array, // api_version_minor (1.10)
+  ]) as Buffer;
 }
 
 /**

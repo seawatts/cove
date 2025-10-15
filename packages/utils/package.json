@@ -1,13 +1,17 @@
 {
   "dependencies": {
+    "@cove/types": "workspace:*",
     "dedent-js": "1.0.1"
   },
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
-    "typescript": "5.9.3"
+    "typescript": "catalog:"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./detect-widget-type": "./src/detect-widget-type.ts",
+    "./fill-time-series-gaps": "./src/fill-time-series-gaps.ts",
+    "./format-sensor-value": "./src/format-sensor-value.ts"
   },
   "license": "MIT",
   "name": "@cove/utils",

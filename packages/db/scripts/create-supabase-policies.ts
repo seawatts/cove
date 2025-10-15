@@ -152,41 +152,59 @@ const policyConfigs: Record<string, PolicyConfig> = {
     ],
     tableName: 'authCodes',
   },
-  connections: {
+  automations: {
     policies: [
       createUserOwnershipPolicy('ALL', 'userId'),
       createOrgOwnershipPolicy('ALL', 'orgId'),
     ],
-    tableName: 'connections',
+    tableName: 'automations',
+  },
+  commands: {
+    policies: [
+      createUserOwnershipPolicy('ALL', 'userId'),
+      // Access through devices table for org ownership
+      {
+        name: 'Users can access commands for their org devices',
+        operation: 'SELECT',
+        using: `EXISTS (
+          SELECT 1 FROM devices
+          WHERE devices.id = "commands"."deviceId"
+          AND (SELECT requesting_org_id()) = devices."orgId"::text
+        )`,
+      },
+    ],
+    tableName: 'commands',
+  },
+  devices: {
+    policies: [
+      createUserOwnershipPolicy('ALL', 'userId'),
+      createOrgOwnershipPolicy('ALL', 'orgId'),
+    ],
+    tableName: 'devices',
   },
   events: {
     policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
+      // Events doesn't have userId/orgId - access through devices table
+      {
+        name: 'Users can view events for their devices',
+        operation: 'SELECT',
+        using: `EXISTS (
+          SELECT 1 FROM devices
+          WHERE devices.id = "events"."deviceId"
+          AND (SELECT requesting_user_id()) = devices."userId"::text
+        )`,
+      },
+      {
+        name: 'Users can view events for their org devices',
+        operation: 'SELECT',
+        using: `EXISTS (
+          SELECT 1 FROM devices
+          WHERE devices.id = "events"."deviceId"
+          AND (SELECT requesting_org_id()) = devices."orgId"::text
+        )`,
+      },
     ],
     tableName: 'events',
-  },
-  forwardingDestinations: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createUserOwnershipPolicy('DELETE', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'forwardingDestinations',
-  },
-  forwardingExecutions: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'forwardingExecutions',
-  },
-  forwardingRules: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'forwardingRules',
   },
   orgMembers: {
     policies: [
@@ -217,27 +235,43 @@ const policyConfigs: Record<string, PolicyConfig> = {
     ],
     tableName: 'orgs',
   },
-  requests: {
+  rooms: {
     policies: [
       createUserOwnershipPolicy('ALL', 'userId'),
       createOrgOwnershipPolicy('ALL', 'orgId'),
+    ],
+    tableName: 'rooms',
+  },
+  scenes: {
+    policies: [
+      createUserOwnershipPolicy('ALL', 'userId'),
+      createOrgOwnershipPolicy('ALL', 'orgId'),
+    ],
+    tableName: 'scenes',
+  },
+  states: {
+    policies: [
+      // States doesn't have userId/orgId - access through devices table
       {
-        name: 'Users can access requests for their webhooks',
+        name: 'Users can view state history for their devices',
         operation: 'SELECT',
-        using: policyConditions.webhookOwnership,
+        using: `EXISTS (
+          SELECT 1 FROM devices
+          WHERE devices.id = "states"."deviceId"
+          AND (SELECT requesting_user_id()) = devices."userId"::text
+        )`,
       },
       {
-        name: 'Users can delete requests for their webhooks',
-        operation: 'DELETE',
-        using: policyConditions.webhookOwnership,
-      },
-      {
-        name: 'Users can update requests for their webhooks',
-        operation: 'UPDATE',
-        using: policyConditions.webhookOwnership,
+        name: 'Users can view state history for their org devices',
+        operation: 'SELECT',
+        using: `EXISTS (
+          SELECT 1 FROM devices
+          WHERE devices.id = "states"."deviceId"
+          AND (SELECT requesting_org_id()) = devices."orgId"::text
+        )`,
       },
     ],
-    tableName: 'requests',
+    tableName: 'states',
   },
   user: {
     policies: [
@@ -245,43 +279,6 @@ const policyConfigs: Record<string, PolicyConfig> = {
       createUserOwnershipPolicy('UPDATE', 'id'),
     ],
     tableName: 'user',
-  },
-  webhookAccessRequests: {
-    policies: [
-      // Users can access requests they made (as requester)
-      {
-        name: 'Users can select their own access requests',
-        operation: 'SELECT',
-        using: policyConditions.userOwnership('requesterId'),
-      },
-      {
-        name: 'Users can insert their own access requests',
-        operation: 'INSERT',
-        withCheck: policyConditions.userOwnership('requesterId'),
-      },
-      {
-        name: 'Users can update their own access requests',
-        operation: 'UPDATE',
-        using: policyConditions.userOwnership('requesterId'),
-        withCheck: policyConditions.userOwnership('requesterId'),
-      },
-      // Users can respond to requests (as responder)
-      {
-        name: 'Users can update requests they are responding to',
-        operation: 'UPDATE',
-        using: policyConditions.userOwnership('responderId'),
-        withCheck: policyConditions.userOwnership('responderId'),
-      },
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'webhookAccessRequests',
-  },
-  webhooks: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'webhooks',
   },
 };
 

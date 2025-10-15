@@ -48,7 +48,7 @@ export class RollingFileDestination implements LogDestination {
     this.filepath = props.filepath;
     this.maxSize = props.maxSize ?? 10 * 1024 * 1024; // 10MB default
     this.maxFiles = props.maxFiles ?? 5;
-    this.rotationInterval = props.rotationInterval ?? 24 * 60 * 60 * 1000; // 24 hours default
+    this.rotationInterval = props.rotationInterval ?? 1 * 60 * 60 * 1000; // 1 hour default
 
     if (props.createDirectory !== false) {
       mkdir(dirname(this.filepath), { recursive: true }).catch((error) => {

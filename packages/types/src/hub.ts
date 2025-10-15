@@ -69,9 +69,10 @@ export interface HubHealth {
 
   // Component health
   components: {
-    database: 'ok' | 'error';
-    supabase: 'ok' | 'error';
-    discovery: 'ok' | 'error';
+    daemon: 'ok' | 'warning' | 'error';
+    database: 'ok' | 'warning' | 'error';
+    supabase: 'ok' | 'warning' | 'error';
+    discovery: 'ok' | 'warning' | 'error';
   };
 
   // Stats
@@ -80,6 +81,8 @@ export interface HubHealth {
     devicesOnline: number;
     messagesProcessed: number;
     queueLag: number;
+    activeAdapters: number;
+    recentErrors: number;
   };
 
   timestamp: Date;

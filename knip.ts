@@ -2,6 +2,7 @@ import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
   ignoreDependencies: ['cz-conventional-changelog'],
+  ignoreWorkspaces: ['apps/expo'],
   workspaces: {
     '.': {
       entry: 'checkly.config.ts',
