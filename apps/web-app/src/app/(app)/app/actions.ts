@@ -1,7 +1,6 @@
 'use server';
 
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { upsertOrg } from '@cove/db';
 import { db } from '@cove/db/client';
 import { Orgs } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
@@ -20,7 +19,7 @@ export const upsertOrgAction = action
     }),
   )
   .action(async ({ parsedInput }) => {
-    const { clerkOrgId, name, webhookId } = parsedInput;
+    const { clerkOrgId, webhookId } = parsedInput;
     const user = await auth();
 
     if (!user.userId) {
@@ -47,49 +46,24 @@ export const upsertOrgAction = action
       console.log('Existing org found:', existingOrg);
 
       if (existingOrg) {
-        // User already has an organization, use upsertOrg to get the proper return structure
-        const result = await upsertOrg({
-          name: existingOrg.name,
-          orgId: existingOrg.clerkOrgId,
-          userId: user.userId,
-        });
-
-        console.log('Returning existing org result:', result);
+        console.log('Returning existing org result:', existingOrg);
 
         return {
-          apiKey: result.apiKey,
-          id: result.org.id,
-          name: result.org.name,
-          stripeCustomerId: result.org.stripeCustomerId,
+          apiKey: undefined,
+          id: existingOrg.id,
+          name: existingOrg.name,
+          stripeCustomerId: existingOrg.stripeCustomerId,
         };
       }
     }
 
     console.log('Creating new organization...');
 
-    // Use the upsertOrg utility function
-    const result = await upsertOrg({
-      name: name || 'Personal',
-      orgId: clerkOrgId || '',
-      userId: user.userId,
-    });
-
-    console.log('New org result:', result);
-
-    // TODO: Re-enable when webhooks are re-implemented
-    // If webhookId is provided, create a custom webhook
-    // if (webhookId && result.webhook) {
-    //   // Update the webhook with the custom ID
-    //   // Note: This would require additional API calls to update the webhook
-    //   console.log('Custom webhook ID requested:', webhookId);
-    // }
-
-    return {
-      apiKey: result.apiKey,
-      id: result.org.id,
-      name: result.org.name,
-      stripeCustomerId: result.org.stripeCustomerId,
-    };
+    // Note: Organization creation should be handled through the tRPC API
+    // This action is mainly for checking existing orgs
+    throw new Error(
+      'New organization creation should use the tRPC org.upsert mutation',
+    );
   });
 
 export async function createOrgAction({

@@ -77,7 +77,9 @@ export function encodeField(
     buffers.push(encodeVarint(value ? 1 : 0));
   }
 
-  return Buffer.concat(buffers);
+  return Buffer.concat(
+    buffers.map((b) => b as unknown as Uint8Array),
+  ) as Buffer;
 }
 
 /**
@@ -151,11 +153,11 @@ export function frameMessage(type: MessageType, payload: Buffer): Buffer {
   const lengthVarint = encodeVarint(payload.length);
 
   return Buffer.concat([
-    Buffer.from([0x00]), // Preamble
-    lengthVarint,
-    typeVarint,
-    payload,
-  ]);
+    Buffer.from([0x00]) as unknown as Uint8Array, // Preamble
+    lengthVarint as unknown as Uint8Array,
+    typeVarint as unknown as Uint8Array,
+    payload as unknown as Uint8Array,
+  ]) as Buffer;
 }
 
 /**

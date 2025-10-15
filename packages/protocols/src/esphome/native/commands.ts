@@ -17,9 +17,9 @@ import type {
  */
 export function buildSwitchCommand(command: SwitchCommand): Buffer {
   return Buffer.concat([
-    encodeField(1, command.key), // key (fixed32)
-    encodeField(2, command.state), // state (bool)
-  ]);
+    encodeField(1, command.key) as unknown as Uint8Array, // key (fixed32)
+    encodeField(2, command.state) as unknown as Uint8Array, // state (bool)
+  ]) as Buffer;
 }
 
 /**
@@ -77,7 +77,9 @@ export function buildLightCommand(command: LightCommand): Buffer {
     buffers.push(encodeField(19, command.effect));
   }
 
-  return Buffer.concat(buffers);
+  return Buffer.concat(
+    buffers.map((b) => b as unknown as Uint8Array),
+  ) as Buffer;
 }
 
 /**
@@ -94,10 +96,10 @@ export function buildButtonCommand(command: ButtonCommand): Buffer {
  */
 export function buildNumberCommand(command: NumberCommand): Buffer {
   return Buffer.concat([
-    encodeField(1, command.key), // key
+    encodeField(1, command.key) as unknown as Uint8Array, // key
     // TODO: Encode float for state
-    encodeField(2, command.state), // state (float)
-  ]);
+    encodeField(2, command.state) as unknown as Uint8Array, // state (float)
+  ]) as Buffer;
 }
 
 /**
@@ -132,7 +134,7 @@ export function encodeFixed32Field(
   const data = isFloat ? encodeFloat(value) : encodeFixed32(value);
 
   return Buffer.concat([
-    Buffer.from([key]), // Simple varint for small field numbers
-    data,
-  ]);
+    Buffer.from([key]) as unknown as Uint8Array, // Simple varint for small field numbers
+    data as unknown as Uint8Array,
+  ]) as Buffer;
 }

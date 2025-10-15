@@ -1,4 +1,12 @@
-import * as schema from '@cove/db/schema';
+import type * as schema from '@cove/db/schema';
+import {
+  ApiKeys,
+  ApiKeyUsage,
+  AuthCodes,
+  OrgMembers,
+  Orgs,
+  Users,
+} from '@cove/db/schema';
 import { sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
@@ -8,12 +16,12 @@ export async function cleanupTestData(
   // Delete all data in reverse order of dependencies
   // Use try-catch to handle potential constraint issues
   try {
-    await db.delete(schema.AuthCodes);
-    await db.delete(schema.ApiKeyUsage);
-    await db.delete(schema.ApiKeys);
-    await db.delete(schema.OrgMembers);
-    await db.delete(schema.Orgs);
-    await db.delete(schema.Users);
+    await db.delete(AuthCodes);
+    await db.delete(ApiKeyUsage);
+    await db.delete(ApiKeys);
+    await db.delete(OrgMembers);
+    await db.delete(Orgs);
+    await db.delete(Users);
   } catch (error) {
     console.warn('Cleanup warning:', error);
     // If there are constraint issues, try again in a different order

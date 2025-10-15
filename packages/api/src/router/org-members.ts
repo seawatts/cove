@@ -1,5 +1,5 @@
+import { eq } from '@cove/db';
 import { OrgMembers } from '@cove/db/schema';
-import { eq } from 'drizzle-orm';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const orgMembersRouter = createTRPCRouter({

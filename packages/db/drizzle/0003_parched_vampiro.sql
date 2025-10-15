@@ -1,0 +1,1 @@
+ALTER TABLE "devices" ALTER COLUMN "userId" DROP NOT NULL;

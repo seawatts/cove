@@ -60,7 +60,7 @@ export function HueBridgePairingWizard() {
     };
 
     discover();
-  }, []);
+  }, [discoverMutation]);
 
   // Poll pairing status
   useEffect(() => {

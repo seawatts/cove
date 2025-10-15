@@ -3,9 +3,9 @@ import { db } from '../src/client';
 
 const tablesToEnableRealtime = [
   'events',
-  'requests',
-  'webhooks',
-  'connections',
+  'states',
+  'commands',
+  'devices',
 ] as const;
 
 // RLS policies for realtime authorization
@@ -73,15 +73,15 @@ const realtimePolicies = [
 ];
 
 async function isTableInPublication(tableName: string): Promise<boolean> {
-  const result = await db.execute<{ exists: boolean }>(sql`
+  const result = (await db.execute<{ exists: boolean }>(sql`
     SELECT EXISTS (
       SELECT 1
       FROM pg_publication_tables
       WHERE pubname = 'supabase_realtime'
       AND tablename = ${tableName}
     ) as exists;
-  `);
-  return result.rows[0]?.exists ?? false;
+  `)) as Array<{ exists: boolean }>;
+  return result[0]?.exists ?? false;
 }
 
 async function enableRealtimeForTable(tableName: string) {
@@ -101,7 +101,7 @@ async function enableRealtimeForTable(tableName: string) {
 }
 
 async function isPolicyExists(policyName: string): Promise<boolean> {
-  const result = await db.execute<{ exists: boolean }>(sql`
+  const result = (await db.execute<{ exists: boolean }>(sql`
     SELECT EXISTS (
       SELECT 1
       FROM pg_policies
@@ -109,8 +109,8 @@ async function isPolicyExists(policyName: string): Promise<boolean> {
       AND schemaname = 'realtime'
       AND tablename = 'messages'
     ) as exists;
-  `);
-  return result.rows[0]?.exists ?? false;
+  `)) as Array<{ exists: boolean }>;
+  return result[0]?.exists ?? false;
 }
 
 async function createRealtimePolicy(policy: (typeof realtimePolicies)[0]) {

@@ -350,7 +350,7 @@ const EditablePreview = React.forwardRef<HTMLDivElement, EditablePreviewProps>(
     const onTrigger = React.useCallback(() => {
       if (context.disabled || context.readOnly) return;
       context.onEdit();
-    }, [context.onEdit, context.disabled, context.readOnly]);
+    }, [context]);
 
     const onClick = React.useCallback(
       (event: React.MouseEvent<HTMLDivElement>) => {
@@ -359,7 +359,8 @@ const EditablePreview = React.forwardRef<HTMLDivElement, EditablePreviewProps>(
 
         onTrigger();
       },
-      [previewProps.onClick, onTrigger, context.triggerMode],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: previewProps forwarding pattern
+      [previewProps, onTrigger, context.triggerMode],
     );
 
     const onDoubleClick = React.useCallback(
@@ -370,7 +371,8 @@ const EditablePreview = React.forwardRef<HTMLDivElement, EditablePreviewProps>(
 
         onTrigger();
       },
-      [previewProps.onDoubleClick, onTrigger, context.triggerMode],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: previewProps forwarding pattern
+      [previewProps, onTrigger, context.triggerMode],
     );
 
     const onFocus = React.useCallback(
@@ -380,7 +382,8 @@ const EditablePreview = React.forwardRef<HTMLDivElement, EditablePreviewProps>(
 
         onTrigger();
       },
-      [previewProps.onFocus, onTrigger, context.triggerMode],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: previewProps forwarding pattern
+      [previewProps, onTrigger, context.triggerMode],
     );
 
     const onKeyDown = React.useCallback(
@@ -397,7 +400,8 @@ const EditablePreview = React.forwardRef<HTMLDivElement, EditablePreviewProps>(
           onTrigger();
         }
       },
-      [previewProps.onKeyDown, onTrigger, context.onEnterKeyDown],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: previewProps forwarding pattern
+      [previewProps, onTrigger, context],
     );
 
     const PreviewPrimitive = asChild ? Slot : 'div';
@@ -493,13 +497,8 @@ const EditableInput = React.forwardRef<HTMLInputElement, EditableInputProps>(
           context.onSubmit(context.value);
         }
       },
-      [
-        context.value,
-        context.onSubmit,
-        inputProps.onBlur,
-        isDisabled,
-        isReadOnly,
-      ],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: inputProps forwarding pattern
+      [context, inputProps, isDisabled, isReadOnly],
     );
 
     const onChange = React.useCallback(
@@ -512,13 +511,8 @@ const EditableInput = React.forwardRef<HTMLInputElement, EditableInputProps>(
         context.onValueChange(event.target.value);
         onAutosize(event.target);
       },
-      [
-        context.onValueChange,
-        inputProps.onChange,
-        onAutosize,
-        isDisabled,
-        isReadOnly,
-      ],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: inputProps forwarding pattern
+      [context, inputProps, onAutosize, isDisabled, isReadOnly],
     );
 
     const onKeyDown = React.useCallback(
@@ -539,15 +533,8 @@ const EditableInput = React.forwardRef<HTMLInputElement, EditableInputProps>(
           context.onSubmit(context.value);
         }
       },
-      [
-        context.value,
-        context.onSubmit,
-        context.onCancel,
-        context.onEscapeKeyDown,
-        inputProps.onKeyDown,
-        isDisabled,
-        isReadOnly,
-      ],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: inputProps forwarding pattern
+      [context, inputProps, isDisabled, isReadOnly],
     );
 
     useIsomorphicLayoutEffect(() => {
@@ -617,7 +604,7 @@ const EditableTrigger = React.forwardRef<
   const onTrigger = React.useCallback(() => {
     if (context.disabled || context.readOnly) return;
     context.onEdit();
-  }, [context.disabled, context.readOnly, context.onEdit]);
+  }, [context.disabled, context.readOnly, context.onEdit, context]);
 
   const TriggerPrimitive = asChild ? Slot : 'button';
 
@@ -695,12 +682,8 @@ const EditableCancel = React.forwardRef<HTMLButtonElement, EditableCancelProps>(
 
         context.onCancel();
       },
-      [
-        cancelProps.onClick,
-        context.onCancel,
-        context.disabled,
-        context.readOnly,
-      ],
+      // biome-ignore lint/correctness/useExhaustiveDependencies: cancelProps forwarding pattern
+      [cancelProps, context],
     );
 
     const CancelPrimitive = asChild ? Slot : 'button';
@@ -745,6 +728,9 @@ const EditableSubmit = React.forwardRef<HTMLButtonElement, EditableSubmitProps>(
         context.value,
         context.disabled,
         context.readOnly,
+        context,
+        // biome-ignore lint/correctness/useExhaustiveDependencies: submitProps forwarding pattern
+        submitProps,
       ],
     );
 

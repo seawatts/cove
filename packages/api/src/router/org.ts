@@ -1,7 +1,7 @@
-import { createOrg } from '@cove/db';
+import { eq } from '@cove/db';
 import { ApiKeys, OrgMembers, Orgs } from '@cove/db/schema';
-import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { createOrg } from '../services/org-service';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const orgRouter = createTRPCRouter({

@@ -2,7 +2,6 @@
 
 import { Badge } from '@cove/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
-import { Icons } from '@cove/ui/custom/icons';
 import { Text } from '@cove/ui/custom/typography';
 import { Lightbulb, Package, Server } from 'lucide-react';
 

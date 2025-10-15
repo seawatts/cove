@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import { spawn } from 'node:child_process';
-import { watch } from 'chokidar';
+import { watch as fsWatch } from 'node:fs';
 import { debounce } from 'lodash-es';
 
 // Function to run type generation
@@ -39,27 +39,22 @@ const tsc = spawn('tsc', ['--watch', '--preserveWatchOutput'], {
 });
 
 // Watch for changes in schema files
-const watcher = watch(['src/schema.ts'], {
-  ignoreInitial: true,
-});
-
-// Run type generation on file changes
-watcher.on('all', (event, path) => {
-  console.log(`📁 ${event} detected in ${path}`);
+const watcher = fsWatch('src/schema.ts', (event, filename) => {
+  console.log(`📁 ${event} detected in ${filename}`);
   debouncedGenerateTypes();
 });
 
 // Handle process termination
 process.on('SIGINT', () => {
   console.log('\n👋 Shutting down...');
-  watcher.close();
+  if (watcher) watcher.close();
   tsc.kill();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   console.log('\n👋 Shutting down...');
-  watcher.close();
+  if (watcher) watcher.close();
   tsc.kill();
   process.exit(0);
 });

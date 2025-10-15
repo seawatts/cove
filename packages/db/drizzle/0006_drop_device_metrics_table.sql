@@ -1,0 +1,1 @@
+DROP TABLE "deviceMetrics" CASCADE;

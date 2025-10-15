@@ -6,7 +6,7 @@
   "description": "Protocol implementations for Cove home automation platform",
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
-    "typescript": "5.9.3"
+    "typescript": "catalog:"
   },
   "exports": {
     ".": "./src/index.ts",

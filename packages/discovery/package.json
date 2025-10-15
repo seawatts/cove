@@ -2,13 +2,13 @@
   "dependencies": {
     "@cove/logger": "workspace:*",
     "@cove/types": "workspace:*",
-    "bonjour-service": "^1.3.0"
+    "bonjour-service": "1.3.0"
   },
   "description": "Device discovery services for Cove (mDNS, SSDP, etc.)",
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
-    "@types/bun": "1.3.0",
-    "typescript": "5.9.3"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   },
   "exports": {
     ".": "./src/index.ts",

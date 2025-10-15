@@ -1,3 +1,4 @@
+import { eq } from '@cove/db';
 import { Orgs } from '@cove/db/schema';
 import {
   BILLING_INTERVALS,
@@ -7,7 +8,6 @@ import {
   PLAN_TYPES,
   stripe,
 } from '@cove/stripe';
-import { eq } from 'drizzle-orm';
 import type Stripe from 'stripe';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';

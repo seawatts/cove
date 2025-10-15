@@ -1,3 +1,5 @@
+import { getApi } from '@cove/api/server';
+import type { SensorMetadata } from '@cove/types/widget';
 import { Badge } from '@cove/ui/badge';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
@@ -5,7 +7,9 @@ import { Icons } from '@cove/ui/custom/icons';
 import { H2, Text } from '@cove/ui/custom/typography';
 import { Power } from 'lucide-react';
 import { Suspense } from 'react';
+import { ESPHomeControls } from './_components/esphome-controls';
 import { HueLightControls } from './_components/hue-light-controls';
+import { SensorWidget } from './_components/sensor-widget';
 
 interface DevicePageProps {
   params: Promise<{ deviceId: string }>;
@@ -24,25 +28,41 @@ export default async function DevicePage({ params }: DevicePageProps) {
 }
 
 async function DeviceDetails({ deviceId }: { deviceId: string }) {
-  // TODO: Fetch device from tRPC
-  const device = {
-    deviceType: 'light',
-    id: deviceId,
-    name: 'Example Device',
-    online: true,
-    protocol: 'hue', // or 'esphome', etc.
-    room: 'Living Room',
-    state: {
-      brightness: 80,
-      color_temp: 366,
-      hue: 10000,
-      on: true,
-      saturation: 200,
-    },
-    type: 'sensor',
-  };
+  // Fetch device from tRPC
+  const device = await (await getApi()).device.get.fetch({ id: deviceId });
+
+  if (!device) {
+    return (
+      <Card>
+        <CardContent className="grid gap-4 p-8 items-center justify-center text-center">
+          <Text>Device not found</Text>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const isHueLight = device.protocol === 'hue' && device.deviceType === 'light';
+  const isESPHomeDevice = device.protocol === 'esphome';
+
+  // Extract sensors from device state dynamically
+  const sensors: SensorMetadata[] =
+    device.state && typeof device.state === 'object'
+      ? Object.entries(device.state)
+          .filter(([_key, value]) => {
+            // Filter out non-sensor properties
+            return typeof value === 'number' || typeof value === 'boolean';
+          })
+          .map(([key, value]) => ({
+            currentValue: value,
+            key,
+            lastChanged: new Date(),
+            name: key
+              .split('_')
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' '),
+            type: typeof value === 'boolean' ? 'binary' : 'continuous',
+          }))
+      : [];
 
   return (
     <>
@@ -54,12 +74,20 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
           </Badge>
         </div>
         <Text variant="muted">
-          {device.type} • {device.room}
+          {device.deviceType} • {device.protocol || 'Unknown protocol'}
+          {device.room && ` • ${device.room.name}`}
         </Text>
+        {(device.host || device.ipAddress) && (
+          <Text className="text-sm" variant="muted">
+            Host: {device.host || device.ipAddress}
+          </Text>
+        )}
       </div>
 
       {isHueLight ? (
         <HueLightControls deviceId={deviceId} lightState={device.state} />
+      ) : isESPHomeDevice ? (
+        <ESPHomeControls deviceId={deviceId} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
@@ -67,14 +95,20 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
               <CardTitle>Current State</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-              {Object.entries(device.state).map(([key, value]) => (
-                <div className="grid grid-cols-[120px_1fr] gap-2" key={key}>
-                  <Text className="capitalize" variant="muted">
-                    {key}:
-                  </Text>
-                  <Text>{String(value)}</Text>
-                </div>
-              ))}
+              {device.state && Object.keys(device.state).length > 0 ? (
+                Object.entries(device.state).map(([key, value]) => (
+                  <div className="grid grid-cols-[120px_1fr] gap-2" key={key}>
+                    <Text className="capitalize" variant="muted">
+                      {key.replace(/_/g, ' ')}:
+                    </Text>
+                    <Text>{String(value)}</Text>
+                  </div>
+                ))
+              ) : (
+                <Text className="text-center py-4" variant="muted">
+                  No state data available
+                </Text>
+              )}
             </CardContent>
           </Card>
 
@@ -96,16 +130,32 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>History (Last 24 Hours)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Text className="text-center py-8" variant="muted">
-            Historical charts coming soon
-          </Text>
-        </CardContent>
-      </Card>
+      {/* Dynamic Sensor Widgets */}
+      {sensors.length > 0 && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {sensors.map((sensor) => (
+            <SensorWidget
+              deviceId={deviceId}
+              key={sensor.key}
+              sensor={sensor}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Placeholder when no sensors are available */}
+      {!isHueLight && sensors.length === 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>No Sensor Data</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Text className="text-center py-8" variant="muted">
+              No sensor data available for this device
+            </Text>
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 }

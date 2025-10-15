@@ -97,7 +97,10 @@ export class ESPHomeNativeClient extends EventEmitter {
    * Handle incoming data
    */
   private handleData(data: Buffer): void {
-    this.buffer = Buffer.concat([this.buffer, data]);
+    this.buffer = Buffer.concat([
+      this.buffer as unknown as Uint8Array,
+      data as unknown as Uint8Array,
+    ]) as Buffer;
 
     // Try to parse frames from buffer
     while (this.buffer.length > 0) {
@@ -215,7 +218,7 @@ export class ESPHomeNativeClient extends EventEmitter {
     }
 
     const frame = frameMessage(type, payload);
-    this.socket.write(frame);
+    this.socket.write(frame as unknown as Uint8Array);
     log(`Sent message type: ${type} (${payload.length} bytes)`);
   }
 
@@ -369,17 +372,20 @@ export class ESPHomeNativeClient extends EventEmitter {
   private handleSensorState(data: Buffer): void {
     const state = messages.parseSensorState(data);
 
+    const entity = this.entities.get(state.key) as SensorEntity;
+
     if (state.missingState) {
+      if (entity) {
+        log(
+          `Sensor state (missing): ${entity.name} (key: ${state.key}) - sensor may be warming up`,
+        );
+      }
       return;
     }
 
-    const entity = this.entities.get(state.key) as SensorEntity;
     if (entity) {
       log(
-        'Sensor state: %s = %s %s',
-        entity.name,
-        state.state,
-        entity.unitOfMeasurement || '',
+        `Sensor state: ${entity.name} = ${state.state} ${entity.unitOfMeasurement || ''}`,
       );
 
       this.emit('sensorState', {
@@ -425,10 +431,7 @@ export class ESPHomeNativeClient extends EventEmitter {
     const entity = this.entities.get(state.key) as NumberEntity;
     if (entity) {
       log(
-        'Number state: %s = %s %s',
-        entity.name,
-        state.state,
-        entity.unitOfMeasurement || '',
+        `Number state: ${entity.name} = ${state.state} ${entity.unitOfMeasurement || ''}`,
       );
       this.emit('numberState', { entity, state: state.state });
     }
