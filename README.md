@@ -1,43 +1,60 @@
-# Cove - Self-Hosted Home Automation Platform
+# Cove - Modern Home Assistant Alternative
 
-> Combining the simplicity of Google Home with the extensibility of Home Assistant
+> A self-hosted home automation platform that combines the power of Home Assistant with modern web technologies and automatic device discovery
 
 ## What is Cove?
 
-Cove is a modern, self-hosted home automation platform that brings together:
+Cove is a **modern, self-hosted alternative to Home Assistant** that brings together:
 
-- **Simple Setup**: HomeKit-style onboarding and intuitive device pairing
-- **Powerful Control**: Beautiful web and mobile interfaces for all your devices
-- **Full Customization**: Matter, Zigbee, ESPHome, and custom integrations
-- **Privacy First**: Runs on your own hardware with optional cloud sync
+- **🚀 Hub Daemon**: Lightweight Bun-powered daemon that runs on Raspberry Pi or any Linux device
+- **🔍 Automatic Discovery**: mDNS-based device discovery (no manual configuration needed)
+- **🏗️ Entity-First Architecture**: Home Assistant-inspired but modernized with TypeScript
+- **💎 Beautiful UI**: Next.js 15 web app with real-time updates and modern design
+- **🔌 Multi-Protocol**: ESPHome, Philips Hue, with Matter/Zigbee coming soon
+- **🏠 Self-Hosted**: Your data stays on your hardware (with optional cloud sync)
+- **⚡ Developer-Friendly**: TypeScript throughout, modern tooling with Bun
+
+## Cove vs Home Assistant
+
+| Feature | Cove | Home Assistant |
+|---------|------|----------------|
+| **Runtime** | Bun (fast, modern) | Python (slower startup) |
+| **UI Framework** | Next.js 15 + React 19 | Custom Python web framework |
+| **Database** | PostgreSQL + TimescaleDB | SQLite (limited scalability) |
+| **Device Discovery** | Automatic mDNS scanning | Manual configuration |
+| **Mobile Apps** | Native iOS + React Native | Companion apps |
+| **Development** | TypeScript monorepo | Python + YAML |
+| **Performance** | Sub-second startup | 30+ second startup |
+| **Entity Architecture** | Modernized HA patterns | Legacy patterns |
 
 ## Architecture
 
-Cove uses a **Home Assistant-inspired entity-first architecture** that provides better scalability and flexibility:
+Cove uses a **Home Assistant-inspired entity-first architecture** with modern improvements:
 
-### Entity-First Design
-- **Devices**: Physical hardware (ESPHome devices, Hue bridges, etc.)
-- **Entities**: Capabilities within devices (sensors, lights, switches)
-- **State Management**: Entity-centric state with TimescaleDB for historical data
-- **Protocol Adapters**: Entity-aware adapters for ESPHome, Hue, Matter, etc.
-
-### Hub (Raspberry Pi)
-- **Bun Runtime**: Fast, modern TypeScript execution
-- **Entity Discovery**: Automatic discovery of entities within devices
+### Hub Daemon (Raspberry Pi / Linux)
+- **Bun Runtime**: Fast, modern TypeScript execution (sub-second startup)
+- **Entity Discovery**: Automatic discovery of entities within devices (sensors, lights, switches)
 - **Protocol Support**: ESPHome, Hue, Matter, Zigbee, and more
-- **TimescaleDB**: Efficient time-series storage for state history
+- **TimescaleDB**: Efficient time-series storage for entity state history
 - **Local API**: WebSocket and REST for real-time entity control
+- **Standalone Binary**: Compiles to single executable (no Node.js required)
 
-### Cloud (Supabase)
+### Web Application
+- **Next.js 15 PWA**: Modern React 19 with server-side rendering
+- **Real-time Updates**: WebSocket connections for instant state changes
+- **Entity Management**: Beautiful UI for controlling all your devices
+- **Mobile Responsive**: Works perfectly on phones and tablets
+- **Offline Support**: PWA capabilities for offline device control
+
+### Cloud (Optional)
 - **Entity Sync**: Keep entity states synchronized across clients
 - **User Management**: Secure authentication with Clerk
 - **Real-time Updates**: Instant entity state changes
-- **Optional**: Works offline, cloud enhances experience
+- **Works Offline**: Cloud enhances experience but isn't required
 
-### Apps
-- **Web PWA** (`apps/web-app`): Next.js 15 control panel
-- **iOS App** (`apps/ios`): Native Swift application
-- **Mobile** (`apps/expo`): React Native for Android (coming soon)
+### Mobile Apps
+- **iOS App**: Native Swift application with widgets and HomeKit integration
+- **Android App**: React Native (coming soon)
 
 ## Quick Start
 
@@ -48,8 +65,8 @@ bun install
 
 ### 2. Environment Setup
 ```bash
-cp .env.example .env
 # Configure your Supabase and Clerk credentials
+# See apps/hub/src/env.ts for all required environment variables
 bun db:push
 ```
 
@@ -72,7 +89,7 @@ apps/
   web-app/          # Next.js 15 PWA control panel
   hub/              # Core hub daemon (Bun runtime)
   expo/             # React Native mobile app (future)
-  ios/              # Native iOS app
+  ios/              # Native iOS app with widgets
 
 packages/
   db/               # Drizzle ORM + TimescaleDB schemas
@@ -81,18 +98,30 @@ packages/
   types/            # Shared TypeScript types (entity-first)
   discovery/        # mDNS device discovery
   ui/               # shadcn/ui components
+  ai/               # BAML-powered AI functions
+  analytics/        # PostHog integration & metrics
+  email/            # Email templates with React Email
+  logger/           # Structured logging
+  id/               # ID generation utilities
+  utils/            # Utility functions
+  zustand/          # State management helpers
 ```
 
-## Supported Devices
+## Supported Devices & Protocols
 
-### Current Support
-- ✅ **ESPHome**: Full native API support
-- ✅ **mDNS Discovery**: Automatic device scanning
-- 🚧 **Matter**: In development
-- 🚧 **Zigbee**: In development
+### Current Support ✅
+- **ESPHome**: Full native API support with entity discovery
+- **Philips Hue**: Complete REST API implementation
+- **mDNS Discovery**: Automatic device scanning and registration
+
+### In Development 🚧
+- **Matter**: Thread/WiFi mesh networking
+- **Zigbee**: Low-power mesh networking
+- **Z-Wave**: Z-Wave JS integration
+- **HomeKit**: Apple HomeKit Accessory Protocol
 
 ### Device Types
-- Lights (on/off, brightness, color)
+- Lights (on/off, brightness, color, temperature)
 - Switches and outlets
 - Sensors (temperature, humidity, motion, CO₂)
 - Thermostats
@@ -104,8 +133,9 @@ packages/
 
 ### Hub Development
 ```bash
-bun dev:hub              # Start hub daemon
+bun dev:hub              # Start hub daemon with hot reload
 bun build:hub            # Build hub for deployment
+bun build:hub:linux-arm64 # Build for Raspberry Pi
 ```
 
 ### Database
@@ -120,27 +150,73 @@ bun db:migrate           # Run migrations
 ```bash
 bun format:fix           # Format code with Biome
 bun typecheck            # Type check all packages
-bun test                 # Run tests
+bun test                 # Run tests with Bun
 bun test:integ           # Run integration tests
 ```
 
 ## Deployment
 
-### Hub (Raspberry Pi)
+### Hub (Raspberry Pi / Linux)
+
 1. Build the hub daemon:
    ```bash
-   bun build:hub
+   bun build:hub:linux-arm64
    ```
-2. Deploy to Raspberry Pi (instructions coming soon)
+
+2. Copy `cove-hub-linux-arm64` to your Raspberry Pi
+
+3. Create systemd service:
+   ```ini
+   [Unit]
+   Description=Cove Hub
+   After=network.target
+
+   [Service]
+   Type=simple
+   ExecStart=/usr/local/bin/cove-hub
+   Restart=always
+   RestartSec=10
+   Environment="HUB_ID=hub_pi"
+   EnvironmentFile=/etc/cove/hub.env
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+4. Enable and start:
+   ```bash
+   sudo systemctl enable cove-hub
+   sudo systemctl start cove-hub
+   ```
 
 ### Web App (Vercel)
 ```bash
 vercel --prod
 ```
 
+### iOS App (App Store)
+```bash
+# Build and deploy via Xcode
+# TestFlight for beta testing
+```
+
+## Technology Stack
+
+- **Runtime**: Bun 1.3.0 (hub daemon)
+- **Framework**: Next.js 15.5.5, React 19.2.0
+- **Database**: Supabase (PostgreSQL + Realtime) + TimescaleDB
+- **ORM**: Drizzle 0.44.6
+- **API**: tRPC v11
+- **Auth**: Clerk
+- **UI**: shadcn/ui + Tailwind CSS 4.1.14
+- **Analytics**: PostHog + Vercel Analytics
+- **AI**: BAML (Boundary ML) with OpenAI GPT-4o
+- **Mobile**: React Native (Expo) + Native iOS Swift
+- **Monorepo**: Turborepo + Bun workspaces
+
 ## Roadmap
 
-### Phase 1 (Current)
+### Phase 1 (Current) ✅
 - [x] Project structure and architecture
 - [x] Entity-first database schemas (TimescaleDB)
 - [x] Hub daemon core with entity discovery
@@ -149,41 +225,34 @@ vercel --prod
 - [x] Hue integration (entity-aware)
 - [x] Web UI with entity display
 - [x] Entity state history and widgets
+- [x] iOS app with widgets
+- [x] Analytics and monitoring
 
-### Phase 2
-- [ ] Device control UI
+### Phase 2 (In Progress)
+- [ ] Device control UI improvements
 - [ ] Hub pairing flow
-- [ ] Real-time updates
-- [ ] Raspberry Pi image
+- [ ] Real-time updates optimization
+- [ ] Raspberry Pi image creation
+- [ ] Android app development
 
-### Phase 3
+### Phase 3 (Future)
 - [ ] Matter protocol support
 - [ ] Zigbee integration
 - [ ] Automation engine
 - [ ] Scene management
-
-### Phase 4
 - [ ] Voice control
-- [ ] Mobile apps
+
+### Phase 4 (Future)
 - [ ] Advanced automations
 - [ ] Community integrations
-
-## Technology Stack
-
-- **Runtime**: Bun (hub daemon)
-- **Framework**: Next.js 15, React 19
-- **Database**: Supabase (PostgreSQL + Realtime) + TimescaleDB
-- **ORM**: Drizzle
-- **API**: tRPC v11
-- **Auth**: Clerk
-- **UI**: shadcn/ui + Tailwind CSS
-- **Monorepo**: Turborepo + Bun workspaces
+- [ ] Plugin system
+- [ ] Enterprise features
 
 ## Contributing
 
 We welcome contributions! Cove is designed to be extensible:
 
-1. **New Device Protocols**: Implement the `DeviceProtocol` interface
+1. **New Device Protocols**: Implement the `ProtocolAdapter` interface
 2. **Device Adapters**: Add support for specific device types
 3. **UI Components**: Contribute to the component library
 4. **Documentation**: Help others get started
