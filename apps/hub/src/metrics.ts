@@ -6,22 +6,20 @@
  */
 
 import { cpus, freemem, totalmem } from 'node:os';
-import { createId } from '@cove/id';
 import { debug } from '@cove/logger';
-import type { DeviceStateHistory } from '@cove/types';
-import type { SupabaseSync } from './supabase';
+import type { HubDatabase } from './db';
 
 const log = debug('cove:hub:metrics');
 
 interface MetricsCollectorOptions {
   deviceId: string; // Hub's device ID
-  supabaseSync?: SupabaseSync | null;
+  db?: HubDatabase | null;
   bufferSize?: number;
   collectionInterval?: number; // seconds
   syncInterval?: number; // seconds
 }
 
-interface HubState {
+interface HubMetrics {
   // System metrics
   cpu_usage: number;
   memory_used: number;
@@ -38,8 +36,8 @@ interface HubState {
 
 export class DeviceMetricsCollector {
   private deviceId: string;
-  private supabaseSync: SupabaseSync | null;
-  private stateHistoryBuffer: DeviceStateHistory[] = [];
+  private db: HubDatabase | null;
+  private metricsBuffer: HubMetrics[] = [];
   private bufferSize: number;
   private collectionInterval: number;
   private syncInterval: number;
@@ -50,11 +48,12 @@ export class DeviceMetricsCollector {
   private activeProtocolsCount = 0;
   private lastCpuUsage = process.cpuUsage();
   private lastCpuTime = Date.now();
-  private lastState: HubState | null = null;
+  private lastMetrics: HubMetrics | null = null;
+  private sensorEntityIds: Map<string, string> = new Map(); // metric name -> entity ID
 
   constructor(options: MetricsCollectorOptions) {
     this.deviceId = options.deviceId;
-    this.supabaseSync = options.supabaseSync || null;
+    this.db = options.db || null;
     this.bufferSize = options.bufferSize || 100; // ~16 minutes at 10s intervals
     this.collectionInterval = options.collectionInterval || 10; // 10 seconds default
     this.syncInterval = options.syncInterval || 60; // 60 seconds default
@@ -63,19 +62,22 @@ export class DeviceMetricsCollector {
   /**
    * Start metrics collection
    */
-  start(): void {
+  async start(): Promise<void> {
     log('Starting metrics collector');
 
+    // Initialize sensor entities for each metric
+    await this.initializeSensorEntities();
+
     // Collect metrics immediately
-    this.collectMetrics();
+    await this.collectMetrics();
 
     // Start collection timer
     this.collectionTimer = setInterval(() => {
       this.collectMetrics();
     }, this.collectionInterval * 1000);
 
-    // Start sync timer if Supabase is enabled
-    if (this.supabaseSync) {
+    // Start sync timer if database is enabled
+    if (this.db) {
       this.syncTimer = setInterval(() => {
         this.syncMetrics();
       }, this.syncInterval * 1000);
@@ -99,7 +101,7 @@ export class DeviceMetricsCollector {
     }
 
     // Final sync before stopping
-    if (this.supabaseSync && this.stateHistoryBuffer.length > 0) {
+    if (this.db && this.metricsBuffer.length > 0) {
       await this.syncMetrics();
     }
   }
@@ -116,6 +118,46 @@ export class DeviceMetricsCollector {
    */
   setActiveProtocols(count: number): void {
     this.activeProtocolsCount = count;
+  }
+
+  /**
+   * Initialize sensor entities for each metric
+   */
+  private async initializeSensorEntities(): Promise<void> {
+    if (!this.db) {
+      log('No database connection, skipping sensor entity initialization');
+      return;
+    }
+
+    const metrics = [
+      { deviceClass: 'cpu', name: 'cpu_usage', unit: '%' },
+      { deviceClass: 'memory', name: 'memory_used', unit: 'MB' },
+      { deviceClass: 'memory', name: 'memory_total', unit: 'MB' },
+      { deviceClass: 'memory', name: 'memory_free', unit: 'MB' },
+      { deviceClass: 'memory', name: 'memory_percent', unit: '%' },
+      { deviceClass: 'duration', name: 'uptime', unit: 's' },
+      { deviceClass: 'count', name: 'connected_devices', unit: 'devices' },
+      { deviceClass: 'count', name: 'active_protocols', unit: 'protocols' },
+    ];
+
+    for (const metric of metrics) {
+      const entityKey = `sensor.hub_${metric.name}`;
+      const entityId = await this.db.createEntity({
+        deviceId: this.deviceId,
+        key: entityKey,
+        kind: 'sensor',
+        traits: {
+          device_class: metric.deviceClass,
+          source: 'hub_metrics',
+          unit_of_measurement: metric.unit,
+        },
+      });
+
+      if (entityId) {
+        this.sensorEntityIds.set(metric.name, entityId);
+        log(`Created sensor entity for ${metric.name}: ${entityId}`);
+      }
+    }
   }
 
   /**
@@ -141,10 +183,10 @@ export class DeviceMetricsCollector {
   }
 
   /**
-   * Collect current system metrics as a state snapshot
-   * Follows Home Assistant pattern: state changes are recorded as history
+   * Collect current system metrics as entity state updates
+   * Follows Home Assistant pattern: metrics are sensor entities with state history
    */
-  private collectMetrics(): void {
+  private async collectMetrics(): Promise<void> {
     const totalMem = totalmem();
     const freeMem = freemem();
     const usedMem = totalMem - freeMem;
@@ -152,8 +194,8 @@ export class DeviceMetricsCollector {
     const uptime = Math.floor((Date.now() - this.startTime) / 1000);
     const now = new Date();
 
-    // Create a full state snapshot
-    const currentState: HubState = {
+    // Create a full metrics snapshot
+    const currentMetrics: HubMetrics = {
       active_protocols: this.activeProtocolsCount,
       connected_devices: this.connectedDevicesCount,
       cpu_usage: Number.parseFloat(cpuUsage.toFixed(2)),
@@ -167,132 +209,155 @@ export class DeviceMetricsCollector {
       uptime,
     };
 
-    // Only record if state has changed significantly or it's been a while
-    // This reduces unnecessary writes while ensuring we capture trends
+    // Only record if metrics have changed significantly or it's been a while
     const shouldRecord =
-      !this.lastState ||
-      Math.abs(currentState.cpu_usage - this.lastState.cpu_usage) > 5 ||
-      Math.abs(currentState.memory_used - this.lastState.memory_used) > 100 ||
-      currentState.connected_devices !== this.lastState.connected_devices ||
-      currentState.active_protocols !== this.lastState.active_protocols ||
-      Date.now() - this.lastState.timestamp > 60000; // Force record every minute
+      !this.lastMetrics ||
+      Math.abs(currentMetrics.cpu_usage - this.lastMetrics.cpu_usage) > 5 ||
+      Math.abs(currentMetrics.memory_used - this.lastMetrics.memory_used) >
+        100 ||
+      currentMetrics.connected_devices !== this.lastMetrics.connected_devices ||
+      currentMetrics.active_protocols !== this.lastMetrics.active_protocols ||
+      Date.now() - this.lastMetrics.timestamp > 60000; // Force record every minute
 
     if (shouldRecord) {
-      const stateHistory: DeviceStateHistory = {
-        attributes: {
-          collection_interval: this.collectionInterval,
-          units: {
-            cpu_usage: '%',
-            memory_free: 'MB',
-            memory_total: 'MB',
-            memory_used: 'MB',
-            uptime: 's',
-          },
-        },
-        deviceId: this.deviceId,
-        id: createId({ prefix: 'state' }),
-        lastChanged: now,
-        lastUpdated: now,
-        state: currentState as unknown as Record<string, unknown>,
-      };
+      // Update each sensor entity with its current value
+      for (const [metricName, entityId] of this.sensorEntityIds.entries()) {
+        const value = currentMetrics[metricName as keyof HubMetrics];
 
-      this.stateHistoryBuffer.push(stateHistory);
-      this.lastState = currentState;
+        if (typeof value === 'number') {
+          // Update entity state
+          await this.db?.upsertEntityState({
+            attrs: {
+              device_class: this.getMetricDeviceClass(metricName),
+              source: 'hub_metrics',
+              unit_of_measurement: this.getMetricUnit(metricName),
+            },
+            entityId,
+            state: value.toString(),
+          });
+
+          // Insert state history
+          await this.db?.insertEntityStateHistory({
+            attrs: {
+              device_class: this.getMetricDeviceClass(metricName),
+              source: 'hub_metrics',
+              unit_of_measurement: this.getMetricUnit(metricName),
+            },
+            entityId,
+            homeId: this.deviceId, // TODO: Get actual home ID
+            state: value.toString(),
+            timestamp: now,
+          });
+        }
+      }
+
+      this.metricsBuffer.push(currentMetrics);
+      this.lastMetrics = currentMetrics;
 
       // Maintain buffer size limit
-      while (this.stateHistoryBuffer.length > this.bufferSize) {
-        this.stateHistoryBuffer.shift();
+      while (this.metricsBuffer.length > this.bufferSize) {
+        this.metricsBuffer.shift();
       }
 
       log(
-        `Recorded state: CPU ${cpuUsage.toFixed(1)}%, Memory ${currentState.memory_used}MB/${currentState.memory_total}MB, Devices ${this.connectedDevicesCount}`,
+        `Recorded metrics: CPU ${cpuUsage.toFixed(1)}%, Memory ${currentMetrics.memory_used}MB/${currentMetrics.memory_total}MB, Devices ${this.connectedDevicesCount}`,
       );
     }
   }
 
   /**
-   * Sync state history to Supabase
+   * Get unit of measurement for a metric
    */
-  private async syncMetrics(): Promise<void> {
-    if (!this.supabaseSync || this.stateHistoryBuffer.length === 0) {
-      return;
-    }
-
-    const statesToSync = [...this.stateHistoryBuffer];
-
-    try {
-      log(`Syncing ${statesToSync.length} state history records to Supabase`);
-      const success =
-        await this.supabaseSync.insertStateHistoryBatch(statesToSync);
-
-      if (success) {
-        // Clear synced states from buffer
-        this.stateHistoryBuffer = [];
-        log(`Successfully synced ${statesToSync.length} state history records`);
-      } else {
-        log('Failed to sync state history, will retry next interval');
-      }
-    } catch (error) {
-      log('Error syncing state history:', error);
-      // States remain in buffer for retry
-    }
+  private getMetricUnit(metricName: string): string {
+    const units: Record<string, string> = {
+      active_protocols: 'protocols',
+      connected_devices: 'devices',
+      cpu_usage: '%',
+      memory_free: 'MB',
+      memory_percent: '%',
+      memory_total: 'MB',
+      memory_used: 'MB',
+      uptime: 's',
+    };
+    return units[metricName] || '';
   }
 
   /**
-   * Get recent state history from buffer
+   * Get device class for a metric
    */
-  getRecentStateHistory(options?: {
-    limit?: number;
-    since?: Date;
-  }): DeviceStateHistory[] {
-    let states = [...this.stateHistoryBuffer];
+  private getMetricDeviceClass(metricName: string): string {
+    const deviceClasses: Record<string, string> = {
+      active_protocols: 'count',
+      connected_devices: 'count',
+      cpu_usage: 'cpu',
+      memory_free: 'memory',
+      memory_percent: 'memory',
+      memory_total: 'memory',
+      memory_used: 'memory',
+      uptime: 'duration',
+    };
+    return deviceClasses[metricName] || '';
+  }
+
+  /**
+   * Sync metrics to database (no-op since we're using entity state history)
+   */
+  private async syncMetrics(): Promise<void> {
+    // Metrics are already persisted as entity state history in collectMetrics()
+    // This method is kept for compatibility but does nothing
+    log('Metrics sync completed (using entity state history pattern)');
+  }
+
+  /**
+   * Get recent metrics from buffer
+   */
+  getRecentMetrics(options?: { limit?: number; since?: Date }): HubMetrics[] {
+    let metrics = [...this.metricsBuffer];
 
     // Filter by timestamp
     if (options?.since) {
-      states = states.filter((s) => s.lastChanged >= (options.since as Date));
+      const sinceTime = options.since.getTime();
+      metrics = metrics.filter((m) => m.timestamp >= sinceTime);
     }
 
     // Sort by timestamp descending (most recent first)
-    states.sort((a, b) => b.lastChanged.getTime() - a.lastChanged.getTime());
+    metrics.sort((a, b) => b.timestamp - a.timestamp);
 
     // Limit results
     if (options?.limit) {
-      states = states.slice(0, options.limit);
+      metrics = metrics.slice(0, options.limit);
     }
 
-    return states;
+    return metrics;
   }
 
   /**
-   * Get current state (most recent)
+   * Get current metrics (most recent)
    */
-  getCurrentState(): HubState | null {
-    return this.lastState;
+  getCurrentMetrics(): HubMetrics | null {
+    return this.lastMetrics;
   }
 
   /**
-   * Get latest state from buffer
+   * Get latest metrics from buffer
    */
-  getLatestState(): DeviceStateHistory | null {
-    if (this.stateHistoryBuffer.length === 0) {
+  getLatestMetrics(): HubMetrics | null {
+    if (this.metricsBuffer.length === 0) {
       return null;
     }
-    return this.stateHistoryBuffer.at(-1) || null;
+    return this.metricsBuffer.at(-1) || null;
   }
 
   /**
    * Get average value for a specific metric field
    */
-  getAverageMetric(field: keyof HubState): number | null {
-    if (this.stateHistoryBuffer.length === 0) {
+  getAverageMetric(field: keyof HubMetrics): number | null {
+    if (this.metricsBuffer.length === 0) {
       return null;
     }
 
-    const values = this.stateHistoryBuffer
-      .map((s) => {
-        const state = s.state as unknown as HubState;
-        return state[field];
-      })
+    const values = this.metricsBuffer
+      .map((m) => m[field])
       .filter((v) => typeof v === 'number');
 
     if (values.length === 0) {
@@ -304,10 +369,10 @@ export class DeviceMetricsCollector {
   }
 
   /**
-   * Clear all state history from buffer
+   * Clear all metrics from buffer
    */
   clearBuffer(): void {
-    this.stateHistoryBuffer = [];
-    log('State history buffer cleared');
+    this.metricsBuffer = [];
+    log('Metrics buffer cleared');
   }
 }

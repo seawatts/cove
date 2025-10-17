@@ -7,7 +7,7 @@
 import { debug, defaultLogger } from '@cove/logger';
 import { ConsoleDestination } from '@cove/logger/destinations/console';
 import { RollingFileDestination } from '@cove/logger/destinations/rolling-file';
-import type { EventSeverity, EventType } from '@cove/types';
+import type { HubEventType } from '@cove/types';
 import { HubDaemon } from './daemon';
 import { env } from './env';
 import { getHealth, getSystemInfo, resetStartTime } from './health';
@@ -107,22 +107,18 @@ Bun.serve({
             url.searchParams.get('limit') || '50',
             10,
           );
-          const severityParam = url.searchParams.get('severity');
           const eventTypeParam = url.searchParams.get('eventType');
           const sinceParam = url.searchParams.get('since');
 
           const events = eventCollector.getRecentEvents({
             eventType: eventTypeParam
-              ? (eventTypeParam as EventType)
+              ? (eventTypeParam as HubEventType)
               : undefined,
             limit,
-            severity: severityParam
-              ? (severityParam as EventSeverity)
-              : undefined,
             since: sinceParam ? new Date(sinceParam) : undefined,
           });
 
-          const counts = eventCollector.getEventCountsBySeverity();
+          const counts = eventCollector.getEventCountsByType();
 
           return Response.json(
             {
@@ -217,18 +213,18 @@ Bun.serve({
           );
           const sinceParam = url.searchParams.get('since');
 
-          const stateHistory = metricsCollector.getRecentStateHistory({
+          const metrics = metricsCollector.getRecentMetrics({
             limit,
             since: sinceParam ? new Date(sinceParam) : undefined,
           });
 
-          const currentState = metricsCollector.getCurrentState();
+          const currentMetrics = metricsCollector.getCurrentMetrics();
 
           return Response.json(
             {
-              currentState,
-              stateHistory,
-              total: stateHistory.length,
+              currentMetrics,
+              metrics,
+              total: metrics.length,
             },
             { headers: corsHeaders },
           );

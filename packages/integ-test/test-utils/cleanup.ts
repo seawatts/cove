@@ -1,38 +1,17 @@
 import type * as schema from '@cove/db/schema';
-import {
-  ApiKeys,
-  ApiKeyUsage,
-  AuthCodes,
-  OrgMembers,
-  Orgs,
-  Users,
-} from '@cove/db/schema';
 import { sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 export async function cleanupTestData(
   db: PostgresJsDatabase<typeof schema>,
 ): Promise<void> {
-  // Delete all data in reverse order of dependencies
-  // Use try-catch to handle potential constraint issues
+  // Use TRUNCATE CASCADE for thorough cleanup
   try {
-    await db.delete(AuthCodes);
-    await db.delete(ApiKeyUsage);
-    await db.delete(ApiKeys);
-    await db.delete(OrgMembers);
-    await db.delete(Orgs);
-    await db.delete(Users);
+    await db.execute(
+      sql`TRUNCATE TABLE "automationTrace", "automationVersion", "automation", "sceneVersion", "scene", "mode", "event", "eventPayload", "eventType", "entityStateHistory", "entityState", "entity", "device", "room", "floor", "home", "users" RESTART IDENTITY CASCADE`,
+    );
   } catch (error) {
-    console.warn('Cleanup warning:', error);
-    // If there are constraint issues, try again in a different order
-    try {
-      // Use TRUNCATE CASCADE for more thorough cleanup
-      await db.execute(
-        sql`TRUNCATE TABLE "authCodes", "apiKeyUsage", "apiKeys", "orgMembers", "orgs", "user" RESTART IDENTITY CASCADE`,
-      );
-    } catch (truncateError) {
-      console.error('Failed to cleanup test data:', truncateError);
-      throw truncateError;
-    }
+    console.error('Failed to cleanup test data:', error);
+    throw error;
   }
 }

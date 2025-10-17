@@ -38,7 +38,7 @@ interface ChartDataPoint {
   synthetic?: boolean;
 }
 
-export function ChartWidget({ deviceId, sensor }: WidgetProps) {
+export function ChartWidget({ sensor }: WidgetProps) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState<'24h' | '7d' | '30d'>('24h');
 
@@ -49,10 +49,9 @@ export function ChartWidget({ deviceId, sensor }: WidgetProps) {
   }, [isMobile]);
 
   const { data: stateHistory = [], isLoading } =
-    api.device.getStateHistory.useQuery(
+    api.entity.getStateHistory.useQuery(
       {
-        deviceId,
-        stateKey: sensor.key,
+        entityId: sensor.key, // sensor.key is now the entityId
         timeRange,
       },
       {

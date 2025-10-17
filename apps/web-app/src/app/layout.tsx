@@ -12,7 +12,6 @@ import '@cove/ui/globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { AnalyticsProviders } from '@cove/analytics/providers';
 import { TRPCReactProvider } from '@cove/api/react';
-import { StripeProvider } from '@cove/stripe/guards/client';
 import { Suspense } from 'react';
 import { env } from '~/env.server';
 
@@ -63,10 +62,8 @@ export default function RootLayout(props: { children: React.ReactNode }) {
               <Suspense>
                 <ClerkProvider>
                   <AnalyticsProviders identifyUser>
-                    <StripeProvider>
-                      {props.children}
-                      <Toaster />
-                    </StripeProvider>
+                    {props.children}
+                    <Toaster />
                   </AnalyticsProviders>
                 </ClerkProvider>
               </Suspense>

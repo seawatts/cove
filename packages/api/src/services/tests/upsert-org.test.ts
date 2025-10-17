@@ -65,24 +65,6 @@ mock.module('@clerk/nextjs/server', () => ({
   clerkClient: () => Promise.resolve(mockClerkClient),
 }));
 
-// Mock Stripe module before it gets imported
-mock.module('@cove/stripe', () => ({
-  BILLING_INTERVALS: { MONTHLY: 'month' },
-  createSubscription: mockCreateSubscription,
-  getFreePlanPriceId: mockGetFreePlanPriceId,
-  PLAN_TYPES: { FREE: 'free' },
-  upsertStripeCustomer: mockUpsertStripeCustomer,
-}));
-
-// Mock the stripe env module
-mock.module('@cove/stripe/src/env.server', () => ({
-  env: {
-    STRIPE_PUBLISHABLE_KEY: 'pk_test_mock',
-    STRIPE_SECRET_KEY: 'sk_test_mock',
-    STRIPE_WEBHOOK_SECRET: 'whsec_test_mock',
-  },
-}));
-
 mock.module('@cove/id', () => ({
   generateRandomName: mockGenerateRandomName,
 }));

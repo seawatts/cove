@@ -14,11 +14,10 @@ interface TableRow {
   relativeTime: string;
 }
 
-export function TableWidget({ deviceId, sensor }: WidgetProps) {
+export function TableWidget({ sensor }: WidgetProps) {
   const { data: stateHistory = [], isLoading } =
-    api.device.getStateHistory.useQuery({
-      deviceId,
-      stateKey: sensor.key,
+    api.entity.getStateHistory.useQuery({
+      entityId: sensor.key, // sensor.key is now the entityId
       timeRange: '24h',
     });
 

@@ -1,16 +1,20 @@
 /**
  * Cove Home Automation - Shared Types
  *
- * Centralized type definitions for the entire Cove platform
+ * Re-exports database types and provides additional UI-specific types
  */
 
-// Automation types
-export * from './automation';
-// Device types
-export * from './device';
-// Hub types
-export * from './hub';
-// Protocol types
-export * from './protocol';
-// Room types
-export * from './room';
+// Re-export all database types (source of truth)
+export * from '@cove/db';
+
+// Discovery types (not in database)
+export * from './discovery';
+
+// Entity types (not in database)
+export * from './entity';
+
+// Event types (not in database)
+export * from './events';
+
+// Widget types (UI-specific, not in database)
+export * from './widget';

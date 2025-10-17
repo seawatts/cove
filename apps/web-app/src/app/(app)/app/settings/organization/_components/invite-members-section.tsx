@@ -2,11 +2,7 @@
 
 import { useOrganization, useUser } from '@clerk/nextjs';
 import { MetricButton, MetricLink } from '@cove/analytics/components';
-import {
-  Entitled,
-  NotEntitled,
-  useIsEntitled,
-} from '@cove/stripe/guards/client';
+
 import { Badge } from '@cove/ui/badge';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
@@ -32,7 +28,6 @@ export function InviteMembersSection() {
     invitations: true,
   });
   const { user } = useUser();
-  const isEntitled = useIsEntitled('unlimited_developers');
 
   const handleInvite = async () => {
     if (!email.trim()) {
@@ -157,7 +152,7 @@ export function InviteMembersSection() {
             <div className="flex-1 gap-2 grid">
               <Label htmlFor="email">Email</Label>
               <Input
-                disabled={isInviting || !isEntitled}
+                disabled={isInviting}
                 id="email"
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -168,7 +163,7 @@ export function InviteMembersSection() {
             <div className="w-fit gap-2 grid">
               <Label htmlFor="role">Role</Label>
               <Select
-                disabled={isInviting || !isEntitled}
+                disabled={isInviting}
                 onValueChange={(value) => setRole(value as 'admin' | 'user')}
                 value={role}
               >
@@ -182,32 +177,28 @@ export function InviteMembersSection() {
               </Select>
             </div>
           </div>
-          <Entitled entitlement="unlimited_developers">
-            <MetricButton
-              disabled={isInviting || !email.trim()}
-              metric="invite_members_section_invite_clicked"
-              onClick={handleInvite}
+          <MetricButton
+            disabled={isInviting || !email.trim()}
+            metric="invite_members_section_invite_clicked"
+            onClick={handleInvite}
+            properties={{
+              location: 'invite_members_section',
+            }}
+          >
+            {isInviting ? 'Sending...' : 'Invite'}
+          </MetricButton>
+          <Button asChild>
+            <MetricLink
+              href="/app/settings/billing"
+              metric="invite_members_section_upgrade_clicked"
               properties={{
+                destination: '/app/settings/billing',
                 location: 'invite_members_section',
               }}
             >
-              {isInviting ? 'Sending...' : 'Invite'}
-            </MetricButton>
-          </Entitled>
-          <NotEntitled entitlement="unlimited_developers">
-            <Button asChild>
-              <MetricLink
-                href="/app/settings/billing"
-                metric="invite_members_section_upgrade_clicked"
-                properties={{
-                  destination: '/app/settings/billing',
-                  location: 'invite_members_section',
-                }}
-              >
-                Upgrade to invite members
-              </MetricLink>
-            </Button>
-          </NotEntitled>
+              Upgrade to invite members
+            </MetricLink>
+          </Button>
         </CardContent>
       </Card>
 

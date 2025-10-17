@@ -1,111 +1,13 @@
 {
+  "version": "7",
   "dialect": "postgresql",
   "entries": [
     {
-      "breakpoints": true,
       "idx": 0,
-      "tag": "0000_glorious_killmonger",
       "version": "7",
-      "when": 1760382023400
-    },
-    {
-      "breakpoints": true,
-      "idx": 1,
-      "tag": "0001_deep_lionheart",
-      "version": "7",
-      "when": 1760392833075
-    },
-    {
-      "breakpoints": true,
-      "idx": 2,
-      "tag": "0002_right_nighthawk",
-      "version": "7",
-      "when": 1760396586677
-    },
-    {
-      "breakpoints": true,
-      "idx": 3,
-      "tag": "0003_parched_vampiro",
-      "version": "7",
-      "when": 1760399528173
-    },
-    {
-      "breakpoints": true,
-      "idx": 4,
-      "tag": "0004_lyrical_ser_duncan",
-      "version": "7",
-      "when": 1760402432097
-    },
-    {
-      "breakpoints": true,
-      "idx": 5,
-      "tag": "0005_cleanup_unused_tables",
-      "version": "7",
-      "when": 1760402940325
-    },
-    {
-      "breakpoints": true,
-      "idx": 6,
-      "tag": "0006_drop_device_metrics_table",
-      "version": "7",
-      "when": 1760403559870
-    },
-    {
-      "breakpoints": true,
-      "idx": 7,
-      "tag": "0007_overconfident_triathlon",
-      "version": "7",
-      "when": 1760409485153
-    },
-    {
-      "breakpoints": true,
-      "idx": 8,
-      "tag": "0008_magical_the_liberteens",
-      "version": "7",
-      "when": 1760411122180
-    },
-    {
-      "breakpoints": true,
-      "idx": 9,
-      "tag": "0009_sharp_romulus",
-      "version": "7",
-      "when": 1760416884982
-    },
-    {
-      "breakpoints": true,
-      "idx": 10,
-      "tag": "0010_sharp_scarecrow",
-      "version": "7",
-      "when": 1760419252754
-    },
-    {
-      "breakpoints": true,
-      "idx": 11,
-      "tag": "0011_many_clea",
-      "version": "7",
-      "when": 1760420043231
-    },
-    {
-      "breakpoints": true,
-      "idx": 12,
-      "tag": "0012_rename_tables",
-      "version": "7",
-      "when": 1760420043232
-    },
-    {
-      "breakpoints": true,
-      "idx": 13,
-      "tag": "0013_enable_timescaledb",
-      "version": "7",
-      "when": 1760420043233
-    },
-    {
-      "breakpoints": true,
-      "idx": 14,
-      "tag": "0015_add_widget_preferences",
-      "version": "7",
-      "when": 1760420043234
+      "when": 1760595042881,
+      "tag": "0000_rainy_forge",
+      "breakpoints": true
     }
-  ],
-  "version": "7"
+  ]
 }

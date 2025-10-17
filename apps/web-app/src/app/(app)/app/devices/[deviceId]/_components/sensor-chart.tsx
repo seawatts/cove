@@ -36,14 +36,12 @@ interface ChartDataPoint {
 }
 
 interface SensorChartProps {
-  deviceId: string;
   sensorKey: string; // 'co2', 'temperature', etc.
   sensorName: string; // 'CO2', 'Temperature', etc.
   unit?: string; // 'ppm', '°C', etc.
 }
 
 export function SensorChart({
-  deviceId,
   sensorKey,
   sensorName,
   unit = '',
@@ -58,10 +56,9 @@ export function SensorChart({
   }, [isMobile]);
 
   const { data: stateHistory = [], isLoading } =
-    api.device.getStateHistory.useQuery(
+    api.entity.getStateHistory.useQuery(
       {
-        deviceId,
-        stateKey: sensorKey,
+        entityId: sensorKey, // sensorKey is now the entityId
         timeRange,
       },
       {

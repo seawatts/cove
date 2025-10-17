@@ -5,7 +5,6 @@
 import { networkInterfaces, hostname as osHostname } from 'node:os';
 import type { DeviceEvent, HubHealth } from '@cove/types';
 import type { HubDaemon } from './daemon';
-import { env } from './env';
 
 let startTime = Date.now();
 
@@ -19,20 +18,13 @@ export function getHealth(daemon?: HubDaemon): HubHealth {
   // Check component health
   let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
   const components: HubHealth['components'] = {
-    daemon: daemon?.isRunning() ? 'ok' : 'error',
-    database: 'ok', // Would need actual DB check
-    discovery: 'ok',
-    supabase: 'ok', // Would need actual Supabase check
+    adapters: { activeCount: 0, status: 'ok' },
+    database: { status: 'ok' },
+    discovery: { devicesFound: 0, status: 'ok' },
   };
-
-  // If daemon not running, mark as unhealthy
-  if (components.daemon === 'error') {
-    status = 'unhealthy';
-  }
 
   // Get real stats from daemon
   let devicesConnected = 0;
-  let devicesOnline = 0;
   let activeAdapters = 0;
   let recentErrors = 0;
 
@@ -41,10 +33,12 @@ export function getHealth(daemon?: HubDaemon): HubHealth {
       // Count discovered devices
       const discovered = daemon.getDiscoveredDevices();
       devicesConnected = discovered.length;
+      components.discovery.devicesFound = devicesConnected;
 
       // Count active protocol adapters
       const adapters = daemon.getAdapters();
       activeAdapters = adapters.size;
+      components.adapters.activeCount = activeAdapters;
 
       // Count recent errors from event collector
       const eventCollector = daemon.getEventCollector();
@@ -55,39 +49,32 @@ export function getHealth(daemon?: HubDaemon): HubHealth {
         });
         recentErrors = recentEvents.filter(
           (e: DeviceEvent) =>
-            e.severity === 'error' || e.severity === 'critical',
+            e.eventType.includes('error') || e.eventType.includes('failed'),
         ).length;
 
         // Mark as degraded if there are recent errors
         if (recentErrors > 5) {
           status = 'degraded';
-          components.daemon = 'warning';
+          components.database.status = 'warning';
         }
       }
 
-      // For now, assume all discovered devices are online (we'd need to check their actual status)
-      devicesOnline = devicesConnected;
+      // Check if daemon is running
+      if (!daemon.isRunning()) {
+        status = 'unhealthy';
+        components.database.status = 'error';
+      }
     } catch (_error) {
       // If we can't get stats, mark as degraded
       status = 'degraded';
-      components.daemon = 'warning';
+      components.database.status = 'warning';
     }
   }
 
   return {
     components,
-    stats: {
-      activeAdapters,
-      devicesConnected,
-      devicesOnline,
-      messagesProcessed: 0, // Would need to track this in command processor
-      queueLag: 0, // Would need to track pending commands
-      recentErrors,
-    },
     status,
-    timestamp: new Date(),
     uptime,
-    version: env.HUB_VERSION,
   };
 }
 

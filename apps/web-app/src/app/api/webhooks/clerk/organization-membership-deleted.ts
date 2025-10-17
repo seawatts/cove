@@ -5,7 +5,6 @@ import type {
 import { posthog } from '@cove/analytics/posthog/server';
 import { db } from '@cove/db/client';
 import { Orgs } from '@cove/db/schema';
-import { PLAN_TYPES, stripe } from '@cove/stripe';
 import { eq } from 'drizzle-orm';
 
 export async function handleOrganizationMembershipDeleted(event: WebhookEvent) {
@@ -41,23 +40,6 @@ export async function handleOrganizationMembershipDeleted(event: WebhookEvent) {
 
   try {
     // Get the subscription from Stripe
-    const subscription = await stripe.subscriptions.retrieve(
-      org.stripeSubscriptionId,
-      {
-        expand: ['items.data.price'],
-      },
-    );
-
-    // Check if this is a team plan (per-user billing)
-    const isTeamPlan = subscription.metadata?.planType === PLAN_TYPES.TEAM;
-
-    if (!isTeamPlan) {
-      console.log(
-        `Organization ${org.id} is not on a team plan, skipping quantity update`,
-      );
-      return new Response('Not a team plan', { status: 200 });
-    }
-
     // Count current organization members (after the deletion)
     const currentMemberCount = membershipData.organization.members_count || 0;
 
@@ -65,20 +47,8 @@ export async function handleOrganizationMembershipDeleted(event: WebhookEvent) {
     const adjustedMemberCount = Math.max(currentMemberCount, 1);
 
     // Update the subscription quantity to match the new member count
-    // For team plans, the quantity represents the number of users
-    const _updatedSubscription = await stripe.subscriptions.update(
-      org.stripeSubscriptionId,
-      {
-        items: subscription.items.data.map((item) => ({
-          id: item.id,
-          quantity: adjustedMemberCount,
-        })),
-      },
-    );
 
-    console.log(
-      `Updated subscription ${org.stripeSubscriptionId} quantity to ${adjustedMemberCount} for organization ${org.id} (after member deletion)`,
-    );
+
 
     // Track the subscription update
     posthog.capture({
@@ -88,7 +58,6 @@ export async function handleOrganizationMembershipDeleted(event: WebhookEvent) {
         clerkOrgId: membershipData.organization.id,
         newQuantity: adjustedMemberCount,
         orgId: org.id,
-        planType: PLAN_TYPES.TEAM,
         reason: 'member_deleted',
         subscriptionId: org.stripeSubscriptionId,
       },
@@ -104,7 +73,7 @@ export async function handleOrganizationMembershipDeleted(event: WebhookEvent) {
     // Track the error
     posthog.capture({
       distinctId: membershipData.public_user_data.user_id,
-      event: 'subscription_quantity_update_failed',
+      event: 'subscription_quantity_update_failed_after_member_deleted',
       properties: {
         clerkOrgId: membershipData.organization.id,
         error: error instanceof Error ? error.message : 'Unknown error',

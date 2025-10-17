@@ -1,21 +1,21 @@
 /**
- * Centralized State Management for All Protocol Adapters
- * Handles delta storage, thresholds, aggregation, and persistence
+ * Entity-First State Management for Home Assistant++ Architecture
+ * Handles entity state updates, thresholds, aggregation, and persistence
  *
- * Industry-standard approach based on research:
- * - Time-series database patterns (InfluxDB, TimescaleDB)
- * - Home Assistant state management
- * - IoT sensor data best practices
+ * Based on Home Assistant state management patterns:
+ * - Entities are the primary state holders
+ * - Latest state in entityState table (hot)
+ * - History in entityStateHistory hypertable (cold)
+ * - Intelligent filtering based on entity traits
  */
 
-import { createId } from '@cove/id';
 import { debug } from '@cove/logger';
-import type { DeviceStateHistory } from '@cove/types';
-import type { SupabaseSync } from './supabase';
+import type { StateUpdate } from '@cove/types';
+import type { HubDatabase } from './db';
 
 const log = debug('cove:hub:state-manager');
 
-// Sensor type classifications
+// Sensor type classifications for filtering
 export enum SensorType {
   Continuous = 'continuous', // Temp, CO2, Humidity - use thresholds
   Binary = 'binary', // Motion, Contact - only on change
@@ -23,39 +23,29 @@ export enum SensorType {
   Event = 'event', // Buttons - always record
 }
 
-// Sensor configuration
-export interface SensorConfig {
+// Entity configuration for filtering
+export interface EntityConfig {
   type: SensorType;
   threshold?: number; // For continuous sensors (change delta to trigger persist)
   unit?: string; // Display unit
   sampleInterval?: number; // For slow-changing (seconds between samples)
 }
 
-// State update payload
-export interface StateUpdate {
-  deviceId: string;
-  stateKey: string;
-  value: unknown;
-  entityName: string;
-  source: string; // 'esphome', 'hue', 'sonos', etc.
-  timestamp?: Date;
-}
-
 // Last known values for threshold comparison
 interface LastValue {
-  value: unknown;
+  value: string;
   timestamp: Date;
 }
 
-// Default sensor configurations by name pattern
-const DEFAULT_SENSOR_CONFIGS: Record<string, SensorConfig> = {
+// Default entity configurations by entity key pattern
+const DEFAULT_ENTITY_CONFIGS: Record<string, EntityConfig> = {
   // Gas sensors from Apollo Air 1
   ammonia: { threshold: 0.1, type: SensorType.Continuous, unit: 'ppm' },
   // Light control
   brightness: { threshold: 5, type: SensorType.Continuous, unit: '%' },
   carbon_dioxide: { threshold: 5, type: SensorType.Continuous, unit: 'ppm' },
   carbon_monoxide: { threshold: 1, type: SensorType.Continuous, unit: 'ppm' },
-  co2: { threshold: 5, type: SensorType.Continuous, unit: 'ppm' }, // Lower threshold for more frequent updates
+  co2: { threshold: 5, type: SensorType.Continuous, unit: 'ppm' },
   color_temp: { threshold: 10, type: SensorType.Continuous, unit: 'mireds' },
   contact: { type: SensorType.Binary },
   door: { type: SensorType.Binary },
@@ -91,7 +81,7 @@ const DEFAULT_SENSOR_CONFIGS: Record<string, SensorConfig> = {
   pressure: { threshold: 1, type: SensorType.Continuous, unit: 'hPa' },
 
   // Slow changing - periodic sampling
-  rssi: { sampleInterval: 300, type: SensorType.SlowChanging, unit: 'dBm' }, // 5min
+  rssi: { sampleInterval: 300, type: SensorType.SlowChanging, unit: 'dBm' },
   temp: { threshold: 0.5, type: SensorType.Continuous, unit: '°C' },
   // Environmental - continuous with thresholds
   temperature: { threshold: 0.5, type: SensorType.Continuous, unit: '°C' },
@@ -106,50 +96,49 @@ const DEFAULT_SENSOR_CONFIGS: Record<string, SensorConfig> = {
 };
 
 export class StateManager {
-  private supabaseSync: SupabaseSync | null;
-  private lastValues: Map<string, LastValue> = new Map(); // deviceId:stateKey -> LastValue
-  private sensorConfigs: Map<string, SensorConfig> = new Map();
-  private deviceStates: Map<string, Record<string, unknown>> = new Map(); // In-memory device states
+  private db: HubDatabase | null;
+  private lastValues: Map<string, LastValue> = new Map(); // entityId -> LastValue
+  private entityConfigs: Map<string, EntityConfig> = new Map();
   private stats = {
     filtered: 0,
     persisted: 0,
     totalUpdates: 0,
   };
 
-  constructor(supabaseSync?: SupabaseSync | null) {
-    this.supabaseSync = supabaseSync || null;
-    this.initializeSensorConfigs();
+  constructor(db?: HubDatabase | null) {
+    this.db = db || null;
+    this.initializeEntityConfigs();
   }
 
-  private initializeSensorConfigs(): void {
+  private initializeEntityConfigs(): void {
     // Load default configs
-    for (const [key, config] of Object.entries(DEFAULT_SENSOR_CONFIGS)) {
-      this.sensorConfigs.set(key, config);
+    for (const [key, config] of Object.entries(DEFAULT_ENTITY_CONFIGS)) {
+      this.entityConfigs.set(key, config);
     }
-    log(`Initialized ${this.sensorConfigs.size} default sensor configurations`);
+    log(`Initialized ${this.entityConfigs.size} default entity configurations`);
   }
 
   /**
-   * Register custom sensor configuration
+   * Register custom entity configuration
    */
-  registerSensorConfig(stateKey: string, config: SensorConfig): void {
-    this.sensorConfigs.set(stateKey, config);
-    log(`Registered custom config for ${stateKey}:`, config);
+  registerEntityConfig(entityKey: string, config: EntityConfig): void {
+    this.entityConfigs.set(entityKey, config);
+    log(`Registered custom config for ${entityKey}:`, config);
   }
 
   /**
-   * Get sensor config by state key or pattern matching
+   * Get entity config by entity key or pattern matching
    */
-  private getSensorConfig(stateKey: string): SensorConfig {
+  private getEntityConfig(entityKey: string): EntityConfig {
     // Direct match
-    if (this.sensorConfigs.has(stateKey)) {
-      const config = this.sensorConfigs.get(stateKey);
+    if (this.entityConfigs.has(entityKey)) {
+      const config = this.entityConfigs.get(entityKey);
       if (config) return config;
     }
 
-    // Pattern matching (e.g., "sen55_temperature" matches "temperature")
-    for (const [pattern, config] of this.sensorConfigs.entries()) {
-      if (stateKey.toLowerCase().includes(pattern)) {
+    // Pattern matching (e.g., "sensor.temperature_living_room" matches "temperature")
+    for (const [pattern, config] of this.entityConfigs.entries()) {
+      if (entityKey.toLowerCase().includes(pattern)) {
         return config;
       }
     }
@@ -159,30 +148,24 @@ export class StateManager {
   }
 
   /**
-   * Main method: Process state update with intelligent filtering
+   * Main method: Process entity state update with intelligent filtering
    */
   async updateState(update: StateUpdate): Promise<boolean> {
     this.stats.totalUpdates++;
 
-    const { deviceId, stateKey, value, entityName, source, timestamp } = update;
-    const config = this.getSensorConfig(stateKey);
-    const lastValueKey = `${deviceId}:${stateKey}`;
-    const lastValue = this.lastValues.get(lastValueKey);
+    const { entityId, state, attrs, timestamp } = update;
+    const config = this.getEntityConfig(entityId);
+    const lastValue = this.lastValues.get(entityId);
     const now = timestamp || new Date();
 
-    // Update in-memory device state
-    const deviceState = this.deviceStates.get(deviceId) || {};
-    deviceState[stateKey] = value;
-    this.deviceStates.set(deviceId, deviceState);
-
-    // Apply filtering logic based on sensor type
+    // Apply filtering logic based on entity type
     let shouldPersist = false;
     let reason = '';
 
     switch (config.type) {
       case SensorType.Binary: {
         // Only persist if value changed
-        shouldPersist = !lastValue || lastValue.value !== value;
+        shouldPersist = !lastValue || lastValue.value !== state;
         reason = shouldPersist ? 'state changed' : 'state unchanged';
         break;
       }
@@ -193,17 +176,27 @@ export class StateManager {
           shouldPersist = true;
           reason = 'first value';
         } else if (
-          typeof value === 'number' &&
-          typeof lastValue.value === 'number'
+          typeof state === 'string' &&
+          typeof lastValue.value === 'string'
         ) {
-          const delta = Math.abs(value - lastValue.value);
-          shouldPersist = config.threshold ? delta >= config.threshold : true;
-          reason = shouldPersist
-            ? `threshold exceeded (Δ${delta.toFixed(2)})`
-            : `below threshold (Δ${delta.toFixed(2)} < ${config.threshold})`;
+          // Try to parse as numbers for threshold comparison
+          const currentNum = Number.parseFloat(state);
+          const lastNum = Number.parseFloat(lastValue.value);
+
+          if (!Number.isNaN(currentNum) && !Number.isNaN(lastNum)) {
+            const delta = Math.abs(currentNum - lastNum);
+            shouldPersist = config.threshold ? delta >= config.threshold : true;
+            reason = shouldPersist
+              ? `threshold exceeded (Δ${delta.toFixed(2)})`
+              : `below threshold (Δ${delta.toFixed(2)} < ${config.threshold})`;
+          } else {
+            // Non-numeric continuous (e.g., text sensors)
+            shouldPersist = state !== lastValue.value;
+            reason = shouldPersist ? 'value changed' : 'value unchanged';
+          }
         } else {
-          // Non-numeric continuous (e.g., text sensors)
-          shouldPersist = value !== lastValue.value;
+          // Non-numeric continuous
+          shouldPersist = state !== lastValue.value;
           reason = shouldPersist ? 'value changed' : 'value unchanged';
         }
         break;
@@ -236,32 +229,29 @@ export class StateManager {
     // Log filtering decision
     if (shouldPersist) {
       log(
-        `✓ ${entityName}: ${value}${config.unit ? ` ${config.unit}` : ''} (${reason})`,
+        `✓ ${entityId}: ${state}${config.unit ? ` ${config.unit}` : ''} (${reason})`,
       );
       this.stats.persisted++;
     } else {
       log(
-        `✗ ${entityName}: ${value}${config.unit ? ` ${config.unit}` : ''} (filtered: ${reason})`,
+        `✗ ${entityId}: ${state}${config.unit ? ` ${config.unit}` : ''} (filtered: ${reason})`,
       );
       this.stats.filtered++;
     }
 
     // Persist to database if needed
-    if (shouldPersist && this.supabaseSync) {
+    if (shouldPersist && this.db) {
       const success = await this.persistStateChange({
-        deviceId,
-        entityName,
-        sensorType: config.type,
-        source,
-        stateKey,
+        attrs,
+        config,
+        entityId,
+        state,
         timestamp: now,
-        unit: config.unit,
-        value,
       });
 
       if (success) {
         // Update last value
-        this.lastValues.set(lastValueKey, { timestamp: now, value });
+        this.lastValues.set(entityId, { timestamp: now, value: state });
       }
 
       return success;
@@ -271,59 +261,53 @@ export class StateManager {
   }
 
   /**
-   * Persist state change to database (delta storage)
+   * Persist state change to database (both entityState and entityStateHistory)
    */
   private async persistStateChange(params: {
-    deviceId: string;
-    stateKey: string;
-    value: unknown;
-    entityName: string;
-    source: string;
+    entityId: string;
+    state: string;
+    attrs?: Record<string, unknown>;
     timestamp: Date;
-    unit?: string;
-    sensorType?: SensorType;
+    config: EntityConfig;
   }): Promise<boolean> {
     try {
-      const {
-        deviceId,
-        stateKey,
-        value,
-        entityName,
-        source,
-        timestamp,
-        unit,
-        sensorType,
-      } = params;
+      const { entityId, state, attrs, timestamp } = params;
 
-      // Update device record with latest state
-      const deviceState = this.deviceStates.get(deviceId);
-      if (deviceState) {
-        await this.supabaseSync?.updateDeviceState(deviceId, deviceState);
-      }
-
-      // Create state history record (delta only)
-      const stateHistory: DeviceStateHistory = {
-        attributes: {
-          entityName,
-          sensorType,
-          source,
-          stateKey,
-          unit,
-        },
-        deviceId,
-        id: createId({ prefix: 'state' }),
-        lastChanged: timestamp,
-        lastUpdated: timestamp,
-        state: value, // Just the value, not full state object
-      };
-
-      const success = await this.supabaseSync?.insertStateHistory(stateHistory);
+      // Update latest state in entityState table (upsert)
+      const success = await this.db?.upsertEntityState({
+        attrs,
+        entityId,
+        state,
+      });
 
       if (!success) {
-        log(`Failed to persist state for ${entityName}`);
+        log(`Failed to update entityState for ${entityId}`);
+        return false;
       }
 
-      return success ?? false;
+      // Append to history in entityStateHistory table
+      // Note: We need homeId for the history table - this should be passed from the caller
+      // For now, we'll need to get it from the entity's device's home
+      const entityWithDevice = await this.db?.getEntityWithDevice(entityId);
+      if (!entityWithDevice) {
+        log(`Failed to get entity with device for ${entityId}`);
+        return false;
+      }
+
+      const historySuccess = await this.db?.insertEntityStateHistory({
+        attrs,
+        entityId,
+        homeId: entityWithDevice.device.homeId,
+        state,
+        timestamp,
+      });
+
+      if (!historySuccess) {
+        log(`Failed to insert entityStateHistory for ${entityId}`);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       log('Error persisting state change:', error);
       return false;
@@ -331,42 +315,19 @@ export class StateManager {
   }
 
   /**
-   * Get current in-memory state for a device
+   * Clear cached state for an entity (on disconnect)
    */
-  getDeviceState(deviceId: string): Record<string, unknown> {
-    return this.deviceStates.get(deviceId) || {};
-  }
-
-  /**
-   * Update full device state (useful for initial sync)
-   */
-  setDeviceState(deviceId: string, state: Record<string, unknown>): void {
-    this.deviceStates.set(deviceId, state);
-  }
-
-  /**
-   * Clear cached state for a device (on disconnect)
-   */
-  clearDeviceState(deviceId: string): void {
-    this.deviceStates.delete(deviceId);
-
-    // Clear last values for this device
-    for (const key of this.lastValues.keys()) {
-      if (key.startsWith(`${deviceId}:`)) {
-        this.lastValues.delete(key);
-      }
-    }
-
-    log(`Cleared state cache for device: ${deviceId}`);
+  clearEntityState(entityId: string): void {
+    this.lastValues.delete(entityId);
+    log(`Cleared state cache for entity: ${entityId}`);
   }
 
   /**
    * Get statistics about filtering efficiency
    */
   getStats(): {
-    devicesTracked: number;
-    sensorsTracked: number;
-    configuredSensors: number;
+    entitiesTracked: number;
+    configuredEntities: number;
     totalUpdates: number;
     persisted: number;
     filtered: number;
@@ -378,12 +339,11 @@ export class StateManager {
         : '0%';
 
     return {
-      configuredSensors: this.sensorConfigs.size,
-      devicesTracked: this.deviceStates.size,
+      configuredEntities: this.entityConfigs.size,
+      entitiesTracked: this.lastValues.size,
       filtered: this.stats.filtered,
       filterRate,
       persisted: this.stats.persisted,
-      sensorsTracked: this.lastValues.size,
       totalUpdates: this.stats.totalUpdates,
     };
   }
@@ -394,8 +354,7 @@ export class StateManager {
   logStats(): void {
     const stats = this.getStats();
     log('StateManager Statistics:');
-    log(`  Devices tracked: ${stats.devicesTracked}`);
-    log(`  Sensors tracked: ${stats.sensorsTracked}`);
+    log(`  Entities tracked: ${stats.entitiesTracked}`);
     log(`  Total updates: ${stats.totalUpdates}`);
     log(`  Persisted: ${stats.persisted}`);
     log(`  Filtered: ${stats.filtered} (${stats.filterRate})`);

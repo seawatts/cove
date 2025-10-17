@@ -6,21 +6,21 @@
 
 import { createId } from '@cove/id';
 import { debug } from '@cove/logger';
-import { type DeviceEvent, EventSeverity, EventType } from '@cove/types';
-import type { SupabaseSync } from './supabase';
+import { type DeviceEvent, getLogLevel, HubEventType } from '@cove/types';
+import type { HubDatabase } from './db';
 
 const log = debug('cove:hub:events');
 
 interface EventCollectorOptions {
   deviceId: string; // Default device ID (typically the hub)
-  supabaseSync?: SupabaseSync | null;
+  db?: HubDatabase | null;
   bufferSize?: number;
   syncInterval?: number; // seconds
 }
 
 export class DeviceEventCollector {
   private defaultDeviceId: string; // Default device ID for hub events
-  private supabaseSync: SupabaseSync | null;
+  private db: HubDatabase | null;
   private eventBuffer: DeviceEvent[] = [];
   private bufferSize: number;
   private syncInterval: number;
@@ -28,7 +28,7 @@ export class DeviceEventCollector {
 
   constructor(options: EventCollectorOptions) {
     this.defaultDeviceId = options.deviceId;
-    this.supabaseSync = options.supabaseSync || null;
+    this.db = options.db || null;
     this.bufferSize = options.bufferSize || 1000;
     this.syncInterval = options.syncInterval || 30; // 30 seconds default
   }
@@ -39,16 +39,15 @@ export class DeviceEventCollector {
   start(): void {
     log('Starting event collector');
 
-    if (this.supabaseSync) {
+    if (this.db) {
       this.syncTimer = setInterval(() => {
         this.syncEvents();
       }, this.syncInterval * 1000);
     }
 
     this.emit({
-      eventType: EventType.HubStarted,
+      eventType: HubEventType.HubStarted,
       message: 'Hub daemon started',
-      severity: EventSeverity.Info,
     });
   }
 
@@ -64,13 +63,12 @@ export class DeviceEventCollector {
     }
 
     this.emit({
-      eventType: EventType.HubStopped,
+      eventType: HubEventType.HubStopped,
       message: 'Hub daemon stopped',
-      severity: EventSeverity.Info,
     });
 
     // Final sync before stopping
-    if (this.supabaseSync && this.eventBuffer.length > 0) {
+    if (this.db && this.eventBuffer.length > 0) {
       await this.syncEvents();
     }
   }
@@ -80,9 +78,8 @@ export class DeviceEventCollector {
    * Can emit events for any device, not just the hub
    */
   emit(event: {
-    eventType: EventType;
+    eventType: HubEventType;
     message: string;
-    severity: EventSeverity;
     deviceId?: string; // Optional - defaults to hub device ID
     metadata?: Record<string, unknown>;
     stateId?: string; // Optional link to state history
@@ -93,7 +90,6 @@ export class DeviceEventCollector {
       id: createId({ prefix: 'event' }),
       message: event.message,
       metadata: event.metadata,
-      severity: event.severity,
       stateId: event.stateId, // Link to state history if provided
       timestamp: new Date(),
     };
@@ -106,40 +102,64 @@ export class DeviceEventCollector {
       this.eventBuffer.shift();
     }
 
-    // Log event
-    const logLevel =
-      event.severity === EventSeverity.Error ||
-      event.severity === EventSeverity.Critical
-        ? 'error'
-        : 'debug';
+    // Log event using inferred log level
+    const logLevel = getLogLevel(event.eventType);
 
     if (logLevel === 'error') {
       console.error(`[${event.eventType}] ${event.message}`, event.metadata);
+    } else if (logLevel === 'warn') {
+      console.warn(`[${event.eventType}] ${event.message}`, event.metadata);
+    } else if (logLevel === 'info') {
+      console.info(`[${event.eventType}] ${event.message}`, event.metadata);
     } else {
       log(`[${event.eventType}] ${event.message}`, event.metadata);
     }
   }
 
   /**
-   * Sync events to Supabase
+   * Sync events to database using HubDatabase
    */
   private async syncEvents(): Promise<void> {
-    if (!this.supabaseSync || this.eventBuffer.length === 0) {
+    if (!this.db || this.eventBuffer.length === 0) {
       return;
     }
 
     const eventsToSync = [...this.eventBuffer];
 
     try {
-      log(`Syncing ${eventsToSync.length} events to Supabase`);
-      const success = await this.supabaseSync.insertDeviceEvents(eventsToSync);
+      log(`Syncing ${eventsToSync.length} events to database`);
 
-      if (success) {
+      // Get home ID from the first event's device (assuming all events are for the same home)
+      const firstEvent = eventsToSync[0];
+      if (!firstEvent?.deviceId) {
+        log('No device ID found in events, skipping sync');
+        return;
+      }
+
+      // Insert each event using HubDatabase
+      let successCount = 0;
+      for (const event of eventsToSync) {
+        const success = await this.db.insertDeviceEvent({
+          contextId: event.deviceId,
+          eventType: event.eventType,
+          homeId: firstEvent?.deviceId, // TODO: Get actual home ID from device
+          message: event.message,
+          metadata: event.metadata,
+        });
+
+        if (success) {
+          successCount++;
+        }
+      }
+
+      if (successCount === eventsToSync.length) {
         // Clear synced events from buffer
         this.eventBuffer = [];
-        log(`Successfully synced ${eventsToSync.length} events`);
+        log(`Successfully synced ${successCount} events`);
       } else {
-        log('Failed to sync events, will retry next interval');
+        log(
+          `Only synced ${successCount}/${eventsToSync.length} events, will retry next interval`,
+        );
       }
     } catch (error) {
       log('Error syncing events:', error);
@@ -152,16 +172,10 @@ export class DeviceEventCollector {
    */
   getRecentEvents(options?: {
     limit?: number;
-    severity?: EventSeverity;
-    eventType?: EventType;
+    eventType?: HubEventType;
     since?: Date;
   }): DeviceEvent[] {
     let events = [...this.eventBuffer];
-
-    // Filter by severity
-    if (options?.severity) {
-      events = events.filter((e) => e.severity === options.severity);
-    }
 
     // Filter by event type
     if (options?.eventType) {
@@ -185,18 +199,21 @@ export class DeviceEventCollector {
   }
 
   /**
-   * Get event count by severity
+   * Get event count by event type
    */
-  getEventCountsBySeverity(): Record<EventSeverity, number> {
-    const counts: Record<EventSeverity, number> = {
-      [EventSeverity.Info]: 0,
-      [EventSeverity.Warning]: 0,
-      [EventSeverity.Error]: 0,
-      [EventSeverity.Critical]: 0,
-    };
+  getEventCountsByType(): Record<HubEventType, number> {
+    const counts: Record<HubEventType, number> = {} as Record<
+      HubEventType,
+      number
+    >;
+
+    // Initialize all event types to 0
+    for (const eventType of Object.values(HubEventType)) {
+      counts[eventType] = 0;
+    }
 
     for (const event of this.eventBuffer) {
-      counts[event.severity]++;
+      counts[event.eventType]++;
     }
 
     return counts;

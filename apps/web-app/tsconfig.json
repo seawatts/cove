@@ -4,7 +4,6 @@
     "incremental": true,
     "paths": {
       "@cove/analytics/*": ["../../packages/analytics/src/*"],
-      "@cove/stripe/*": ["../../packages/stripe/src/*"],
       "@cove/ui/*": ["../../packages/ui/src/*"],
       "@cove/zustand/*": ["../../packages/zustand/src/*"],
       "~/*": ["./src/*"]

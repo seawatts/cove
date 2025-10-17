@@ -1,7 +1,9 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "concurrency": "20",
-  "globalEnv": ["NODE_ENV"],
+  "globalEnv": [
+    "NODE_ENV"
+  ],
   "globalPassThroughEnv": [
     "NODE_ENV",
     "CI",
@@ -15,12 +17,7 @@
     "VERCEL_TOKEN"
   ],
   "tasks": {
-    "@cove/stripe#build": {
-      "cache": false,
-      "env": ["STRIPE_*"]
-    },
     "@cove/web-app#build": {
-      "dependsOn": ["@cove/stripe#build"],
       "env": [
         "NEXT_PUBLIC_*",
         "CLERK_*",
@@ -36,7 +33,9 @@
       "cache": false
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "env": [
         "NEXT_PUBLIC_*",
         "CLERK_*",
@@ -87,11 +86,15 @@
       "persistent": true
     },
     "format": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "format:ci": {
       "cache": false,
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "gen-migration": {
       "cache": false,
@@ -155,22 +158,36 @@
     },
     "test": {
       "cache": false,
-      "dependsOn": ["^build"],
-      "env": ["USE_LOCAL_DB"],
-      "outputs": ["coverage/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "env": [
+        "USE_LOCAL_DB"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     },
     "test:ci": {
       "cache": false,
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     },
     "test:watch": {
       "cache": false,
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "persistent": true
     },
     "typecheck": {
-      "outputs": ["node_modules/.cache/tsbuildinfo.json"]
+      "outputs": [
+        "node_modules/.cache/tsbuildinfo.json"
+      ]
     },
     "ui-add": {
       "cache": false,

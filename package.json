@@ -1,6 +1,6 @@
 {
   "catalog": {
-    "@clerk/nextjs": "6.33.4",
+    "@clerk/nextjs": "6.33.5",
     "@supabase/supabase-js": "2.75.0",
     "@t3-oss/env-core": "0.13.8",
     "@t3-oss/env-nextjs": "0.13.8",
@@ -13,6 +13,7 @@
     "@types/react-dom": "19.2.2",
     "date-fns": "4.1.0",
     "drizzle-orm": "0.44.6",
+    "drizzle-zod": "0.8.3",
     "next": "15.5.5",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -90,7 +91,7 @@
     "test:integ:ci": "turbo run test:ci --filter=@cove/integ-test",
     "test:integ:watch": "turbo run test:watch --filter=@cove/integ-test",
     "typecheck": "turbo run typecheck",
-    "typecheck:ci": "turbo run build --filter @cove/stripe && turbo run typecheck",
+    "typecheck:ci": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
     "version": "changeset version && bun biome check --write",
     "with-env": "infisical run --"

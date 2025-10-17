@@ -14,3 +14,4 @@
 export * as esphome from './esphome';
 export * as hue from './hue';
 export type * from './types';
+export * from './types';

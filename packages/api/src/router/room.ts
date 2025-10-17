@@ -1,5 +1,4 @@
 import { eq } from '@cove/db';
-import { Rooms } from '@cove/db/schema';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
@@ -43,7 +42,7 @@ export const roomRouter = createTRPCRouter({
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.Rooms.findFirst({
+      return ctx.db.query.room.findFirst({
         where: eq(Rooms.id, input.id),
         with: {
           devices: true,
@@ -52,7 +51,7 @@ export const roomRouter = createTRPCRouter({
     }),
   // List all rooms for the current user
   list: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.Rooms.findMany({
+    return ctx.db.query.room.findMany({
       orderBy: (rooms, { asc }) => [asc(rooms.name)],
       where: eq(Rooms.userId, ctx.auth.userId),
       with: {

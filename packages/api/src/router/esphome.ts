@@ -4,7 +4,6 @@
  */
 
 import { and, eq } from '@cove/db';
-import { Commands, Devices, Entities } from '@cove/db/schema';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
@@ -25,7 +24,7 @@ export const esphomeRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Verify device exists and belongs to the user
-      const device = await ctx.db.query.Devices.findFirst({
+      const device = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.deviceId),
           eq(Devices.userId, ctx.auth.userId),
@@ -50,7 +49,7 @@ export const esphomeRouter = createTRPCRouter({
     .input(z.object({ deviceId: z.string() }))
     .query(async ({ ctx, input }) => {
       // Verify device exists and belongs to the user
-      const device = await ctx.db.query.Devices.findFirst({
+      const device = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.deviceId),
           eq(Devices.userId, ctx.auth.userId),
@@ -61,7 +60,7 @@ export const esphomeRouter = createTRPCRouter({
         throw new Error('Device not found');
       }
 
-      return ctx.db.query.Entities.findMany({
+      return ctx.db.query.entity.findMany({
         orderBy: (entities, { asc }) => [
           asc(entities.entityType),
           asc(entities.name),
@@ -80,7 +79,7 @@ export const esphomeRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Verify device exists and belongs to the user
-      const device = await ctx.db.query.Devices.findFirst({
+      const device = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.deviceId),
           eq(Devices.userId, ctx.auth.userId),
@@ -113,7 +112,7 @@ export const esphomeRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Verify device exists and belongs to the user
-      const device = await ctx.db.query.Devices.findFirst({
+      const device = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.deviceId),
           eq(Devices.userId, ctx.auth.userId),
