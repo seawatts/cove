@@ -35,38 +35,55 @@ const createRequestingUserIdFunction = async () => {
   console.log('requesting_user_id function created successfully');
 };
 
-// Create the requesting_org_id function for consistency
-const createRequestingOrgIdFunction = async () => {
-  console.log('Creating requesting_org_id function...');
-  await db.execute(sql`
-    CREATE OR REPLACE FUNCTION requesting_org_id()
-    RETURNS text
-    LANGUAGE sql
-    STABLE
-    SECURITY DEFINER
-    SET search_path = ''
-    AS $$
-      SELECT NULLIF(
-        current_setting('request.jwt.claims', true)::json->>'org_id',
-        ''
-      )::text;
-    $$;
-  `);
-  console.log('requesting_org_id function created successfully');
-};
-
 // Common policy conditions using the requesting_user_id function
 const policyConditions = {
-  orgOwnership: (columnName = 'orgId') =>
-    `(SELECT requesting_org_id()) = ("${columnName}")::text`,
+  deviceHomeAccess: (columnName = 'deviceId') =>
+    `EXISTS (
+      SELECT 1 FROM device
+      JOIN users ON users."homeId" = device."homeId"
+      WHERE device.id = ("${columnName}")::text
+      AND users.id = (SELECT requesting_user_id())
+    )`,
+  entityHomeAccess: (columnName = 'entityId') =>
+    `EXISTS (
+      SELECT 1 FROM entity
+      JOIN device ON device.id = entity."deviceId"
+      JOIN users ON users."homeId" = device."homeId"
+      WHERE entity.id = ("${columnName}")::text
+      AND users.id = (SELECT requesting_user_id())
+    )`,
+  homeOwnership: (columnName = 'homeId') =>
+    `EXISTS (
+      SELECT 1 FROM users
+      WHERE users.id = (SELECT requesting_user_id())
+      AND users."homeId" = ("${columnName}")::text
+    )`,
+  userHomeAccess: (columnName = 'homeId') =>
+    `EXISTS (
+      SELECT 1 FROM users
+      WHERE users.id = (SELECT requesting_user_id())
+      AND users."homeId" = ("${columnName}")::text
+    )`,
   userOwnership: (columnName = 'userId') =>
     `(SELECT requesting_user_id()) = ("${columnName}")::text`,
-  webhookOwnership: `EXISTS (
-    SELECT 1 FROM webhooks
-    WHERE webhooks.id = requests."webhookId"
-    AND webhooks."orgId" = (SELECT requesting_org_id())
-  )`,
 } as const;
+
+// Helper to create a policy for home ownership
+const createHomeOwnershipPolicy = (
+  operation: PolicyOperation,
+  columnName: string,
+): Policy => ({
+  name: `Users can ${operation.toLowerCase()} records for their home`,
+  operation,
+  using:
+    operation === 'INSERT'
+      ? undefined
+      : policyConditions.userHomeAccess(columnName),
+  withCheck:
+    operation === 'INSERT'
+      ? policyConditions.userHomeAccess(columnName)
+      : undefined,
+});
 
 // Helper to create a policy for user ownership
 const createUserOwnershipPolicy = (
@@ -83,16 +100,6 @@ const createUserOwnershipPolicy = (
     operation === 'INSERT'
       ? policyConditions.userOwnership(columnName)
       : undefined,
-});
-
-// Helper to create a policy for org ownership
-const createOrgOwnershipPolicy = (
-  operation: PolicyOperation,
-  columnName: string,
-): Policy => ({
-  name: `Users can ${operation.toLowerCase()} their organization's records`,
-  operation,
-  using: policyConditions.orgOwnership(columnName),
 });
 
 const createPolicy = async (tableName: string, policy: Policy) => {
@@ -131,154 +138,160 @@ const enableRLS = async (tableName: string) => {
 };
 
 const policyConfigs: Record<string, PolicyConfig> = {
-  apiKeys: {
+  automation: {
     policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
+      createHomeOwnershipPolicy('ALL', 'homeId'),
+      createUserOwnershipPolicy('ALL', 'createdBy'),
     ],
-    tableName: 'apiKeys',
+    tableName: 'automation',
   },
-  apiKeyUsage: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'apiKeyUsage',
+  automationTrace: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'automationTrace',
   },
-  authCodes: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'authCodes',
+  automationVersion: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'automationVersion',
   },
-  automations: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'automations',
+  device: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'device',
   },
-  commands: {
+  entity: {
     policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      // Access through devices table for org ownership
       {
-        name: 'Users can access commands for their org devices',
+        name: 'Users can access entities for their home devices',
         operation: 'SELECT',
-        using: `EXISTS (
-          SELECT 1 FROM devices
-          WHERE devices.id = "commands"."deviceId"
-          AND (SELECT requesting_org_id()) = devices."orgId"::text
-        )`,
-      },
-    ],
-    tableName: 'commands',
-  },
-  devices: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'devices',
-  },
-  events: {
-    policies: [
-      // Events doesn't have userId/orgId - access through devices table
-      {
-        name: 'Users can view events for their devices',
-        operation: 'SELECT',
-        using: `EXISTS (
-          SELECT 1 FROM devices
-          WHERE devices.id = "events"."deviceId"
-          AND (SELECT requesting_user_id()) = devices."userId"::text
-        )`,
+        using: policyConditions.deviceHomeAccess('deviceId'),
       },
       {
-        name: 'Users can view events for their org devices',
-        operation: 'SELECT',
-        using: `EXISTS (
-          SELECT 1 FROM devices
-          WHERE devices.id = "events"."deviceId"
-          AND (SELECT requesting_org_id()) = devices."orgId"::text
-        )`,
-      },
-    ],
-    tableName: 'events',
-  },
-  orgMembers: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'orgMembers',
-  },
-  orgs: {
-    policies: [
-      // Users can access orgs they created
-      {
-        name: 'Users can select orgs they created',
-        operation: 'SELECT',
-        using: policyConditions.userOwnership('createdByUserId'),
-      },
-      {
-        name: 'Users can insert orgs',
+        name: 'Users can insert entities for their home devices',
         operation: 'INSERT',
-        withCheck: policyConditions.userOwnership('createdByUserId'),
+        withCheck: policyConditions.deviceHomeAccess('deviceId'),
       },
       {
-        name: 'Users can update orgs they created',
+        name: 'Users can update entities for their home devices',
         operation: 'UPDATE',
-        using: policyConditions.userOwnership('createdByUserId'),
-        withCheck: policyConditions.userOwnership('createdByUserId'),
-      },
-    ],
-    tableName: 'orgs',
-  },
-  rooms: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'rooms',
-  },
-  scenes: {
-    policies: [
-      createUserOwnershipPolicy('ALL', 'userId'),
-      createOrgOwnershipPolicy('ALL', 'orgId'),
-    ],
-    tableName: 'scenes',
-  },
-  states: {
-    policies: [
-      // States doesn't have userId/orgId - access through devices table
-      {
-        name: 'Users can view state history for their devices',
-        operation: 'SELECT',
-        using: `EXISTS (
-          SELECT 1 FROM devices
-          WHERE devices.id = "states"."deviceId"
-          AND (SELECT requesting_user_id()) = devices."userId"::text
-        )`,
+        using: policyConditions.deviceHomeAccess('deviceId'),
+        withCheck: policyConditions.deviceHomeAccess('deviceId'),
       },
       {
-        name: 'Users can view state history for their org devices',
+        name: 'Users can delete entities for their home devices',
+        operation: 'DELETE',
+        using: policyConditions.deviceHomeAccess('deviceId'),
+      },
+    ],
+    tableName: 'entity',
+  },
+  entityState: {
+    policies: [
+      {
+        name: 'Users can access entity states for their home entities',
+        operation: 'SELECT',
+        using: policyConditions.entityHomeAccess('entityId'),
+      },
+      {
+        name: 'Users can insert entity states for their home entities',
+        operation: 'INSERT',
+        withCheck: policyConditions.entityHomeAccess('entityId'),
+      },
+      {
+        name: 'Users can update entity states for their home entities',
+        operation: 'UPDATE',
+        using: policyConditions.entityHomeAccess('entityId'),
+        withCheck: policyConditions.entityHomeAccess('entityId'),
+      },
+    ],
+    tableName: 'entityState',
+  },
+  entityStateHistory: {
+    policies: [
+      {
+        name: 'Users can view entity state history for their home',
+        operation: 'SELECT',
+        using: policyConditions.userHomeAccess('homeId'),
+      },
+    ],
+    tableName: 'entityStateHistory',
+  },
+  event: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'event',
+  },
+  eventPayload: {
+    policies: [
+      {
+        name: 'Users can access event payloads for their home events',
         operation: 'SELECT',
         using: `EXISTS (
-          SELECT 1 FROM devices
-          WHERE devices.id = "states"."deviceId"
-          AND (SELECT requesting_org_id()) = devices."orgId"::text
+          SELECT 1 FROM event
+          WHERE event."payloadId" = "eventPayload".id
+          AND EXISTS (
+            SELECT 1 FROM users
+            WHERE users.id = (SELECT requesting_user_id())
+            AND users."homeId" = event."homeId"::text
+          )
         )`,
       },
     ],
-    tableName: 'states',
+    tableName: 'eventPayload',
   },
-  user: {
+  eventType: {
+    policies: [
+      {
+        name: 'Authenticated users can view event types',
+        operation: 'SELECT',
+        using: 'true',
+      },
+    ],
+    tableName: 'eventType',
+  },
+  floor: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'floor',
+  },
+  home: {
+    policies: [
+      createHomeOwnershipPolicy('SELECT', 'id'),
+      createHomeOwnershipPolicy('UPDATE', 'id'),
+      {
+        name: 'Users can insert homes',
+        operation: 'INSERT',
+        withCheck: `(SELECT requesting_user_id()) = "createdBy"::text`,
+      },
+    ],
+    tableName: 'home',
+  },
+  mode: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'mode',
+  },
+  room: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'room',
+  },
+  scene: {
+    policies: [
+      createHomeOwnershipPolicy('ALL', 'homeId'),
+      createUserOwnershipPolicy('ALL', 'createdBy'),
+    ],
+    tableName: 'scene',
+  },
+  sceneVersion: {
+    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
+    tableName: 'sceneVersion',
+  },
+  users: {
     policies: [
       createUserOwnershipPolicy('SELECT', 'id'),
       createUserOwnershipPolicy('UPDATE', 'id'),
+      {
+        name: 'Users can insert their own user record',
+        operation: 'INSERT',
+        withCheck: `(SELECT requesting_user_id()) = "id"::text`,
+      },
     ],
-    tableName: 'user',
+    tableName: 'users',
   },
 };
 
@@ -327,9 +340,8 @@ async function dropTablePolicies(config: PolicyConfig) {
 async function setupAllPolicies() {
   return withErrorHandling(
     async () => {
-      // First create the requesting_user_id and requesting_org_id functions
+      // Create the requesting_user_id function
       await createRequestingUserIdFunction();
-      await createRequestingOrgIdFunction();
 
       // Process tables sequentially to avoid deadlocks
       for (const config of Object.values(policyConfigs)) {

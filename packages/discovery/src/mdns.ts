@@ -9,7 +9,7 @@ import type {
   DiscoveryService,
   ProtocolType,
 } from '@cove/types';
-import { MDNS_SERVICE_TYPES } from '@cove/types/protocol';
+import { MDNS_SERVICE_TYPES } from '@cove/types';
 import Bonjour, {
   type Bonjour as BonjourInstance,
   type Browser,

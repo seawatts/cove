@@ -3,3 +3,5 @@ export { alias, getTableConfig } from 'drizzle-orm/pg-core';
 export * from 'drizzle-orm/sql';
 
 export * from './supabase/types';
+export * from './types';
+export * from './zod-schemas';

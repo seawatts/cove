@@ -21,7 +21,7 @@ export const hueRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Verify the bridge exists and belongs to the user
-      const bridge = await ctx.db.query.Devices.findFirst({
+      const bridge = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.bridgeId),
           eq(Devices.userId, ctx.auth.userId),
@@ -61,7 +61,7 @@ export const hueRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Verify the light exists and belongs to the user
-      const light = await ctx.db.query.Devices.findFirst({
+      const light = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.lightId),
           eq(Devices.userId, ctx.auth.userId),
@@ -156,7 +156,7 @@ export const hueRouter = createTRPCRouter({
   discoverBridges: protectedProcedure.mutation(async ({ ctx }) => {
     // TODO: Communicate with hub daemon to trigger Hue bridge discovery
     // For now, return bridges that are already in the database
-    const bridges = await ctx.db.query.Devices.findMany({
+    const bridges = await ctx.db.query.device.findMany({
       where: and(
         eq(Devices.userId, ctx.auth.userId),
         eq(Devices.protocol, 'hue'),
@@ -179,7 +179,7 @@ export const hueRouter = createTRPCRouter({
   getLights: protectedProcedure
     .input(z.object({ bridgeId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const lights = await ctx.db.query.Devices.findMany({
+      const lights = await ctx.db.query.device.findMany({
         where: and(
           eq(Devices.userId, ctx.auth.userId),
           eq(Devices.protocol, 'hue'),
@@ -201,7 +201,7 @@ export const hueRouter = createTRPCRouter({
   getPairingStatus: protectedProcedure
     .input(z.object({ bridgeId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const bridge = await ctx.db.query.Devices.findFirst({
+      const bridge = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.bridgeId),
           eq(Devices.userId, ctx.auth.userId),
@@ -226,7 +226,7 @@ export const hueRouter = createTRPCRouter({
     .input(z.object({ bridgeId: z.string() }))
     .query(async ({ ctx, input }) => {
       // Verify the bridge exists and belongs to the user
-      const bridge = await ctx.db.query.Devices.findFirst({
+      const bridge = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.bridgeId),
           eq(Devices.userId, ctx.auth.userId),
@@ -246,7 +246,7 @@ export const hueRouter = createTRPCRouter({
    * Get all Hue bridges for the current user
    */
   listBridges: protectedProcedure.query(async ({ ctx }) => {
-    const bridges = await ctx.db.query.Devices.findMany({
+    const bridges = await ctx.db.query.device.findMany({
       where: and(
         eq(Devices.userId, ctx.auth.userId),
         eq(Devices.protocol, 'hue'),
@@ -276,7 +276,7 @@ export const hueRouter = createTRPCRouter({
     .input(z.object({ bridgeId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // Verify the bridge exists and belongs to the user
-      const bridge = await ctx.db.query.Devices.findFirst({
+      const bridge = await ctx.db.query.device.findFirst({
         where: and(
           eq(Devices.id, input.bridgeId),
           eq(Devices.userId, ctx.auth.userId),

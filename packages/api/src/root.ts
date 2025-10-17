@@ -4,7 +4,9 @@ import { authRouter } from './router/auth';
 import { automationRouter, sceneRouter } from './router/automation';
 import { billingRouter } from './router/billing';
 import { deviceRouter } from './router/device';
+import { entityRouter } from './router/entity';
 import { esphomeRouter } from './router/esphome';
+import { homeRouter } from './router/home';
 import { hubRouter } from './router/hub';
 import { hueRouter } from './router/hue';
 import { orgRouter } from './router/org';
@@ -21,7 +23,9 @@ export const appRouter = createTRPCRouter({
   automation: automationRouter,
   billing: billingRouter,
   device: deviceRouter,
+  entity: entityRouter,
   esphome: esphomeRouter,
+  home: homeRouter,
   hub: hubRouter,
   hue: hueRouter,
   org: orgRouter,

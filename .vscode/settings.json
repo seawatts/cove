@@ -2,7 +2,7 @@
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
-  "cSpell.words": ["Omni", "openai"],
+  "cSpell.words": ["automations", "Omni", "openai"],
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit"
   },

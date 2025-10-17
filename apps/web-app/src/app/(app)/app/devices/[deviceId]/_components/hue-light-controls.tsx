@@ -10,51 +10,90 @@ import { Switch } from '@cove/ui/switch';
 import { useEffect, useState } from 'react';
 
 interface HueLightControlsProps {
-  deviceId: string;
-  lightState: {
-    on?: boolean;
-    brightness?: number; // 0-100
-    color_temp?: number; // mireds
-    hue?: number; // 0-65535
-    saturation?: number; // 0-254
+  entities: Array<{
+    entityId: string;
+    kind: string;
+    key: string;
+    name: string;
+    traits: Record<string, unknown>;
+    state?: {
+      state: string;
+      attrs?: Record<string, unknown>;
+      updatedAt: Date;
+    };
+  }>;
+}
+
+export function HueLightControls({ entities }: HueLightControlsProps) {
+  // For Hue, we expect lights to be entities under the bridge device
+  const lights = entities.filter((e) => e.kind === 'light');
+
+  if (lights.length === 0) {
+    return (
+      <Card>
+        <CardContent className="grid gap-4 p-8 items-center justify-center text-center">
+          <Text>No Hue lights found for this device</Text>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="grid gap-4">
+      {lights.map((light) => (
+        <HueLightControl key={light.entityId} light={light} />
+      ))}
+    </div>
+  );
+}
+
+interface HueLightControlProps {
+  light: {
+    entityId: string;
+    key: string;
+    name: string;
+    traits: Record<string, unknown>;
+    state?: {
+      state: string;
+      attrs?: Record<string, unknown>;
+      updatedAt: Date;
+    };
   };
 }
 
-export function HueLightControls({
-  deviceId,
-  lightState,
-}: HueLightControlsProps) {
-  const [isOn, setIsOn] = useState(lightState.on ?? false);
-  const [brightness, setBrightness] = useState(lightState.brightness ?? 100);
-  const [colorTemp, setColorTemp] = useState(lightState.color_temp ?? 366);
-  const [hue, setHue] = useState(
-    lightState.hue ? Math.round((lightState.hue / 65535) * 360) : 0,
-  );
-  const [saturation, setSaturation] = useState(
-    lightState.saturation ? Math.round((lightState.saturation / 254) * 100) : 0,
-  );
+function HueLightControl({ light }: HueLightControlProps) {
+  const [isOn, setIsOn] = useState(false);
+  const [brightness, setBrightness] = useState(100);
+  const [colorTemp, setColorTemp] = useState(366);
+  const [hue, setHue] = useState(0);
+  const [saturation, setSaturation] = useState(0);
 
-  const controlMutation = api.hue.controlLight.useMutation();
+  const controlMutation = api.entity.sendCommand.useMutation();
 
-  // Sync with prop changes
+  // Initialize state from entity
   useEffect(() => {
-    setIsOn(lightState.on ?? false);
-    setBrightness(lightState.brightness ?? 100);
-    setColorTemp(lightState.color_temp ?? 366);
-    if (lightState.hue) {
-      setHue(Math.round((lightState.hue / 65535) * 360));
+    const state = light.state?.state;
+    const attrs = light.state?.attrs || {};
+
+    setIsOn(state === 'on');
+    setBrightness((attrs.brightness as number) || 100);
+    setColorTemp((attrs.color_temp as number) || 366);
+
+    if (attrs.hue !== undefined) {
+      setHue(Math.round(((attrs.hue as number) / 65535) * 360));
     }
-    if (lightState.saturation) {
-      setSaturation(Math.round((lightState.saturation / 254) * 100));
+    if (attrs.sat !== undefined) {
+      setSaturation(Math.round(((attrs.sat as number) / 254) * 100));
     }
-  }, [lightState]);
+  }, [light.state]);
 
   const handleToggle = async (on: boolean) => {
     setIsOn(on);
     try {
       await controlMutation.mutateAsync({
-        command: { on },
-        lightId: deviceId,
+        capability: 'on_off',
+        entityId: light.entityId,
+        value: on,
       });
     } catch (_error) {
       // Revert on error
@@ -68,8 +107,9 @@ export function HueLightControls({
     setBrightness(newBrightness);
     try {
       await controlMutation.mutateAsync({
-        command: { brightness: newBrightness },
-        lightId: deviceId,
+        capability: 'brightness',
+        entityId: light.entityId,
+        value: newBrightness,
       });
     } catch (_error) {
       // Silently fail or show toast
@@ -82,8 +122,9 @@ export function HueLightControls({
     setColorTemp(newTemp);
     try {
       await controlMutation.mutateAsync({
-        command: { colorTemp: newTemp },
-        lightId: deviceId,
+        capability: 'color_temp',
+        entityId: light.entityId,
+        value: newTemp,
       });
     } catch (_error) {
       // Silently fail
@@ -98,8 +139,9 @@ export function HueLightControls({
       const satValue = Math.round((saturation / 100) * 254);
 
       await controlMutation.mutateAsync({
-        command: { hue: hueValue, saturation: satValue },
-        lightId: deviceId,
+        capability: 'color_rgb',
+        entityId: light.entityId,
+        value: { hue: hueValue, saturation: satValue },
       });
     } catch (_error) {
       // Silently fail
@@ -170,15 +212,17 @@ export function HueLightControls({
     <div className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Power</CardTitle>
+          <CardTitle>{light.name}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="power-toggle">Light Power</Label>
+            <Label htmlFor={`power-toggle-${light.entityId}`}>
+              Light Power
+            </Label>
             <Switch
               checked={isOn}
               disabled={controlMutation.isPending}
-              id="power-toggle"
+              id={`power-toggle-${light.entityId}`}
               onCheckedChange={handleToggle}
             />
           </div>

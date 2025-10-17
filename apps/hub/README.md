@@ -1,14 +1,16 @@
 # @cove/hub - Cove Hub Daemon
 
-Core daemon for Cove home automation platform. Runs on Raspberry Pi using Bun runtime.
+Core daemon for Cove home automation platform. Runs on Raspberry Pi using Bun runtime with **Home Assistant++ entity-first architecture**.
 
 ## Features
 
-- **Device Discovery**: Automatic mDNS scanning for smart home devices
-- **Protocol Support**: ESPHome, Matter, Zigbee, and more
-- **Cloud Sync**: Optional Supabase integration for remote access
+- **Entity Discovery**: Automatic discovery of entities within devices (sensors, lights, switches)
+- **Protocol Support**: ESPHome, Hue, Matter, Zigbee, and more
+- **Drizzle ORM**: Type-safe database operations with PostgreSQL/TimescaleDB
+- **Entity State History**: Efficient time-series storage for entity state history
+- **Home-Centric Architecture**: Multi-home support with proper isolation
 - **Health Monitoring**: `/health` and `/info` endpoints
-- **WebSocket API**: Real-time device state updates
+- **WebSocket API**: Real-time entity state updates
 - **Standalone Binary**: Compiles to single executable
 
 ## Quick Start
@@ -58,7 +60,15 @@ HUB_VERSION=0.1.0
 PORT=3100
 HOST=0.0.0.0
 
-# Supabase
+# Database (PostgreSQL/TimescaleDB)
+DATABASE_URL=postgresql://user:password@localhost:5432/cove_hub
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=cove_hub
+DATABASE_USER=user
+DATABASE_PASSWORD=password
+
+# Supabase (for Realtime subscriptions)
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-key
@@ -89,12 +99,13 @@ Returns:
   "uptime": 3600,
   "components": {
     "database": "ok",
-    "supabase": "ok",
-    "discovery": "ok"
+    "discovery": "ok",
+    "adapters": "ok"
   },
   "stats": {
     "devicesConnected": 5,
     "devicesOnline": 4,
+    "entitiesDiscovered": 25,
     "messagesProcessed": 1234,
     "queueLag": 0
   },
@@ -116,17 +127,20 @@ ws://localhost:3100/
 
 Real-time device state updates and command handling.
 
-## ESPHome Native API
+## ESPHome Entity-Aware Integration
 
-The hub connects to ESPHome devices using the **Native API** which uses Protocol Buffers over TCP (port 6053).
+The hub connects to ESPHome devices using the **Native API** and discovers entities within each device.
 
-### Protocol Flow
+### Entity Discovery Flow
 
-1. **Connect**: TCP connection to `device_ip:6053`
-2. **Hello**: Send `HelloRequest` with client info
-3. **Authenticate**: Send `ConnectRequest` with optional password
-4. **Subscribe**: Subscribe to state updates via `SubscribeStatesRequest`
-5. **Control**: Send commands (`SwitchCommandRequest`, `LightCommandRequest`, etc.)
+1. **Device Discovery**: mDNS finds ESPHome device (`_esphomelib._tcp.local.`)
+2. **Connect**: TCP connection to `device_ip:6053`
+3. **Hello**: Send `HelloRequest` with client info
+4. **Authenticate**: Send `ConnectRequest` with optional password
+5. **List Entities**: Request entity list (`ListEntitiesRequest`)
+6. **Create Entities**: Create entity records in database for each discovered entity
+7. **Subscribe**: Subscribe to entity state updates via `SubscribeStatesRequest`
+8. **Control**: Send entity commands (`SwitchCommandRequest`, `LightCommandRequest`, etc.)
 
 ### Apollo Air Integration
 
@@ -134,8 +148,9 @@ For Apollo Air CO₂ sensors:
 1. Device discovered via mDNS (`_esphomelib._tcp.local.`)
 2. Connect to device IP on port 6053
 3. List entities to find CO₂, temperature, humidity sensors
-4. Subscribe to sensor state updates
-5. Stream metrics to `device_metrics` table
+4. Create entity records for each sensor
+5. Subscribe to entity state updates
+6. Stream entity state history to TimescaleDB
 
 ### Protobuf Implementation
 
@@ -160,12 +175,75 @@ See `src/protocols/esphome-native-api.ts` for detailed protocol documentation.
 HubDaemon
 ├── DiscoveryManager
 │   └── MDNSDiscoveryService (discovers devices)
-├── SupabaseSync (cloud sync)
+├── StateManager (entity-first state management)
+├── HubDatabase (Drizzle ORM database layer)
+├── CommandProcessor (entity command handling)
+├── DeviceEventCollector (event logging)
+├── DeviceMetricsCollector (hub metrics as sensor entities)
 └── Protocol Adapters
-    ├── ESPHomeAdapter (Native API via protobuf)
+    ├── ESPHomeAdapter (Entity-aware Native API)
+    ├── HueAdapter (Entity-aware Hue API)
     ├── MatterAdapter (future)
     └── ZigbeeAdapter (future)
 ```
+
+### Home Assistant++ Entity-First Design
+
+The hub uses a **Home Assistant++ entity-first architecture**:
+
+1. **Device Discovery**: mDNS scanning finds devices
+2. **Entity Discovery**: Adapters discover entities within devices
+3. **Entity Creation**: Entities created in database with traits and capabilities
+4. **State Management**: Entity states managed separately from devices
+5. **Command Processing**: Commands target specific entities
+6. **State History**: TimescaleDB stores entity state history efficiently
+7. **Home-Centric**: Multi-home support with proper isolation
+
+### Database Schema Alignment
+
+The hub now uses the standardized schema from `@cove/db`:
+
+- **`home`**: Home instances with timezone and address
+- **`device`**: Physical devices (hub, sensors, lights, etc.)
+- **`entity`**: Logical entities within devices (sensors, lights, switches)
+- **`entityState`**: Current state of each entity
+- **`entityStateHistory`**: Time-series history of entity state changes
+- **`event`**: System events and logs
+- **`eventType`**: Event type definitions
+- **`eventPayload`**: Event payload data
+
+### Metrics as Sensor Entities
+
+Hub metrics are now stored as sensor entities following Home Assistant patterns:
+
+- **CPU Usage**: `sensor.hub_cpu_usage` (%)
+- **Memory Usage**: `sensor.hub_memory_used` (MB)
+- **Memory Total**: `sensor.hub_memory_total` (MB)
+- **Memory Free**: `sensor.hub_memory_free` (MB)
+- **Memory Percent**: `sensor.hub_memory_percent` (%)
+- **Uptime**: `sensor.hub_uptime` (seconds)
+- **Connected Devices**: `sensor.hub_connected_devices` (count)
+- **Active Protocols**: `sensor.hub_active_protocols` (count)
+
+Each metric is stored as both current state and state history, enabling time-series analysis and monitoring.
+
+### Migration from SupabaseSync
+
+The hub has been migrated from the old `SupabaseSync` architecture to the new `HubDatabase` layer:
+
+- **Drizzle ORM**: Type-safe database operations replacing raw Supabase client calls
+- **Schema Alignment**: All table names and field names now match `@cove/db/schema.ts`
+- **Home-Centric**: Removed organization/user-centric references, now uses home-based organization
+- **Entity-First**: All state management now revolves around entities rather than devices
+- **Type Safety**: Proper TypeScript types throughout using `@cove/db/types`
+
+### Missing Schema Elements
+
+Some schema elements are documented in `SCHEMA_TODO.md` and will be added in future iterations:
+
+- **`commands` table**: For entity command processing and queuing
+- **`protocol` field**: On device table for protocol identification
+- **Additional entity traits**: For automation and advanced capabilities
 
 ## Development Notes
 

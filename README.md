@@ -13,16 +13,25 @@ Cove is a modern, self-hosted home automation platform that brings together:
 
 ## Architecture
 
+Cove uses a **Home Assistant-inspired entity-first architecture** that provides better scalability and flexibility:
+
+### Entity-First Design
+- **Devices**: Physical hardware (ESPHome devices, Hue bridges, etc.)
+- **Entities**: Capabilities within devices (sensors, lights, switches)
+- **State Management**: Entity-centric state with TimescaleDB for historical data
+- **Protocol Adapters**: Entity-aware adapters for ESPHome, Hue, Matter, etc.
+
 ### Hub (Raspberry Pi)
 - **Bun Runtime**: Fast, modern TypeScript execution
-- **Device Discovery**: Automatic mDNS scanning for compatible devices
-- **Protocol Support**: ESPHome, Matter, Zigbee, Z-Wave, and more
-- **Local API**: WebSocket and REST for real-time control
+- **Entity Discovery**: Automatic discovery of entities within devices
+- **Protocol Support**: ESPHome, Hue, Matter, Zigbee, and more
+- **TimescaleDB**: Efficient time-series storage for state history
+- **Local API**: WebSocket and REST for real-time entity control
 
 ### Cloud (Supabase)
-- **Device Sync**: Keep device states synchronized across clients
+- **Entity Sync**: Keep entity states synchronized across clients
 - **User Management**: Secure authentication with Clerk
-- **Real-time Updates**: Instant device state changes
+- **Real-time Updates**: Instant entity state changes
 - **Optional**: Works offline, cloud enhances experience
 
 ### Apps
@@ -61,16 +70,16 @@ bun dev:next
 ```
 apps/
   web-app/          # Next.js 15 PWA control panel
+  hub/              # Core hub daemon (Bun runtime)
   expo/             # React Native mobile app (future)
   ios/              # Native iOS app
 
 packages/
-  hub/              # Core hub daemon (Bun runtime)
-  device-protocols/ # ESPHome, Matter, Zigbee adapters
+  db/               # Drizzle ORM + TimescaleDB schemas
+  api/              # tRPC API layer (entity-focused)
+  protocols/        # ESPHome, Hue, Matter adapters
+  types/            # Shared TypeScript types (entity-first)
   discovery/        # mDNS device discovery
-  types/            # Shared TypeScript types
-  db/               # Drizzle ORM + Supabase schemas
-  api/              # tRPC API layer
   ui/               # shadcn/ui components
 ```
 
@@ -133,11 +142,13 @@ vercel --prod
 
 ### Phase 1 (Current)
 - [x] Project structure and architecture
-- [x] Database schemas
-- [ ] Hub daemon core
-- [ ] mDNS discovery
-- [ ] ESPHome integration
-- [ ] Web UI basics
+- [x] Entity-first database schemas (TimescaleDB)
+- [x] Hub daemon core with entity discovery
+- [x] mDNS discovery
+- [x] ESPHome integration (entity-aware)
+- [x] Hue integration (entity-aware)
+- [x] Web UI with entity display
+- [x] Entity state history and widgets
 
 ### Phase 2
 - [ ] Device control UI
@@ -161,7 +172,7 @@ vercel --prod
 
 - **Runtime**: Bun (hub daemon)
 - **Framework**: Next.js 15, React 19
-- **Database**: Supabase (PostgreSQL + Realtime)
+- **Database**: Supabase (PostgreSQL + Realtime) + TimescaleDB
 - **ORM**: Drizzle
 - **API**: tRPC v11
 - **Auth**: Clerk

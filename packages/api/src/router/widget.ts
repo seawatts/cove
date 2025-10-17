@@ -1,5 +1,4 @@
 import { and } from '@cove/db';
-import { WidgetPreferences } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';

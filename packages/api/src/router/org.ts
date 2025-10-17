@@ -1,5 +1,5 @@
 import { eq } from '@cove/db';
-import { ApiKeys, OrgMembers, Orgs } from '@cove/db/schema';
+import { apiKeys, orgMembers, Orgs } from '@cove/db/schema';
 import { z } from 'zod';
 import { createOrg } from '../services/org-service';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
@@ -14,7 +14,7 @@ export const orgRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       // First check if the user already has access to an organization with this name
-      const existingOrgWithAccess = await ctx.db.query.Orgs.findFirst({
+      const existingOrgWithAccess = await ctx.db.query.orgs.findFirst({
         where: eq(Orgs.name, input.name),
         with: {
           orgMembers: {
@@ -34,7 +34,7 @@ export const orgRouter = createTRPCRouter({
         };
       }
 
-      const existingOrg = await ctx.db.query.Orgs.findFirst({
+      const existingOrg = await ctx.db.query.orgs.findFirst({
         where: eq(Orgs.name, input.name),
       });
 
@@ -51,7 +51,7 @@ export const orgRouter = createTRPCRouter({
     }),
   current: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.auth.orgId) throw new Error('Organization ID is required');
-    return ctx.db.query.Orgs.findFirst({
+    return ctx.db.query.orgs.findFirst({
       where: eq(Orgs.id, ctx.auth.orgId),
     });
   }),
@@ -73,7 +73,7 @@ export const orgRouter = createTRPCRouter({
       if (!ctx.auth.orgId) throw new Error('Organization ID is required');
 
       // Check if organization name already exists
-      const existingOrg = await ctx.db.query.Orgs.findFirst({
+      const existingOrg = await ctx.db.query.orgs.findFirst({
         where: eq(Orgs.name, input.name),
       });
 
@@ -108,12 +108,12 @@ export const orgRouter = createTRPCRouter({
       }
 
       try {
-        const existingOrg = await ctx.db.query.Orgs.findFirst({
+        const existingOrg = await ctx.db.query.orgs.findFirst({
           where: eq(Orgs.name, input.name),
         });
 
         if (existingOrg) {
-          const apiKey = await ctx.db.query.ApiKeys.findFirst({
+          const apiKey = await ctx.db.query.apiKeys.findFirst({
             where: eq(ApiKeys.orgId, existingOrg.id),
           });
           return {

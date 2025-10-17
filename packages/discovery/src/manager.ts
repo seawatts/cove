@@ -73,6 +73,10 @@ export class DiscoveryManager {
     return this.running;
   }
 
+  isActive(): boolean {
+    return this.running;
+  }
+
   getDiscoveredDevices(): DeviceDiscovery[] {
     const allDevices: DeviceDiscovery[] = [];
 

@@ -1,1107 +1,729 @@
 import { createId } from '@cove/id';
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import {
   type AnyPgColumn,
+  bigint,
+  bigserial,
   boolean,
   index,
+  inet,
   integer,
-  json,
+  jsonb,
   pgEnum,
   pgTable,
-  primaryKey,
-  real,
+  smallint,
   text,
   timestamp,
   unique,
-  varchar,
 } from 'drizzle-orm/pg-core';
-import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
-import { z } from 'zod';
 
-// Helper function to get user ID from Clerk JWT
-const requestingUserId = () => sql`requesting_user_id()`;
-
-// Helper function to get org ID from Clerk JWT
-const requestingOrgId = () => sql`requesting_org_id()`;
-
-export const userRoleEnum = pgEnum('userRole', ['admin', 'superAdmin', 'user']);
-export const localConnectionStatusEnum = pgEnum('localConnectionStatus', [
-  'connected',
-  'disconnected',
+// ===================================
+// Enums
+// ===================================
+export const userRole = pgEnum('userRole', [
+  'OWNER',
+  'ADULT',
+  'CHILD',
+  'GUEST',
+  'SERVICE',
 ]);
-export const stripeSubscriptionStatusEnum = pgEnum('stripeSubscriptionStatus', [
-  'active',
-  'canceled',
-  'incomplete',
-  'incomplete_expired',
-  'past_due',
-  'paused',
-  'trialing',
-  'unpaid',
+export const homeMode = pgEnum('homeMode', [
+  'HOME',
+  'AWAY',
+  'SLEEP',
+  'VACATION',
+  'GUEST',
+  'CUSTOM',
 ]);
 
-export const apiKeyUsageTypeEnum = pgEnum('apiKeyUsageType', ['mcp-server']);
+// ===================================
+// User & Home Management
+// ===================================
 
-export const UserRoleType = z.enum(userRoleEnum.enumValues).enum;
-export const LocalConnectionStatusType = z.enum(
-  localConnectionStatusEnum.enumValues,
-).enum;
-export const StripeSubscriptionStatusType = z.enum(
-  stripeSubscriptionStatusEnum.enumValues,
-).enum;
-export const ApiKeyUsageTypeType = z.enum(apiKeyUsageTypeEnum.enumValues).enum;
-
-export const Users = pgTable('user', {
-  avatarUrl: text('avatarUrl'),
-  clerkId: text('clerkId').unique().notNull(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  email: text('email').notNull(),
-  firstName: text('firstName'),
-  id: varchar('id', { length: 128 }).notNull().primaryKey(),
-  lastLoggedInAt: timestamp('lastLoggedInAt', {
-    mode: 'date',
-    withTimezone: true,
-  }),
-  lastName: text('lastName'),
-  online: boolean('online').default(false).notNull(),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-});
-
-export const UsersRelations = relations(Users, ({ many }) => ({
-  apiKeys: many(ApiKeys),
-  apiKeyUsage: many(ApiKeyUsage),
-  authCodes: many(AuthCodes),
-  orgMembers: many(OrgMembers),
-}));
-
-export type UserType = typeof Users.$inferSelect;
-
-export const CreateUserSchema = createInsertSchema(Users).omit({
-  createdAt: true,
-  id: true,
-  updatedAt: true,
-});
-
-export const Orgs = pgTable('orgs', {
-  clerkOrgId: text('clerkOrgId').unique().notNull(),
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).defaultNow(),
-  createdByUserId: varchar('createdByUserId')
-    .references(() => Users.id, {
-      onDelete: 'cascade',
-    })
-    .notNull(),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'org' }))
+export const home = pgTable('home', {
+  address: jsonb('address'),
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdBy: text('createdBy').references((): AnyPgColumn => users.id),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'home' }))
     .notNull()
     .primaryKey(),
-  name: text('name').notNull().unique(),
-  // Stripe fields
-  stripeCustomerId: text('stripeCustomerId'),
-  stripeSubscriptionId: text('stripeSubscriptionId'),
-  stripeSubscriptionStatus: stripeSubscriptionStatusEnum(
-    'stripeSubscriptionStatus',
-  ),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
+  name: text('name').notNull(),
+  timezone: text('timezone').notNull().default('America/Los_Angeles'),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
-export type OrgType = typeof Orgs.$inferSelect;
+// ===================================
+// Topology: floors / rooms / devices / entities
+// ===================================
 
-export const updateOrgSchema = createInsertSchema(Orgs).omit({
-  createdAt: true,
-  createdByUserId: true,
-  id: true,
-  updatedAt: true,
-});
-
-export const OrgsRelations = relations(Orgs, ({ one, many }) => ({
-  apiKeys: many(ApiKeys),
-  apiKeyUsage: many(ApiKeyUsage),
-  authCodes: many(AuthCodes),
-  createdByUser: one(Users, {
-    fields: [Orgs.createdByUserId],
-    references: [Users.id],
-  }),
-  orgMembers: many(OrgMembers),
-}));
-
-// Company Members Table
-export const OrgMembers = pgTable(
-  'orgMembers',
+export const floor = pgTable(
+  'floor',
   {
-    createdAt: timestamp('createdAt', {
-      mode: 'date',
-      withTimezone: true,
-    }).defaultNow(),
-    id: varchar('id', { length: 128 })
-      .$defaultFn(() => createId({ prefix: 'member' }))
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'floor' }))
       .notNull()
       .primaryKey(),
-    orgId: varchar('orgId')
-      .references(() => Orgs.id, {
-        onDelete: 'cascade',
-      })
-      .notNull()
-      .default(requestingOrgId()),
-    role: userRoleEnum('role').default('user').notNull(),
-    updatedAt: timestamp('updatedAt', {
-      mode: 'date',
-      withTimezone: true,
-    }).$onUpdateFn(() => new Date()),
-    userId: varchar('userId')
-      .references(() => Users.id, {
-        onDelete: 'cascade',
-      })
-      .notNull()
-      .default(requestingUserId()),
+    level: integer('index').notNull(),
+    name: text('name'),
   },
-  (table) => [
-    // Unique constraint for userId and orgId combination
-    unique('orgMembers_userId_orgId_unique').on(table.userId, table.orgId),
-  ],
+  (t) => [unique('floorUnique').on(t.homeId, t.level)],
 );
 
-export type OrgMembersType = typeof OrgMembers.$inferSelect & {
-  user?: UserType;
-  org?: OrgType;
-};
-
-export const OrgMembersRelations = relations(OrgMembers, ({ one }) => ({
-  org: one(Orgs, {
-    fields: [OrgMembers.orgId],
-    references: [Orgs.id],
-  }),
-  user: one(Users, {
-    fields: [OrgMembers.userId],
-    references: [Users.id],
-  }),
-}));
-
-export const AuthCodes = pgTable('authCodes', {
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
-  expiresAt: timestamp('expiresAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .$defaultFn(() => new Date(Date.now() + 1000 * 60 * 30)) // 30 minutes
-    .notNull(),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'ac' }))
-    .notNull()
-    .primaryKey(),
-  orgId: varchar('orgId')
-    .references(() => Orgs.id, {
-      onDelete: 'cascade',
-    })
-    .notNull()
-    .default(requestingOrgId()),
-  sessionId: text('sessionId').notNull(),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-  usedAt: timestamp('usedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }),
-  userId: varchar('userId')
-    .references(() => Users.id, {
-      onDelete: 'cascade',
-    })
-    .notNull()
-    .default(requestingUserId()),
-});
-
-export type AuthCodeType = typeof AuthCodes.$inferSelect;
-
-export const AuthCodesRelations = relations(AuthCodes, ({ one }) => ({
-  org: one(Orgs, {
-    fields: [AuthCodes.orgId],
-    references: [Orgs.id],
-  }),
-  user: one(Users, {
-    fields: [AuthCodes.userId],
-    references: [Users.id],
-  }),
-}));
-
-// API Keys Table
-export const ApiKeys = pgTable('apiKeys', {
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
-  expiresAt: timestamp('expiresAt', {
-    mode: 'date',
-    withTimezone: true,
-  }),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'ak' }))
-    .notNull()
-    .primaryKey(),
-  isActive: boolean('isActive').notNull().default(true),
-  key: text('key')
-    .notNull()
-    .unique()
-    .$defaultFn(() => createId({ prefix: 'usk', prefixSeparator: '-live-' })),
-  lastUsedAt: timestamp('lastUsedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }),
-  name: text('name').notNull(),
-  orgId: varchar('orgId')
-    .references(() => Orgs.id, {
-      onDelete: 'cascade',
-    })
-    .notNull()
-    .default(requestingOrgId()),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-  userId: varchar('userId')
-    .references(() => Users.id, {
-      onDelete: 'cascade',
-    })
-    .notNull()
-    .default(requestingUserId()),
-});
-
-export type ApiKeyType = typeof ApiKeys.$inferSelect;
-
-export const CreateApiKeySchema = createInsertSchema(ApiKeys).omit({
-  createdAt: true,
-  id: true,
-  lastUsedAt: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const UpdateApiKeySchema = createUpdateSchema(ApiKeys).omit({
-  createdAt: true,
-  id: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const ApiKeysRelations = relations(ApiKeys, ({ one, many }) => ({
-  org: one(Orgs, {
-    fields: [ApiKeys.orgId],
-    references: [Orgs.id],
-  }),
-  usage: many(ApiKeyUsage),
-  user: one(Users, {
-    fields: [ApiKeys.userId],
-    references: [Users.id],
-  }),
-}));
-
-// API Key Usage Table
-export const ApiKeyUsage = pgTable('apiKeyUsage', {
-  apiKeyId: varchar('apiKeyId', { length: 128 })
-    .references(() => ApiKeys.id, {
-      onDelete: 'cascade',
-    })
-    .notNull(),
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'aku' }))
-    .notNull()
-    .primaryKey(),
-  // Generic metadata for different usage types
-  metadata: json('metadata').$type<Record<string, unknown>>(),
-  orgId: varchar('orgId')
-    .references(() => Orgs.id, {
-      onDelete: 'cascade',
-    })
-    .notNull()
-    .default(requestingOrgId()),
-  type: apiKeyUsageTypeEnum('type').notNull(),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-  userId: varchar('userId')
-    .references(() => Users.id, {
-      onDelete: 'cascade',
-    })
-    .notNull()
-    .default(requestingUserId()),
-});
-
-export type ApiKeyUsageType = typeof ApiKeyUsage.$inferSelect;
-
-export const CreateApiKeyUsageSchema = createInsertSchema(ApiKeyUsage).omit({
-  createdAt: true,
-  id: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const ApiKeyUsageRelations = relations(ApiKeyUsage, ({ one }) => ({
-  apiKey: one(ApiKeys, {
-    fields: [ApiKeyUsage.apiKeyId],
-    references: [ApiKeys.id],
-  }),
-  org: one(Orgs, {
-    fields: [ApiKeyUsage.orgId],
-    references: [Orgs.id],
-  }),
-  user: one(Users, {
-    fields: [ApiKeyUsage.userId],
-    references: [Users.id],
-  }),
-}));
-
-// ShortUrls table removed - not needed for home automation
-
-// ===================================
-// Home Automation Tables
-// ===================================
-
-// Enums for home automation
-export const deviceTypeEnum = pgEnum('deviceType', [
-  'light',
-  'switch',
-  'sensor',
-  'thermostat',
-  'lock',
-  'camera',
-  'speaker',
-  'fan',
-  'outlet',
-  'cove_hub', // Our Cove Hub device (the thing running this daemon)
-  'hub', // Other hub devices (Hue Bridge, SmartThings, etc.)
-  'other',
-]);
-
-export const deviceCapabilityEnum = pgEnum('deviceCapability', [
-  'on_off',
-  'brightness',
-  'color_temperature',
-  'color_rgb',
-  'temperature',
-  'humidity',
-  'air_quality',
-  'co2',
-  'pressure',
-  'motion',
-  'occupancy',
-  'contact_sensor',
-  'battery',
-  'power_consumption',
-  'voltage',
-  'lock',
-  'unlock',
-  'audio_volume',
-  'audio_playback',
-  'video_stream',
-  'fan_speed',
-  'heating',
-  'cooling',
-  'target_temperature',
-  'custom',
-]);
-
-export const protocolTypeEnum = pgEnum('protocolType', [
-  'esphome',
-  'hue',
-  'matter',
-  'sonos',
-  'zigbee',
-  'zwave',
-  'wifi',
-  'bluetooth',
-  'mqtt',
-  'http',
-]);
-
-export const eventSeverityEnum = pgEnum('eventSeverity', [
-  'info',
-  'warning',
-  'error',
-  'critical',
-]);
-
-export const eventTypeEnum = pgEnum('eventType', [
-  'hub_started',
-  'hub_stopped',
-  'device_discovered',
-  'device_lost',
-  'device_connected',
-  'device_disconnected',
-  'adapter_initialized',
-  'adapter_error',
-  'adapter_shutdown',
-  'command_processed',
-  'command_failed',
-  'sync_success',
-  'sync_error',
-  'system_error',
-  'config_updated',
-  // Device activity events (user-facing)
-  'state_changed',
-  'lock_accessed',
-  'lock_unlocked',
-  'lock_locked',
-  'motion_detected',
-  'motion_cleared',
-  'camera_stream_started',
-  'camera_stream_stopped',
-  'camera_motion_detected',
-  'sensor_threshold_exceeded',
-  'sensor_threshold_normal',
-  'device_tampered',
-  'battery_low',
-  'battery_critical',
-]);
-
-// Export Zod enums for validation
-export const DeviceTypeEnum = z.enum(deviceTypeEnum.enumValues).enum;
-export const DeviceCapabilityEnum = z.enum(
-  deviceCapabilityEnum.enumValues,
-).enum;
-export const ProtocolTypeEnum = z.enum(protocolTypeEnum.enumValues).enum;
-export const EventSeverityEnum = z.enum(eventSeverityEnum.enumValues).enum;
-export const EventTypeEnum = z.enum(eventTypeEnum.enumValues).enum;
-
-// Export TypeScript types for enum values (single source of truth)
-// Note: DeviceType (table row) is exported below, so we use DeviceTypeValue for the enum
-export type DeviceTypeValue = (typeof deviceTypeEnum.enumValues)[number];
-export type DeviceCapabilityValue =
-  (typeof deviceCapabilityEnum.enumValues)[number];
-export type ProtocolTypeValue = (typeof protocolTypeEnum.enumValues)[number];
-export type EventSeverityValue = (typeof eventSeverityEnum.enumValues)[number];
-export type EventTypeValue = (typeof eventTypeEnum.enumValues)[number];
-
-// Hubs table removed - hubs are now stored in Devices table with deviceType='hub'
-// Hub-specific configuration stored in device config field
-// Other devices reference their managing hub via hubId field (points to hub device ID)
-
-// Rooms Table
-export const Rooms = pgTable('rooms', {
-  automationsEnabled: boolean('automationsEnabled').default(true).notNull(),
-  color: text('color'),
-
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .defaultNow()
-    .notNull(),
-  description: text('description'),
-
-  floor: json('floor').$type<number>(),
-  icon: text('icon'),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'room' }))
-    .notNull()
-    .primaryKey(),
-  name: text('name').notNull(),
-  orgId: varchar('orgId')
-    .references(() => Orgs.id, { onDelete: 'cascade' })
-    .default(requestingOrgId()),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-
-  userId: varchar('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
-    .notNull()
-    .default(requestingUserId()),
-});
-
-export type RoomType = typeof Rooms.$inferSelect;
-export const CreateRoomSchema = createInsertSchema(Rooms).omit({
-  createdAt: true,
-  id: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const RoomsRelations = relations(Rooms, ({ one, many }) => ({
-  devices: many(Devices),
-  org: one(Orgs, {
-    fields: [Rooms.orgId],
-    references: [Orgs.id],
-  }),
-  user: one(Users, {
-    fields: [Rooms.userId],
-    references: [Users.id],
-  }),
-}));
-
-// Devices Table
-export const Devices = pgTable(
-  'devices',
+export const room = pgTable(
+  'room',
   {
-    available: boolean('available').default(true).notNull(),
-
-    capabilities: json('capabilities').$type<string[]>().notNull().default([]),
-    config: json('config')
-      .$type<Record<string, unknown>>()
+    floorId: text('floorId').references(() => floor.id, {
+      onDelete: 'set null',
+    }),
+    homeId: text('homeId')
       .notNull()
-      .default({}),
+      .references(() => home.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'room' }))
+      .notNull()
+      .primaryKey(),
+    name: text('name').notNull(),
+  },
+  (t) => [unique('roomUnique').on(t.homeId, t.name)],
+);
 
-    createdAt: timestamp('createdAt', {
-      mode: 'date',
-      withTimezone: true,
-    })
-      .defaultNow()
-      .notNull(),
-    deviceType: deviceTypeEnum('deviceType').notNull(),
-
-    // External unique identifier for deduplication (protocol-specific)
-    // Examples: "hue_bridge123_light_4", "esphome_livingroom_temp", "matter_abc123"
-    // This is what we use to prevent duplicates, not the database ID
-    externalId: text('externalId').unique().notNull(),
-
-    // Local hostname (e.g., "Sonos-7828CA22AF1C.local", "apollo-air-1.local")
-    host: text('host'),
-
-    // hubId now references another device with deviceType='hub' (self-referential FK)
-    hubId: varchar('hubId', { length: 128 }).references(
-      (): AnyPgColumn => Devices.id,
-      {
-        onDelete: 'cascade',
-      },
-    ),
-    id: varchar('id', { length: 128 })
+export const device = pgTable(
+  'device',
+  {
+    config: jsonb('config').$type<Record<string, unknown>>(),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    id: text('id')
       .$defaultFn(() => createId({ prefix: 'device' }))
       .notNull()
       .primaryKey(),
-
-    ipAddress: text('ipAddress'),
-
-    lastSeen: timestamp('lastSeen', {
-      mode: 'date',
-      withTimezone: true,
-    }),
-    macAddress: text('macAddress'),
-
-    // Device identification (common across all protocols)
-    manufacturer: text('manufacturer'), // e.g., "Philips", "Sonos", "Espressif"
-    model: text('model'), // e.g., "Hue White A19", "One SL", "ESP32"
-
+    ipAddress: inet('ipAddress'),
+    lastSeen: timestamp('lastSeen', { withTimezone: true }),
+    manufacturer: text('manufacturer'),
+    matterNodeId: bigint('matterNodeId', { mode: 'number' }),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>(),
+    model: text('model'),
     name: text('name').notNull(),
-
-    online: boolean('online').default(false).notNull(),
-    orgId: varchar('orgId')
-      .references(() => Orgs.id, { onDelete: 'cascade' })
-      .default(requestingOrgId()),
-    protocol: protocolTypeEnum('protocol'),
-
-    roomId: varchar('roomId', { length: 128 }).references(() => Rooms.id, {
+    online: boolean('online').notNull().default(false),
+    roomId: text('roomId').references(() => room.id, {
       onDelete: 'set null',
     }),
-
-    state: json('state').$type<Record<string, unknown>>().notNull().default({}),
-    updatedAt: timestamp('updatedAt', {
-      mode: 'date',
-      withTimezone: true,
-    }).$onUpdateFn(() => new Date()),
-
-    userId: varchar('userId')
-      .references(() => Users.id, { onDelete: 'cascade' })
-      .default(requestingUserId()),
-
-    // Hub-specific field (only used when deviceType='hub')
-    version: text('version'),
+    state: jsonb('state').$type<Record<string, unknown>>(),
+    swVersion: text('swVersion'),
+    updatedAt: timestamp('updatedAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    viaDeviceId: text('viaDeviceId').references((): AnyPgColumn => device.id, {
+      onDelete: 'set null',
+    }),
   },
-  (table) => [
-    // Index for faster lookups by IP and MAC
-    index('devices_ipAddress_idx').on(table.ipAddress),
-    index('devices_macAddress_idx').on(table.macAddress),
+  (t) => [
+    index('device_homeId_idx').on(t.homeId),
+    index('device_roomId_idx').on(t.roomId),
+    index('device_matterNodeId_idx').on(t.matterNodeId),
+    index('device_updatedAt_idx').on(t.updatedAt),
   ],
 );
 
-export type DeviceType = typeof Devices.$inferSelect;
-export const CreateDeviceSchema = createInsertSchema(Devices).omit({
-  createdAt: true,
-  id: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const DevicesRelations = relations(Devices, ({ one, many }) => ({
-  commands: many(Commands),
-  entities: many(Entities),
-  events: many(Events),
-  // Self-referential: devices managed by this hub (only if this device is a hub)
-  managedDevices: many(Devices, {
-    relationName: 'hubDevices',
-  }),
-  org: one(Orgs, {
-    fields: [Devices.orgId],
-    references: [Orgs.id],
-  }),
-  // Self-referential: the hub device that manages this device
-  parentHub: one(Devices, {
-    fields: [Devices.hubId],
-    references: [Devices.id],
-    relationName: 'hubDevices',
-  }),
-  room: one(Rooms, {
-    fields: [Devices.roomId],
-    references: [Rooms.id],
-  }),
-  stateHistory: many(States),
-  user: one(Users, {
-    fields: [Devices.userId],
-    references: [Users.id],
-  }),
-}));
-
-// States Table (time-series state changes)
-// Replaces DeviceMetrics - follows Home Assistant pattern where all state changes are history
-// Note: For TimescaleDB hypertables, primary key must include partitioning column (lastChanged)
-export const States = pgTable(
-  'states',
+export const entity = pgTable(
+  'entity',
   {
-    attributes: json('attributes').$type<Record<string, unknown>>().default({}),
-    deviceId: varchar('deviceId', { length: 128 })
-      .references(() => Devices.id, { onDelete: 'cascade' })
-      .notNull(),
-    id: varchar('id', { length: 128 })
-      .$defaultFn(() => createId({ prefix: 'state' }))
-      .notNull(),
-
-    // When the state actually changed (different from lastUpdated)
-    // This is the partitioning column for TimescaleDB hypertable
-    lastChanged: timestamp('lastChanged', {
-      mode: 'date',
-      withTimezone: true,
-    })
-      .defaultNow()
-      .notNull(),
-
-    // When this record was written/updated
-    lastUpdated: timestamp('lastUpdated', {
-      mode: 'date',
-      withTimezone: true,
-    })
-      .defaultNow()
-      .notNull(),
-
-    // State value - can be primitive (delta storage) or object (full state)
-    // Delta storage: { state: 280, attributes: { entityName: "CO2", stateKey: "co2" } }
-    // Full state: { state: { co2: 280, temp: 22, ... }, attributes: { ... } }
-    state: json('state').notNull(),
+    deviceId: text('deviceId')
+      .notNull()
+      .references(() => device.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'entity' }))
+      .notNull()
+      .primaryKey(),
+    key: text('key').notNull().unique(), // e.g. 'light.kitchen'
+    kind: text('kind').notNull(), // 'light','sensor','lock',...
+    traits: jsonb('traits').notNull(), // capabilities JSON
   },
-  (table) => [
-    // Index for time-range queries (most common query pattern)
-    index('states_deviceId_lastChanged_idx').on(
-      table.deviceId,
-      table.lastChanged,
-    ),
-    // Composite primary key (required for TimescaleDB hypertable)
-    // Must include partitioning column (lastChanged)
-    primaryKey({ columns: [table.id, table.lastChanged] }),
+  (t) => [
+    index('entity_deviceId_idx').on(t.deviceId),
+    index('entity_kind_idx').on(t.kind),
   ],
 );
 
-export type StateType = typeof States.$inferSelect;
-export const CreateStateSchema = createInsertSchema(States).omit({
-  id: true,
-});
+// ===================================
+// Runtime: latest snapshot
+// ===================================
 
-export const StatesRelations = relations(States, ({ one }) => ({
-  device: one(Devices, {
-    fields: [States.deviceId],
-    references: [Devices.id],
-  }),
-  // Note: events relation removed because TimescaleDB hypertables don't support FK constraints
-  // Events can reference states via stateId, but no automatic relation
-}));
-
-// Legacy export for backwards compatibility
-export const DeviceStateHistory = States;
-export type DeviceStateHistoryType = StateType;
-export const CreateDeviceStateHistorySchema = CreateStateSchema;
-export const DeviceStateHistoryRelations = StatesRelations;
-
-// DeviceMetrics table removed - replaced by DeviceStateHistory
-
-// Entities Table (for ESPHome entity metadata)
-export const Entities = pgTable('entities', {
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  currentValue: json('currentValue'), // Current state value
-  deviceClass: text('deviceClass'),
-  deviceId: varchar('deviceId', { length: 128 })
-    .references(() => Devices.id, { onDelete: 'cascade' })
-    .notNull(),
-
-  // State
-  disabled: boolean('disabled').default(false),
-  effects: json('effects').$type<string[]>(),
-
-  // Entity type and capabilities
-  entityType: text('entityType').notNull(), // 'sensor', 'button', 'number', 'light', 'switch'
-  icon: text('icon'),
-  id: varchar('id', { length: 128 }).primaryKey(),
-
-  // ESPHome entity info
-  key: integer('key').notNull(), // ESPHome entity key
-  maxValue: real('maxValue'),
-
-  // Number-specific
-  minValue: real('minValue'),
-  name: text('name').notNull(), // Display name
-  objectId: text('objectId'), // e.g., "co2", "temperature_offset"
-  step: real('step'),
-
-  // Light-specific
-  supportsBrightness: boolean('supportsBrightness'),
-  supportsColorTemp: boolean('supportsColorTemp'),
-  supportsRgb: boolean('supportsRgb'),
-  uniqueId: text('uniqueId'),
-  unitOfMeasurement: text('unitOfMeasurement'),
-  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
-});
-
-export type EntityType = typeof Entities.$inferSelect;
-export const CreateEntitySchema = createInsertSchema(Entities).omit({
-  createdAt: true,
-  id: true,
-  updatedAt: true,
-});
-
-export const EntitiesRelations = relations(Entities, ({ one }) => ({
-  device: one(Devices, {
-    fields: [Entities.deviceId],
-    references: [Devices.id],
-  }),
-}));
-
-// Commands Table (for hub daemon command queue)
-export const commandStatusEnum = pgEnum('commandStatus', [
-  'pending',
-  'processing',
-  'completed',
-  'failed',
-]);
-
-export const CommandStatusType = z.enum(commandStatusEnum.enumValues).enum;
-
-export const Commands = pgTable('commands', {
-  capability: text('capability').notNull(),
-
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .defaultNow()
-    .notNull(),
-
-  deviceId: varchar('deviceId', { length: 128 })
-    .references(() => Devices.id, { onDelete: 'cascade' })
-    .notNull(),
-  error: text('error'),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'cmd' }))
+export const entityState = pgTable('entityState', {
+  attrs: jsonb('attrs'),
+  entityId: text('entityId')
+    .primaryKey()
+    .references(() => entity.id, { onDelete: 'cascade' }),
+  state: text('state').notNull(),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
     .notNull()
-    .primaryKey(),
-
-  processedAt: timestamp('processedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }),
-
-  status: commandStatusEnum('status').default('pending').notNull(),
-
-  userId: varchar('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
-    .notNull()
-    .default(requestingUserId()),
-  value: json('value').notNull(),
+    .defaultNow(),
 });
 
-export type CommandType = typeof Commands.$inferSelect;
-export const CreateCommandSchema = createInsertSchema(Commands).omit({
-  createdAt: true,
-  id: true,
-  userId: true,
+// ===================================
+// Runtime: history (Timescale hypertable)
+// ===================================
+
+export const entityStateHistory = pgTable(
+  'entityStateHistory',
+  {
+    attrs: jsonb('attrs'),
+    entityId: text('entityId')
+      .notNull()
+      .references(() => entity.id, { onDelete: 'cascade' }),
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    state: text('state').notNull(),
+    ts: timestamp('ts', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    index('entityStateHistory_entityId_ts_idx').on(t.entityId, t.ts.desc()),
+    index('entityStateHistory_homeId_ts_idx').on(t.homeId, t.ts.desc()),
+    index('entityStateHistory_ts_idx').on(t.ts.desc()),
+  ],
+);
+// NOTE: Timescale transforms this table with create_hypertable() in SQL migration.
+
+// ===================================
+// Events (non-state)
+// ===================================
+
+export const eventType = pgTable('eventType', {
+  eventType: text('eventType').notNull().unique(),
+  id: smallint('id').primaryKey().default(1), // serial smallint
 });
 
-export const CommandsRelations = relations(Commands, ({ one }) => ({
-  device: one(Devices, {
-    fields: [Commands.deviceId],
-    references: [Devices.id],
-  }),
-  user: one(Users, {
-    fields: [Commands.userId],
-    references: [Users.id],
-  }),
-}));
-
-// Legacy exports for backwards compatibility
-export const DeviceCommands = Commands;
-export type DeviceCommandType = CommandType;
-export const CreateDeviceCommandSchema = CreateCommandSchema;
-export const DeviceCommandsRelations = CommandsRelations;
-
-// Automations Table
-export const Automations = pgTable('automations', {
-  actions: json('actions').$type<Array<Record<string, unknown>>>().notNull(),
-  conditions: json('conditions')
-    .$type<Array<Record<string, unknown>>>()
-    .notNull()
-    .default([]),
-
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .defaultNow()
-    .notNull(),
-  description: text('description'),
-  enabled: boolean('enabled').default(true).notNull(),
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'auto' }))
-    .notNull()
-    .primaryKey(),
-
-  lastTriggered: timestamp('lastTriggered', {
-    mode: 'date',
-    withTimezone: true,
-  }),
-  name: text('name').notNull(),
-  orgId: varchar('orgId')
-    .references(() => Orgs.id, { onDelete: 'cascade' })
-    .default(requestingOrgId()),
-
-  trigger: json('trigger').$type<Record<string, unknown>>().notNull(),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-
-  userId: varchar('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
-    .notNull()
-    .default(requestingUserId()),
+export const eventPayload = pgTable('eventPayload', {
+  body: jsonb('body').notNull(),
+  hash: bigint('hash', { mode: 'number' }).unique(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 });
 
-export type AutomationType = typeof Automations.$inferSelect;
-export const CreateAutomationSchema = createInsertSchema(Automations).omit({
-  createdAt: true,
-  id: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
+export const event = pgTable(
+  'event',
+  {
+    contextId: text('contextId'),
+    eventTypeId: smallint('eventTypeId')
+      .notNull()
+      .references(() => eventType.id),
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    originIdx: smallint('originIdx'),
+    payloadId: bigint('payloadId', { mode: 'number' }).references(
+      () => eventPayload.id,
+    ),
+    ts: timestamp('ts', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    index('event_homeId_ts_idx').on(t.homeId, t.ts.desc()),
+    index('event_eventTypeId_ts_idx').on(t.eventTypeId, t.ts.desc()),
+    index('event_ts_idx').on(t.ts.desc()),
+  ],
+);
 
-export const AutomationsRelations = relations(Automations, ({ one }) => ({
-  org: one(Orgs, {
-    fields: [Automations.orgId],
-    references: [Orgs.id],
-  }),
-  user: one(Users, {
-    fields: [Automations.userId],
-    references: [Users.id],
-  }),
-}));
+// ===================================
+// Scenes & Automations (versioned)
+// ===================================
 
-// Scenes Table
-export const Scenes = pgTable('scenes', {
-  actions: json('actions').$type<Array<Record<string, unknown>>>().notNull(),
+export const mode = pgTable(
+  'mode',
+  {
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'mode' }))
+      .notNull()
+      .primaryKey(),
+    key: homeMode('key').notNull(),
+    policy: jsonb('policy'),
+  },
+  (t) => [unique('modeUnique').on(t.homeId, t.key)],
+);
 
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .defaultNow()
-    .notNull(),
-  description: text('description'),
-  icon: text('icon'),
-  id: varchar('id', { length: 128 })
+export const scene = pgTable('scene', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdBy: text('createdBy').references(() => users.id),
+  homeId: text('homeId')
+    .notNull()
+    .references(() => home.id, { onDelete: 'cascade' }),
+  id: text('id')
     .$defaultFn(() => createId({ prefix: 'scene' }))
     .notNull()
     .primaryKey(),
-
-  lastActivated: timestamp('lastActivated', {
-    mode: 'date',
-    withTimezone: true,
-  }),
   name: text('name').notNull(),
-  orgId: varchar('orgId')
-    .references(() => Orgs.id, { onDelete: 'cascade' })
-    .default(requestingOrgId()),
-  updatedAt: timestamp('updatedAt', {
-    mode: 'date',
-    withTimezone: true,
-  }).$onUpdateFn(() => new Date()),
-
-  userId: varchar('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
-    .notNull()
-    .default(requestingUserId()),
+  userId: text('userId').references(() => users.id),
 });
 
-export type SceneType = typeof Scenes.$inferSelect;
-export const CreateSceneSchema = createInsertSchema(Scenes).omit({
-  createdAt: true,
-  id: true,
-  orgId: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const ScenesRelations = relations(Scenes, ({ one }) => ({
-  org: one(Orgs, {
-    fields: [Scenes.orgId],
-    references: [Orgs.id],
-  }),
-  user: one(Users, {
-    fields: [Scenes.userId],
-    references: [Users.id],
-  }),
-}));
-
-// Events Table (Activity Feed for ALL devices including hubs)
-// Captures both system diagnostics AND user-facing device activity
-export const Events = pgTable('events', {
-  createdAt: timestamp('createdAt', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .defaultNow()
-    .notNull(),
-
-  deviceId: varchar('deviceId', { length: 128 })
-    .references(() => Devices.id, { onDelete: 'cascade' })
-    .notNull(),
-
-  eventType: eventTypeEnum('eventType').notNull(),
-
-  id: varchar('id', { length: 128 })
-    .$defaultFn(() => createId({ prefix: 'event' }))
-    .notNull()
-    .primaryKey(),
-
-  message: text('message').notNull(),
-
-  metadata: json('metadata').$type<Record<string, unknown>>(),
-
-  severity: eventSeverityEnum('severity').notNull().default('info'),
-
-  // Optional link to state history entry (for state_changed events)
-  // Note: No FK constraint because TimescaleDB hypertables don't support FK constraints pointing to them
-  stateId: varchar('stateId', { length: 128 }),
-
-  timestamp: timestamp('timestamp', {
-    mode: 'date',
-    withTimezone: true,
-  })
-    .defaultNow()
-    .notNull(),
-});
-
-export type EventType = typeof Events.$inferSelect;
-export const CreateEventSchema = createInsertSchema(Events).omit({
-  createdAt: true,
-  id: true,
-});
-
-export const EventsRelations = relations(Events, ({ one }) => ({
-  device: one(Devices, {
-    fields: [Events.deviceId],
-    references: [Devices.id],
-  }),
-  // Note: stateHistory relation removed because TimescaleDB hypertables don't support FK constraints
-  // You can still join manually using stateId, but no automatic relation
-}));
-
-// Widget Preferences Table
-export const WidgetPreferences = pgTable(
-  'widgetPreferences',
+export const sceneVersion = pgTable(
+  'sceneVersion',
   {
-    createdAt: timestamp('createdAt', {
-      mode: 'date',
-      withTimezone: true,
-    })
-      .defaultNow()
-      .notNull(),
-
-    deviceId: varchar('deviceId', { length: 128 })
-      .references(() => Devices.id, { onDelete: 'cascade' })
-      .notNull(),
-    id: varchar('id', { length: 128 })
-      .$defaultFn(() => createId({ prefix: 'widget_pref' }))
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    note: text('note'),
+    sceneId: text('sceneId')
+      .notNull()
+      .references(() => scene.id, { onDelete: 'cascade' }),
+    sceneVersionId: text('sceneVersionId')
+      .$defaultFn(() => createId({ prefix: 'sceneVersion' }))
+      .notNull()
       .primaryKey(),
-
-    sensorKey: varchar('sensorKey', { length: 128 }).notNull(),
-
-    updatedAt: timestamp('updatedAt', {
-      mode: 'date',
-      withTimezone: true,
-    }).$onUpdateFn(() => new Date()),
-
-    userId: varchar('userId', { length: 128 }).notNull(),
-
-    widgetConfig: json('widgetConfig')
-      .$type<Record<string, unknown>>()
-      .default({}),
-
-    widgetType: varchar('widgetType', { length: 50 }).notNull(), // 'chart', 'value_card', 'gauge', 'table', 'radial'
+    steps: jsonb('steps').notNull(), // [{entityId,state,attrs}]
+    version: integer('version').notNull(),
   },
-  (table) => [
-    // Unique constraint: one preference per user/device/sensor combination
-    unique('user_device_sensor_unique').on(
-      table.userId,
-      table.deviceId,
-      table.sensorKey,
-    ),
-  ],
+  (t) => [unique('sceneVersionUnique').on(t.sceneId, t.version)],
 );
 
-export type WidgetPreferenceType = typeof WidgetPreferences.$inferSelect;
-export const CreateWidgetPreferenceSchema = createInsertSchema(
-  WidgetPreferences,
-).omit({
-  createdAt: true,
-  id: true,
-  updatedAt: true,
+export const automation = pgTable('automation', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdBy: text('createdBy').references(() => users.id),
+  enabled: boolean('enabled').notNull().default(true),
+  homeId: text('homeId')
+    .notNull()
+    .references(() => home.id, { onDelete: 'cascade' }),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'automation' }))
+    .notNull()
+    .primaryKey(),
+  lastActivated: timestamp('lastActivated', { withTimezone: true }),
+  name: text('name').notNull(),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  userId: text('userId').references(() => users.id),
 });
 
-export const WidgetPreferencesRelations = relations(
-  WidgetPreferences,
+export const automationVersion = pgTable(
+  'automationVersion',
+  {
+    automationId: text('automationId')
+      .notNull()
+      .references(() => automation.id, { onDelete: 'cascade' }),
+    automationVersionId: text('automationVersionId')
+      .$defaultFn(() => createId({ prefix: 'automationVersion' }))
+      .notNull()
+      .primaryKey(),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    graph: jsonb('graph').notNull(), // typed in TS with Zod; stored as JSONB
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    version: integer('version').notNull(),
+  },
+  (t) => [unique('automationVersionUnique').on(t.automationId, t.version)],
+);
+
+export const automationTrace = pgTable(
+  'automationTrace',
+  {
+    automationId: text('automationId')
+      .notNull()
+      .references(() => automation.id, { onDelete: 'cascade' }),
+    finishedAt: timestamp('finishedAt', { withTimezone: true }),
+    homeId: text('homeId')
+      .notNull()
+      .references(() => home.id, { onDelete: 'cascade' }),
+    runId: text('runId')
+      .$defaultFn(() => createId({ prefix: 'run' }))
+      .notNull(),
+    spans: jsonb('spans'),
+    startedAt: timestamp('startedAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    status: text('status').notNull().default('running'),
+    traceId: text('traceId')
+      .$defaultFn(() => createId({ prefix: 'trace' }))
+      .notNull()
+      .primaryKey(),
+    version: integer('version').notNull(),
+  },
+  (t) => [unique('traceIdUnique').on(t.traceId)],
+);
+
+// ===================================
+// User Management
+// ===================================
+
+export const users = pgTable('users', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  email: text('email').notNull().unique(),
+  firstName: text('firstName'),
+  homeId: text('homeId').references(() => home.id, {
+    onDelete: 'set null',
+  }),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'user' }))
+    .notNull()
+    .primaryKey(),
+  imageUrl: text('imageUrl'),
+  lastName: text('lastName'),
+  role: userRole('role').notNull().default('ADULT'),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+// ===================================
+// Relations
+// ===================================
+
+export const homeRelations = relations(home, ({ many }) => ({
+  automations: many(automation),
+  devices: many(device),
+  events: many(event),
+  floors: many(floor),
+  modes: many(mode),
+  rooms: many(room),
+  scenes: many(scene),
+  users: many(users),
+}));
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  createdAutomations: many(automation),
+  createdScenes: many(scene),
+  home: one(home, {
+    fields: [users.homeId],
+    references: [home.id],
+  }),
+}));
+
+export const floorRelations = relations(floor, ({ one, many }) => ({
+  home: one(home, {
+    fields: [floor.homeId],
+    references: [home.id],
+  }),
+  rooms: many(room),
+}));
+
+export const roomRelations = relations(room, ({ one, many }) => ({
+  devices: many(device),
+  floor: one(floor, {
+    fields: [room.floorId],
+    references: [floor.id],
+  }),
+  home: one(home, {
+    fields: [room.homeId],
+    references: [home.id],
+  }),
+}));
+
+export const deviceRelations = relations(device, ({ one, many }) => ({
+  entities: many(entity),
+  home: one(home, {
+    fields: [device.homeId],
+    references: [home.id],
+  }),
+  room: one(room, {
+    fields: [device.roomId],
+    references: [room.id],
+  }),
+  viaDevice: one(device, {
+    fields: [device.viaDeviceId],
+    references: [device.id],
+    relationName: 'viaDevice',
+  }),
+}));
+
+export const entityRelations = relations(entity, ({ one, many }) => ({
+  device: one(device, {
+    fields: [entity.deviceId],
+    references: [device.id],
+  }),
+  state: one(entityState),
+  stateHistory: many(entityStateHistory),
+}));
+
+export const entityStateRelations = relations(entityState, ({ one }) => ({
+  entity: one(entity, {
+    fields: [entityState.entityId],
+    references: [entity.id],
+  }),
+}));
+
+export const entityStateHistoryRelations = relations(
+  entityStateHistory,
   ({ one }) => ({
-    device: one(Devices, {
-      fields: [WidgetPreferences.deviceId],
-      references: [Devices.id],
+    entity: one(entity, {
+      fields: [entityStateHistory.entityId],
+      references: [entity.id],
     }),
   }),
 );
 
-// Legacy exports for backwards compatibility
-export const DeviceEvents = Events;
-export type DeviceEventType = EventType;
-export const CreateDeviceEventSchema = CreateEventSchema;
-export const DeviceEventsRelations = EventsRelations;
+export const eventTypeRelations = relations(eventType, ({ many }) => ({
+  events: many(event),
+}));
+
+export const eventPayloadRelations = relations(eventPayload, ({ many }) => ({
+  events: many(event),
+}));
+
+export const eventRelations = relations(event, ({ one }) => ({
+  eventType: one(eventType, {
+    fields: [event.eventTypeId],
+    references: [eventType.id],
+  }),
+  home: one(home, {
+    fields: [event.homeId],
+    references: [home.id],
+  }),
+  payload: one(eventPayload, {
+    fields: [event.payloadId],
+    references: [eventPayload.id],
+  }),
+}));
+
+export const modeRelations = relations(mode, ({ one }) => ({
+  home: one(home, {
+    fields: [mode.id],
+    references: [home.id],
+  }),
+}));
+
+export const sceneRelations = relations(scene, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [scene.createdBy],
+    references: [users.id],
+  }),
+  home: one(home, {
+    fields: [scene.homeId],
+    references: [home.id],
+  }),
+  versions: many(sceneVersion),
+}));
+
+export const sceneVersionRelations = relations(sceneVersion, ({ one }) => ({
+  scene: one(scene, {
+    fields: [sceneVersion.sceneId],
+    references: [scene.id],
+  }),
+}));
+
+export const automationRelations = relations(automation, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [automation.createdBy],
+    references: [users.id],
+  }),
+  home: one(home, {
+    fields: [automation.homeId],
+    references: [home.id],
+  }),
+  traces: many(automationTrace),
+  versions: many(automationVersion),
+}));
+
+export const automationVersionRelations = relations(
+  automationVersion,
+  ({ one }) => ({
+    automation: one(automation, {
+      fields: [automationVersion.automationId],
+      references: [automation.id],
+    }),
+  }),
+);
+
+// ===================================
+// API & Organization Management
+// ===================================
+
+export const orgs = pgTable('orgs', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'org' }))
+    .notNull()
+    .primaryKey(),
+  name: text('name').notNull(),
+  stripeCustomerId: text('stripeCustomerId'),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const orgMembers = pgTable('orgMembers', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'org_member' }))
+    .notNull()
+    .primaryKey(),
+  orgId: text('orgId')
+    .notNull()
+    .references(() => orgs.id, { onDelete: 'cascade' }),
+  role: text('role').notNull().default('MEMBER'),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+});
+
+export const apiKeys = pgTable('apiKeys', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'api_key' }))
+    .notNull()
+    .primaryKey(),
+  isActive: boolean('isActive').notNull().default(true),
+  key: text('key').notNull().unique(),
+  lastUsedAt: timestamp('lastUsedAt', { withTimezone: true }),
+  name: text('name').notNull(),
+  orgId: text('orgId')
+    .notNull()
+    .references(() => orgs.id, { onDelete: 'cascade' }),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const apiKeyUsage = pgTable('apiKeyUsage', {
+  apiKeyId: text('apiKeyId')
+    .notNull()
+    .references(() => apiKeys.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  endpoint: text('endpoint').notNull(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'api_key_usage' }))
+    .notNull()
+    .primaryKey(),
+  method: text('method').notNull(),
+  orgId: text('orgId')
+    .notNull()
+    .references(() => orgs.id, { onDelete: 'cascade' }),
+  timestamp: timestamp('timestamp', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  type: text('type').notNull().default('api'),
+});
+
+export const authCodes = pgTable('authCodes', {
+  code: text('code').notNull().unique(),
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  expiresAt: timestamp('expiresAt', { withTimezone: true }).notNull(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'auth_code' }))
+    .notNull()
+    .primaryKey(),
+  orgId: text('orgId').references(() => orgs.id, { onDelete: 'cascade' }),
+  sessionId: text('sessionId'),
+  usedAt: timestamp('usedAt', { withTimezone: true }),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+});
+
+export const widgetPreferences = pgTable('widgetPreferences', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'widget_pref' }))
+    .notNull()
+    .primaryKey(),
+  preferences: jsonb('preferences').notNull(),
+  updatedAt: timestamp('updatedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  widgetType: text('widgetType').notNull(),
+});
+
+export const automationTraceRelations = relations(
+  automationTrace,
+  ({ one }) => ({
+    automation: one(automation, {
+      fields: [automationTrace.automationId],
+      references: [automation.id],
+    }),
+  }),
+);
+
+// ===================================
+// Stub Tables for API Compatibility
+// ===================================
+
+export const deviceCommands = pgTable('deviceCommands', {
+  command: text('command').notNull(),
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  deviceId: text('deviceId').references(() => device.id),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'cmd' }))
+    .notNull()
+    .primaryKey(),
+});
+
+export const commands = pgTable('commands', {
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  id: text('id')
+    .$defaultFn(() => createId({ prefix: 'cmd' }))
+    .notNull()
+    .primaryKey(),
+  name: text('name').notNull(),
+});
+
+// ===================================
+// Type Exports for API Package
+// ===================================
+
+export type ApiKeyType = typeof apiKeys.$inferSelect;
+export type OrgType = typeof orgs.$inferSelect;
+export type OrgMembersType = typeof orgMembers.$inferSelect;
+export type UserType = typeof users.$inferSelect;
+
+// ===================================
+// Zod Schema Exports
+// ===================================
+
+import { createInsertSchema } from 'drizzle-zod';
+
+export const CreateApiKeySchema = createInsertSchema(apiKeys).omit({
+  createdAt: true,
+  id: true,
+});
+export const CreateApiKeyUsageSchema = createInsertSchema(apiKeyUsage).omit({
+  id: true,
+});
+export const CreateUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+  id: true,
+});

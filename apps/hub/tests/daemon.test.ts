@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { HubDaemon } from '../src/daemon';
 
-// Skip Supabase calls in tests
+// Skip database calls in tests
 process.env.SKIP_ENV_VALIDATION = 'true';
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321';
 process.env.SUPABASE_ANON_KEY = 'test-key';
@@ -29,11 +29,11 @@ describe('Hub Daemon', () => {
   it('should start and stop correctly', async () => {
     expect(daemon.isRunning()).toBe(false);
 
-    // Start daemon (will fail to connect to Supabase but that's ok for tests)
+    // Start daemon (will fail to connect to database but that's ok for tests)
     try {
       await daemon.start();
     } catch {
-      // Expected to fail without real Supabase connection
+      // Expected to fail without real database connection
     }
 
     // Stop daemon
@@ -47,5 +47,21 @@ describe('Hub Daemon', () => {
 
     expect(hubId).toBeDefined();
     expect(hubId.length).toBeGreaterThan(0);
+  });
+
+  it('should report correct status', () => {
+    const status = daemon.getStatus();
+
+    expect(status).toBeDefined();
+    expect(status.running).toBe(false);
+    expect(status.hubId).toBe('test-hub-id');
+    expect(status.databaseConnected).toBe(false);
+    expect(status.discoveryActive).toBe(false);
+    expect(Array.isArray(status.adapters)).toBe(true);
+  });
+
+  it('should handle device discovery', () => {
+    const discoveredDevices = daemon.getDiscoveredDevices();
+    expect(Array.isArray(discoveredDevices)).toBe(true);
   });
 });

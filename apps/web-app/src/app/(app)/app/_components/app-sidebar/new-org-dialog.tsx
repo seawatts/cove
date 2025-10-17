@@ -3,11 +3,7 @@
 import { useOrganizationList, useUser } from '@clerk/nextjs';
 import { MetricButton, MetricLink } from '@cove/analytics/components';
 import { api } from '@cove/api/react';
-import {
-  Entitled,
-  NotEntitled,
-  useIsEntitled,
-} from '@cove/stripe/guards/client';
+
 import { Button } from '@cove/ui/components/button';
 import { P } from '@cove/ui/custom/typography';
 import {
@@ -38,7 +34,6 @@ export function NewOrgDialog({ open, onOpenChange }: NewOrgDialogProps) {
 
   const [errors, setErrors] = useState<string[]>([]);
   const { user } = useUser();
-  const isEntitled = useIsEntitled('unlimited_developers');
 
   // Webhook name validation state
   const [webhookNameValidation, setWebhookNameValidation] = useState<{
@@ -214,7 +209,7 @@ export function NewOrgDialog({ open, onOpenChange }: NewOrgDialogProps) {
             </Label>
             <Input
               autoFocus
-              disabled={isLoading || !isEntitled}
+              disabled={isLoading}
               id="org-name"
               onChange={(e) => setName(e.target.value)}
               placeholder="Seawatts Inc"
@@ -227,7 +222,7 @@ export function NewOrgDialog({ open, onOpenChange }: NewOrgDialogProps) {
               Webhook Name (Optional)
             </Label>
             <Input
-              disabled={isLoading || !isEntitled}
+              disabled={isLoading}
               id="webhook-id"
               onChange={(e) => setWebhookName(e.target.value)}
               placeholder="production-webhook"
@@ -310,32 +305,28 @@ export function NewOrgDialog({ open, onOpenChange }: NewOrgDialogProps) {
                 Cancel
               </MetricButton>
             </DialogClose>
-            <Entitled entitlement="unlimited_developers">
-              <MetricButton
-                disabled={isLoading || !name}
-                metric="new_org_dialog_create_clicked"
-                type="submit"
+            <MetricButton
+              disabled={isLoading || !name}
+              metric="new_org_dialog_create_clicked"
+              type="submit"
+            >
+              {isLoading && (
+                <IconLoader2 className="text-secondary" size="sm" />
+              )}
+              Create
+            </MetricButton>
+            <Button asChild>
+              <MetricLink
+                href="/app/settings/billing"
+                metric="new_org_dialog_upgrade_clicked"
+                properties={{
+                  destination: '/app/settings/billing',
+                  location: 'new_org_dialog',
+                }}
               >
-                {isLoading && (
-                  <IconLoader2 className="text-secondary" size="sm" />
-                )}
-                Create
-              </MetricButton>
-            </Entitled>
-            <NotEntitled entitlement="unlimited_developers">
-              <Button asChild>
-                <MetricLink
-                  href="/app/settings/billing"
-                  metric="new_org_dialog_upgrade_clicked"
-                  properties={{
-                    destination: '/app/settings/billing',
-                    location: 'new_org_dialog',
-                  }}
-                >
-                  Upgrade to create organizations
-                </MetricLink>
-              </Button>
-            </NotEntitled>
+                Upgrade to create organizations
+              </MetricLink>
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

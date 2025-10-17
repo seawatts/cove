@@ -1,5 +1,5 @@
 import { eq } from '@cove/db';
-import { Automations, Scenes } from '@cove/db/schema';
+import { automation, scene } from '@cove/db/schema';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
@@ -18,21 +18,21 @@ export const automationRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const [automation] = await ctx.db
-        .insert(Automations)
+        .insert(automation)
         .values({
           ...input,
           userId: ctx.auth.userId,
         })
         .returning();
 
-      return automation;
+      return automations;
     }),
 
   // Delete automation
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.delete(Automations).where(eq(Automations.id, input.id));
+      await ctx.db.delete(automation).where(eq(automation.id, input.id));
       return { success: true };
     }),
 
@@ -40,15 +40,15 @@ export const automationRouter = createTRPCRouter({
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.Automations.findFirst({
-        where: eq(Automations.id, input.id),
+      return ctx.db.query.automation.findFirst({
+        where: eq(automation.id, input.id),
       });
     }),
   // List all automations
   list: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.Automations.findMany({
+    return ctx.db.query.automation.findMany({
       orderBy: (automations, { desc }) => [desc(automations.createdAt)],
-      where: eq(Automations.userId, ctx.auth.userId),
+      where: eq(automation.userId, ctx.auth.userId),
     });
   }),
 
@@ -57,9 +57,9 @@ export const automationRouter = createTRPCRouter({
     .input(z.object({ enabled: z.boolean(), id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const [updated] = await ctx.db
-        .update(Automations)
+        .update(automation)
         .set({ enabled: input.enabled })
-        .where(eq(Automations.id, input.id))
+        .where(eq(automation.id, input.id))
         .returning();
 
       return updated;
@@ -73,9 +73,9 @@ export const sceneRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // TODO: Execute scene actions
       const [updated] = await ctx.db
-        .update(Scenes)
+        .update(scene)
         .set({ lastActivated: new Date() })
-        .where(eq(Scenes.id, input.id))
+        .where(eq(scene.id, input.id))
         .returning();
 
       return updated;
@@ -93,28 +93,28 @@ export const sceneRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const [scene] = await ctx.db
-        .insert(Scenes)
+        .insert(scene)
         .values({
           ...input,
           userId: ctx.auth.userId,
         })
         .returning();
 
-      return scene;
+      return scenes;
     }),
 
   // Delete scene
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.delete(Scenes).where(eq(Scenes.id, input.id));
+      await ctx.db.delete(scene).where(eq(scene.id, input.id));
       return { success: true };
     }),
   // List all scenes
   list: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.Scenes.findMany({
+    return ctx.db.query.scene.findMany({
       orderBy: (scenes, { desc }) => [desc(scenes.createdAt)],
-      where: eq(Scenes.userId, ctx.auth.userId),
+      where: eq(scene.userId, ctx.auth.userId),
     });
   }),
 });

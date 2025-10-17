@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "@cove/db": "workspace:*"
+  },
   "description": "Shared TypeScript types for Cove home automation platform",
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
@@ -6,11 +9,8 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./automation": "./src/automation.ts",
-    "./device": "./src/device.ts",
-    "./hub": "./src/hub.ts",
-    "./protocol": "./src/protocol.ts",
-    "./room": "./src/room.ts",
+    "./discovery": "./src/discovery.ts",
+    "./entity": "./src/entity.ts",
     "./widget": "./src/widget.ts"
   },
   "license": "MIT",

@@ -19,7 +19,7 @@ export const hubRouter = createTRPCRouter({
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.Devices.findFirst({
+      return ctx.db.query.device.findFirst({
         where: and(eq(Devices.id, input.id), eq(Devices.deviceType, 'hub')),
         with: {
           managedDevices: true, // Get all devices managed by this hub
@@ -41,7 +41,7 @@ export const hubRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       // Verify this is actually a hub device
-      const hubDevice = await ctx.db.query.Devices.findFirst({
+      const hubDevice = await ctx.db.query.device.findFirst({
         where: and(eq(Devices.id, input.hubId), eq(Devices.deviceType, 'hub')),
       });
 
@@ -90,7 +90,7 @@ export const hubRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       // Get hub device to find its API endpoint
-      const hubDevice = await ctx.db.query.Devices.findFirst({
+      const hubDevice = await ctx.db.query.device.findFirst({
         where: and(eq(Devices.id, input.hubId), eq(Devices.deviceType, 'hub')),
       });
 
@@ -134,7 +134,7 @@ export const hubRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       // Verify this is actually a hub device
-      const hubDevice = await ctx.db.query.Devices.findFirst({
+      const hubDevice = await ctx.db.query.device.findFirst({
         where: and(eq(Devices.id, input.hubId), eq(Devices.deviceType, 'hub')),
       });
 
@@ -171,7 +171,7 @@ export const hubRouter = createTRPCRouter({
 
   // List all hubs for the current user (query devices with deviceType='hub')
   list: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.Devices.findMany({
+    return ctx.db.query.device.findMany({
       orderBy: (devices, { desc }) => [desc(devices.lastSeen)],
       where: and(
         eq(Devices.userId, ctx.auth.userId),
@@ -199,7 +199,7 @@ export const hubRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Fetch existing hub device to merge config
-      const existingHub = await ctx.db.query.Devices.findFirst({
+      const existingHub = await ctx.db.query.device.findFirst({
         where: and(eq(Devices.id, input.id), eq(Devices.deviceType, 'hub')),
       });
 

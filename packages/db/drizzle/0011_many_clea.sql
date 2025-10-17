@@ -1,1 +1,0 @@
-ALTER TYPE "public"."deviceType" ADD VALUE 'cove_hub' BEFORE 'hub';

@@ -4,8 +4,6 @@ import type {
 } from '@clerk/nextjs/server';
 import { posthog } from '@cove/analytics/posthog/server';
 import { db } from '@cove/db/client';
-import { Orgs } from '@cove/db/schema';
-import { PLAN_TYPES, stripe } from '@cove/stripe';
 import { eq } from 'drizzle-orm';
 
 export async function handleOrganizationInvitationAccepted(
@@ -24,7 +22,7 @@ export async function handleOrganizationInvitationAccepted(
   });
 
   // Find the organization in our database
-  const org = await db.query.Orgs.findFirst({
+  const org = await db.query.orgs.findFirst({
     where: eq(Orgs.clerkOrgId, membershipData.organization.id),
   });
 

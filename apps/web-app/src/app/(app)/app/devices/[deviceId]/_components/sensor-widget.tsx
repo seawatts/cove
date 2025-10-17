@@ -100,9 +100,8 @@ export function SensorWidget({ deviceId, sensor }: SensorWidgetProps) {
   });
 
   const userPreference = preferences.find((p) => p.sensorKey === sensor.key);
-  const { data: stateHistory = [] } = api.device.getStateHistory.useQuery({
-    deviceId,
-    stateKey: sensor.key,
+  const { data: stateHistory = [] } = api.entity.getStateHistory.useQuery({
+    entityId: sensor.key, // sensor.key is now the entityId
     timeRange: '24h',
   });
 
@@ -128,7 +127,6 @@ export function SensorWidget({ deviceId, sensor }: SensorWidgetProps) {
 
   const widgetProps: WidgetProps = {
     config: userPreference?.widgetConfig || {},
-    deviceId,
     sensor,
   };
 

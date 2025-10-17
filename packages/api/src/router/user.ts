@@ -1,12 +1,12 @@
 import { eq } from '@cove/db';
-import { CreateUserSchema, Users } from '@cove/db/schema';
+import { CreateUserSchema, } from '@cove/db/schema';
 import { createId } from '@cove/id';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const userRouter = createTRPCRouter({
   all: publicProcedure.query(({ ctx }) => {
-    return ctx.db.query.Users.findMany({
+    return ctx.db.query.users.findMany({
       limit: 10,
     });
   }),
@@ -20,7 +20,7 @@ export const userRouter = createTRPCRouter({
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
-      return ctx.db.query.Users.findFirst({
+      return ctx.db.query.users.findFirst({
         where: eq(Users.id, input.id),
       });
     }),
@@ -34,7 +34,7 @@ export const userRouter = createTRPCRouter({
       return user;
     }),
   current: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.Users.findFirst({
+    return ctx.db.query.users.findFirst({
       where: eq(Users.id, ctx.auth.userId),
     });
   }),

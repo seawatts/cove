@@ -1,10 +1,10 @@
 {
   "dependencies": {
-    "@clerk/chrome-extension": "2.7.4",
+    "@clerk/chrome-extension": "2.7.5",
     "@clerk/nextjs": "catalog:",
     "@cove/logger": "workspace:*",
     "@cove/ui": "workspace:*",
-    "@sentry/nextjs": "10.19.0",
+    "@sentry/nextjs": "10.20.0",
     "@t3-oss/env-core": "catalog:",
     "@t3-oss/env-nextjs": "catalog:",
     "@vercel/analytics": "1.5.0",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
-    "@types/aws-lambda": "8.10.155",
+    "@types/aws-lambda": "8.10.156",
     "@types/chrome": "0.1.24",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

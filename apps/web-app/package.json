@@ -1,13 +1,12 @@
 {
   "dependencies": {
-    "@clerk/elements": "0.23.70",
+    "@clerk/elements": "0.23.71",
     "@clerk/nextjs": "catalog:",
     "@cove/analytics": "workspace:*",
     "@cove/api": "workspace:*",
     "@cove/db": "workspace:*",
     "@cove/id": "workspace:*",
     "@cove/logger": "workspace:*",
-    "@cove/stripe": "workspace:*",
     "@cove/types": "workspace:*",
     "@cove/ui": "workspace:*",
     "@cove/utils": "workspace:*",
@@ -18,7 +17,7 @@
     "@hookform/resolvers": "5.2.2",
     "@modelcontextprotocol/sdk": "1.20.0",
     "@number-flow/react": "0.5.10",
-    "@stripe/stripe-js": "8.0.0",
+    "@stripe/stripe-js": "8.1.0",
     "@supabase/ssr": "0.7.0",
     "@t3-oss/env-nextjs": "catalog:",
     "@tabler/icons-react": "3.35.0",

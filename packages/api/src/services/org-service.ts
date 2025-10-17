@@ -11,16 +11,15 @@ import {
 } from '@clerk/nextjs/server';
 import { eq } from '@cove/db';
 import { db } from '@cove/db/client';
-import { ApiKeys, OrgMembers, Orgs, Users } from '@cove/db/schema';
 import { generateRandomName, generateUniqueOrgName } from '@cove/id';
 import {
   BILLING_INTERVALS,
   createSubscription,
   getFreePlanPriceId,
   PLAN_TYPES,
+  type Stripe,
   upsertStripeCustomer,
-} from '@cove/stripe';
-import type Stripe from 'stripe';
+} from '../lib/billing';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -374,14 +373,14 @@ async function findExistingOrg({
       // Check 2: If orgId is provided, check if organization already exists
       orgId
         ? tx.query.Orgs.findFirst({
-            where: eq(Orgs.clerkOrgId, orgId),
-          })
+          where: eq(Orgs.clerkOrgId, orgId),
+        })
         : null,
       // Check 3: User has created any organization
       !orgId
         ? tx.query.Orgs.findFirst({
-            where: eq(Orgs.createdByUserId, userId),
-          })
+          where: eq(Orgs.createdByUserId, userId),
+        })
         : null,
     ]);
 

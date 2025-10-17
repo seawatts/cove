@@ -3,7 +3,6 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { db } from '@cove/db/client';
 import { OrgMembers, Orgs } from '@cove/db/schema';
-import { isEntitled } from '@cove/stripe/guards/server';
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';

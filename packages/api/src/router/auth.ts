@@ -1,7 +1,7 @@
 import { clerkClient } from '@clerk/nextjs/server';
 import { and, eq, gte, isNull } from '@cove/db';
 import { db } from '@cove/db/client';
-import { AuthCodes } from '@cove/db/schema';
+import { authCodes } from '@cove/db/schema';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { upsertOrg } from '../services/org-service';
@@ -19,11 +19,11 @@ export const authRouter = {
       const { code } = input;
 
       const authCode = await db.transaction(async (tx) => {
-        const foundCode = await tx.query.AuthCodes.findFirst({
+        const foundCode = await tx.query.authCodes.findFirst({
           where: and(
-            eq(AuthCodes.id, code),
-            isNull(AuthCodes.usedAt),
-            gte(AuthCodes.expiresAt, new Date()),
+            eq(authCodes.id, code),
+            isNull(authCodes.usedAt),
+            gte(authCodes.expiresAt, new Date()),
           ),
         });
 
@@ -32,11 +32,11 @@ export const authRouter = {
         }
 
         await tx
-          .update(AuthCodes)
+          .update(authCodes)
           .set({
             usedAt: new Date(),
           })
-          .where(eq(AuthCodes.id, code));
+          .where(eq(authCodes.id, code));
 
         return foundCode;
       });

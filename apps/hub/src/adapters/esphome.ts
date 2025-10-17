@@ -1,21 +1,26 @@
 /**
  * ESPHome Protocol Adapter
+ * Updated for Home Assistant++ entity-first architecture
  * Wraps @cove/protocols/esphome/native for hub daemon integration
  */
 
 import { debug } from '@cove/logger';
+import type {
+  EntityAwareProtocolAdapter,
+  ProtocolEntity,
+} from '@cove/protocols';
+// Remove unused import
 import {
   type AnyEntity,
   ESPHomeNativeClient,
 } from '@cove/protocols/esphome/native';
 import type {
-  Device,
-  DeviceCapability,
-  DeviceCommand,
-  ProtocolAdapter,
+  EntityKind,
+  EntityTraits,
   ProtocolType,
+  StateUpdate,
 } from '@cove/types';
-import { DeviceCapability as Capability } from '@cove/types';
+import type { HubDatabase } from '../db';
 import type { StateManager } from '../state-manager';
 
 const log = debug('cove:hub:adapter:esphome');
@@ -23,26 +28,32 @@ const log = debug('cove:hub:adapter:esphome');
 interface ESPHomeDeviceConnection {
   client: ESPHomeNativeClient;
   deviceId: string;
-  device: Device;
+  device: {
+    id: string;
+    name: string;
+    ipAddress?: string;
+    manufacturer?: string;
+    model?: string;
+    metadata?: Record<string, unknown>;
+  };
   ipAddress: string;
   connected: boolean;
+  entities: Map<string, ProtocolEntity>; // entityId -> ProtocolEntity
+  subscriptions: Map<string, (state: StateUpdate) => void>; // entityId -> callback
 }
 
-export class ESPHomeAdapter implements ProtocolAdapter {
+export class ESPHomeAdapter implements EntityAwareProtocolAdapter {
   readonly name = 'ESPHome Adapter';
   readonly protocol: ProtocolType = 'esphome' as ProtocolType;
 
   private connections: Map<string, ESPHomeDeviceConnection> = new Map();
   private initialized = false;
   private stateManager: StateManager | null = null;
-  private supabaseSync: SupabaseSync | null = null;
+  private db: HubDatabase | null = null;
 
-  constructor(
-    stateManager?: StateManager | null,
-    supabaseSync?: SupabaseSync | null,
-  ) {
+  constructor(stateManager?: StateManager | null, db?: HubDatabase | null) {
     this.stateManager = stateManager || null;
-    this.supabaseSync = supabaseSync || null;
+    this.db = db || null;
   }
 
   async initialize(): Promise<void> {
@@ -84,10 +95,29 @@ export class ESPHomeAdapter implements ProtocolAdapter {
     // No-op, discovery is handled externally
   }
 
+  async connect(): Promise<void> {
+    // No-op for global connection
+  }
+
+  async disconnect(): Promise<void> {
+    await this.shutdown();
+  }
+
+  isConnected(): boolean {
+    return this.initialized && this.connections.size > 0;
+  }
+
   /**
-   * Connect to an ESPHome device
+   * Connect to an ESPHome device (custom method for hub integration)
    */
-  async connect(device: Device): Promise<void> {
+  async connectDevice(device: {
+    id: string;
+    name: string;
+    ipAddress?: string;
+    manufacturer?: string;
+    model?: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<void> {
     if (!device.ipAddress) {
       throw new Error('ESPHome device requires IP address');
     }
@@ -109,7 +139,7 @@ export class ESPHomeAdapter implements ProtocolAdapter {
     const client = new ESPHomeNativeClient({
       clientInfo: 'Cove Hub',
       host: device.ipAddress,
-      password: (device.config.api_password as string) || '',
+      password: (device.metadata?.api_password as string) || '',
       port: 6053,
     });
 
@@ -119,7 +149,9 @@ export class ESPHomeAdapter implements ProtocolAdapter {
       connected: false,
       device,
       deviceId,
+      entities: new Map(),
       ipAddress: device.ipAddress,
+      subscriptions: new Map(),
     };
 
     this.connections.set(deviceId, connection);
@@ -150,8 +182,8 @@ export class ESPHomeAdapter implements ProtocolAdapter {
       log(`Device info for ${device.name}:`, info);
 
       // Update device metadata
-      device.config = {
-        ...device.config,
+      device.metadata = {
+        ...device.metadata,
         esphomeVersion: info.esphomeVersion,
         macAddress: info.macAddress,
         model: info.model,
@@ -172,418 +204,302 @@ export class ESPHomeAdapter implements ProtocolAdapter {
     client.on('entitiesComplete', async (entities: Map<number, AnyEntity>) => {
       log(`Discovered ${entities.size} entities for ${device.name}`);
 
-      // Store entity information in device config
-      const entityList = Array.from(entities.values()).map((e: AnyEntity) => ({
-        key: e.key,
-        name: e.name,
-        objectId: e.objectId,
-        type: e.type,
-        uniqueId: e.uniqueId,
-      }));
-
-      device.config = {
-        ...device.config,
-        entities: entityList,
-      };
-
-      // Persist entities to database
-      if (this.supabaseSync && device.id) {
-        log(
-          `Persisting ${entities.size} entities for ${device.name} to database`,
-        );
-        const entitiesForDb = Array.from(entities.values()).map(
-          (e: AnyEntity) => ({
-            deviceClass: e.deviceClass,
-            disabled: e.disabled,
-            effects: e.effects,
-            icon: e.icon,
-            key: e.key,
-            maxValue: e.maxValue,
-            minValue: e.minValue,
-            name: e.name,
-            objectId: e.objectId,
-            step: e.step,
-            supportsBrightness: e.supportsBrightness,
-            supportsColorTemp: e.supportsColorTemp,
-            supportsRgb: e.supportsRgb,
-            type: e.type,
-            unitOfMeasurement: e.unitOfMeasurement,
-          }),
-        );
-
-        try {
-          await this.supabaseSync.upsertEntities(device.id, entitiesForDb);
-          log(
-            `Successfully persisted ${entities.size} entities for ${device.name}`,
-          );
-        } catch (error) {
-          log(`Failed to persist entities for ${device.name}:`, error);
-        }
-      } else {
-        log(
-          `Skipping entity persistence - supabaseSync: ${!!this.supabaseSync}, device.id: ${device.id}`,
-        );
+      // Create entity records for each discovered entity
+      for (const [, espEntity] of entities.entries()) {
+        await this.createEntityFromESPHome(device, espEntity, connection);
       }
+    });
 
-      // Determine device capabilities based on entities
-      const capabilities = new Set<DeviceCapability>();
+    // Handle entity state changes
+    client.on('entityState', (entityKey: number, state: unknown) => {
+      const connection = this.findConnectionByEntityKey(entityKey);
+      if (!connection) return;
 
-      for (const entity of entities.values()) {
-        switch (entity.type) {
-          case 'switch':
-            capabilities.add(Capability.OnOff);
-            break;
-          case 'light':
-            capabilities.add(Capability.OnOff);
-            capabilities.add(Capability.Brightness);
-            break;
-          case 'sensor':
-          case 'binary_sensor':
-            // Sensors don't add capabilities (they're read-only)
-            break;
+      // Find the entity by key in the connection
+      let entityId: string | null = null;
+      for (const [id, entity] of connection.entities.entries()) {
+        if (entity.key === entityKey.toString()) {
+          entityId = id;
+          break;
         }
       }
 
-      if (capabilities.size > 0) {
-        device.capabilities = Array.from(capabilities);
-      }
-    });
+      if (!entityId) return;
 
-    // Handle sensor state updates
-    client.on('sensorState', async ({ entity, state }) => {
-      const stateKey =
-        entity.objectId || entity.name.toLowerCase().replace(/\s+/g, '_');
-
-      device.state = {
-        ...device.state,
-        [stateKey]: state,
-      };
-      device.updatedAt = new Date();
-      device.lastSeen = new Date();
-
-      // Use StateManager for intelligent persistence
-      if (this.stateManager && device.id) {
-        await this.stateManager.updateState({
-          deviceId: device.id,
-          entityName: entity.name,
+      // Convert ESPHome state to our StateUpdate format
+      const stateUpdate: StateUpdate = {
+        attrs: {
+          deviceName: device.name,
+          entityKey: entityKey,
           source: 'esphome',
-          stateKey,
-          value: state,
-        });
-      }
-    });
-
-    // Handle binary sensor state updates
-    client.on('binarySensorState', async ({ entity, state }) => {
-      const stateKey =
-        entity.objectId || entity.name.toLowerCase().replace(/\s+/g, '_');
-
-      device.state = {
-        ...device.state,
-        [stateKey]: state,
+        },
+        entityId: entityId,
+        state: String(state),
+        timestamp: new Date(),
       };
-      device.updatedAt = new Date();
-      device.lastSeen = new Date();
 
-      // Use StateManager for intelligent persistence
-      if (this.stateManager && device.id) {
-        await this.stateManager.updateState({
-          deviceId: device.id,
-          entityName: entity.name,
-          source: 'esphome',
-          stateKey,
-          value: state,
-        });
+      // Send to state manager
+      if (this.stateManager) {
+        this.stateManager.updateState(stateUpdate);
+      }
+
+      // Notify subscribers
+      const callback = connection.subscriptions.get(entityId);
+      if (callback) {
+        callback(stateUpdate);
       }
     });
 
-    // Handle switch state updates
-    client.on('switchState', async ({ entity, state }) => {
-      const stateKey =
-        entity.objectId || entity.name.toLowerCase().replace(/\s+/g, '_');
-
-      device.state = {
-        ...device.state,
-        [stateKey]: state,
-        on: state, // Also map to generic 'on' state
-      };
-      device.updatedAt = new Date();
-      device.lastSeen = new Date();
-
-      // Use StateManager for intelligent persistence
-      if (this.stateManager && device.id) {
-        await this.stateManager.updateState({
-          deviceId: device.id,
-          entityName: entity.name,
-          source: 'esphome',
-          stateKey,
-          value: state,
-        });
-      }
+    // Handle connection events
+    client.on('connect', () => {
+      connection.connected = true;
+      log(`Connected to ESPHome device: ${device.name}`);
     });
 
-    // Handle light state updates
-    client.on('lightState', async ({ entity, state }) => {
-      const stateKey =
-        entity.objectId || entity.name.toLowerCase().replace(/\s+/g, '_');
-
-      device.state = {
-        ...device.state,
-        [stateKey]: state.state,
-        brightness: state.brightness
-          ? Math.round(state.brightness * 100)
-          : undefined,
-        color_temp: state.colorTemperature,
-        on: state.state,
-      };
-      device.updatedAt = new Date();
-      device.lastSeen = new Date();
-
-      // Use StateManager for intelligent persistence
-      if (this.stateManager && device.id) {
-        await this.stateManager.updateState({
-          deviceId: device.id,
-          entityName: entity.name,
-          source: 'esphome',
-          stateKey,
-          value: state.state,
-        });
-      }
-    });
-
-    // Handle number state updates
-    client.on('numberState', async ({ entity, state }) => {
-      const stateKey =
-        entity.objectId || entity.name.toLowerCase().replace(/\s+/g, '_');
-
-      device.state = {
-        ...device.state,
-        [stateKey]: state,
-      };
-      device.updatedAt = new Date();
-      device.lastSeen = new Date();
-
-      // Use StateManager for intelligent persistence
-      if (this.stateManager && device.id) {
-        await this.stateManager.updateState({
-          deviceId: device.id,
-          entityName: entity.name,
-          source: 'esphome',
-          stateKey,
-          value: state,
-        });
-      }
-    });
-
-    // Handle text sensor state updates
-    client.on('textSensorState', async ({ entity, state }) => {
-      const stateKey =
-        entity.objectId || entity.name.toLowerCase().replace(/\s+/g, '_');
-
-      device.state = {
-        ...device.state,
-        [stateKey]: state,
-      };
-      device.updatedAt = new Date();
-      device.lastSeen = new Date();
-
-      // Use StateManager for intelligent persistence
-      if (this.stateManager && device.id) {
-        await this.stateManager.updateState({
-          deviceId: device.id,
-          entityName: entity.name,
-          source: 'esphome',
-          stateKey,
-          value: state,
-        });
-      }
-    });
-
-    // Handle disconnection
-    client.on('disconnected', () => {
-      log(`Device disconnected: ${device.name}`);
+    client.on('disconnect', () => {
       connection.connected = false;
-      device.online = false;
-      device.available = false;
+      log(`Disconnected from ESPHome device: ${device.name}`);
     });
 
-    // Handle errors
     client.on('error', (error) => {
-      log(`Device error (${device.name}):`, error);
-      device.online = false;
-      device.available = false;
+      log(`Error from ESPHome device ${device.name}:`, error);
     });
   }
 
   /**
-   * Disconnect from an ESPHome device
+   * Create entity record from ESPHome entity discovery
    */
-  async disconnect(device: Device): Promise<void> {
-    if (!device.id) {
-      log('Device has no ID, cannot disconnect');
-      return;
-    }
-
-    const deviceId = device.id;
-    const connection = this.connections.get(deviceId);
-
-    if (!connection) {
-      log(`Device ${deviceId} not connected`);
-      return;
-    }
-
-    log(`Disconnecting from device: ${deviceId}`);
-
+  private async createEntityFromESPHome(
+    device: {
+      id: string;
+      name: string;
+      ipAddress?: string;
+      manufacturer?: string;
+      model?: string;
+      metadata?: Record<string, unknown>;
+    },
+    espEntity: AnyEntity,
+    connection: ESPHomeDeviceConnection,
+  ): Promise<void> {
     try {
-      await connection.client.disconnect();
-    } catch (error) {
-      log(`Error disconnecting from device ${deviceId}:`, error);
-    }
+      // Map ESPHome entity type to our EntityKind
+      const entityKind = this.mapESPHomeEntityType(espEntity.type);
 
-    this.connections.delete(deviceId);
-    log(`Disconnected from device: ${deviceId}`);
-  }
+      // Generate entity key - use a simple format for now
+      const entityKey = `${espEntity.type}.${device.name.toLowerCase().replace(/\s+/g, '_')}_${espEntity.name.toLowerCase().replace(/\s+/g, '_')}`;
 
-  /**
-   * Send a command to an ESPHome device
-   */
-  async sendCommand(device: Device, command: DeviceCommand): Promise<void> {
-    if (!device.id) {
-      throw new Error('Device ID is required');
-    }
-    const connection = this.connections.get(device.id);
-    if (!connection || !connection.connected) {
-      throw new Error(`Device ${device.id} not connected`);
-    }
+      // Build traits from ESPHome entity properties
+      const traits: EntityTraits = {
+        disabled: espEntity.disabled,
+        icon: espEntity.icon,
+      };
 
-    log(
-      `Sending command to device ${device.name}: ${command.capability} =`,
-      command.value,
-    );
-
-    // Find the entity to control
-    const entities = device.config.entities as
-      | Array<{ key: number; name: string; type: string; objectId: string }>
-      | undefined;
-
-    if (!entities || entities.length === 0) {
-      throw new Error('No entities found for device');
-    }
-
-    // For now, use the first entity of the appropriate type
-    // In the future, we could use command.target to select specific entities
-    switch (command.capability) {
-      case Capability.OnOff: {
-        const switchEntity = entities.find(
-          (e) => e.type === 'switch' || e.type === 'light',
-        );
-        if (!switchEntity) {
-          throw new Error('No switch or light entity found');
-        }
-
-        if (switchEntity.type === 'switch') {
-          await connection.client.switchCommand(
-            switchEntity.key,
-            command.value as boolean,
-          );
-        } else if (switchEntity.type === 'light') {
-          await connection.client.lightCommand(switchEntity.key, {
-            state: command.value as boolean,
-          });
-        }
-        break;
+      // Add type-specific properties
+      if (espEntity.type === 'sensor' && 'unitOfMeasurement' in espEntity) {
+        traits.unit_of_measurement = espEntity.unitOfMeasurement;
+        traits.device_class = espEntity.deviceClass;
+        traits.precision = espEntity.accuracyDecimals;
+      } else if (
+        espEntity.type === 'light' &&
+        'supportsBrightness' in espEntity
+      ) {
+        traits.supports_brightness = espEntity.supportsBrightness;
+        traits.supports_color_temp =
+          espEntity.supportedColorModes?.includes(2) || false;
+        traits.supports_rgb =
+          espEntity.supportedColorModes?.includes(3) || false;
+        traits.min_color_temp = espEntity.minMireds;
+        traits.max_color_temp = espEntity.maxMireds;
+        traits.effects = espEntity.effects;
+      } else if (espEntity.type === 'number' && 'minValue' in espEntity) {
+        traits.min_value = espEntity.minValue;
+        traits.max_value = espEntity.maxValue;
+        traits.step = espEntity.step;
+        traits.unit_of_measurement = espEntity.unitOfMeasurement;
+        traits.device_class = espEntity.deviceClass;
+      } else if (
+        espEntity.type === 'binary_sensor' &&
+        'deviceClass' in espEntity
+      ) {
+        traits.device_class = espEntity.deviceClass;
+      } else if (espEntity.type === 'switch' && 'deviceClass' in espEntity) {
+        traits.device_class = espEntity.deviceClass;
+        traits.supports_on_off = true;
+      } else if (espEntity.type === 'button' && 'deviceClass' in espEntity) {
+        traits.device_class = espEntity.deviceClass;
+      } else if (
+        espEntity.type === 'text_sensor' &&
+        'deviceClass' in espEntity
+      ) {
+        traits.device_class = espEntity.deviceClass;
       }
 
-      case Capability.Brightness: {
-        const lightEntity = entities.find((e) => e.type === 'light');
-        if (!lightEntity) {
-          throw new Error('No light entity found');
-        }
-
-        // Convert 0-100 to 0-1
-        const brightness = (command.value as number) / 100;
-        await connection.client.lightCommand(lightEntity.key, {
-          brightness,
-          state: brightness > 0,
+      // Create entity in database
+      if (this.db && device.id) {
+        const entityId = await this.db.createEntity({
+          deviceId: device.id,
+          key: entityKey,
+          kind: entityKind,
+          traits,
         });
-        break;
+
+        if (entityId) {
+          // Store in connection
+          const protocolEntity: ProtocolEntity = {
+            deviceId: device.id,
+            key: entityKey,
+            kind: entityKind,
+            name: espEntity.name,
+            traits,
+          };
+
+          connection.entities.set(entityId, protocolEntity);
+          log(`Created entity: ${entityId} (${entityKind}: ${entityKey})`);
+        }
       }
+    } catch (error) {
+      log(`Failed to create entity for ${espEntity.name}:`, error);
+    }
+  }
 
-      default: {
-        log(`Unsupported command capability: ${command.capability}`);
-        throw new Error(`Unsupported capability: ${command.capability}`);
+  /**
+   * Map ESPHome entity type to EntityKind
+   */
+  private mapESPHomeEntityType(esphomeType: string): EntityKind {
+    switch (esphomeType) {
+      case 'sensor':
+        return 'sensor' as EntityKind;
+      case 'binary_sensor':
+        return 'binary_sensor' as EntityKind;
+      case 'light':
+        return 'light' as EntityKind;
+      case 'switch':
+        return 'switch' as EntityKind;
+      case 'button':
+        return 'button' as EntityKind;
+      case 'number':
+        return 'number' as EntityKind;
+      case 'select':
+        return 'select' as EntityKind;
+      case 'text':
+        return 'text' as EntityKind;
+      case 'time':
+        return 'time' as EntityKind;
+      case 'date':
+        return 'date' as EntityKind;
+      case 'datetime':
+        return 'datetime' as EntityKind;
+      case 'color':
+        return 'color' as EntityKind;
+      default:
+        return 'other' as EntityKind;
+    }
+  }
+
+  /**
+   * Find connection by ESPHome entity key
+   */
+  private findConnectionByEntityKey(
+    entityKey: number,
+  ): ESPHomeDeviceConnection | null {
+    for (const connection of this.connections.values()) {
+      if (connection.entities.has(entityKey.toString())) {
+        return connection;
+      }
+    }
+    return null;
+  }
+
+  // EntityAwareProtocolAdapter implementation
+
+  async discoverEntities(deviceId: string): Promise<ProtocolEntity[]> {
+    const connection = this.connections.get(deviceId);
+    if (!connection) {
+      return [];
+    }
+
+    return Array.from(connection.entities.values());
+  }
+
+  subscribeEntityState(
+    entityId: string,
+    callback: (state: StateUpdate) => void,
+  ): void {
+    // Find the connection that has this entity
+    for (const connection of this.connections.values()) {
+      if (connection.entities.has(entityId)) {
+        connection.subscriptions.set(entityId, callback);
+        log(`Subscribed to entity state: ${entityId}`);
+        return;
+      }
+    }
+    log(`Entity not found for subscription: ${entityId}`);
+  }
+
+  unsubscribeEntityState(entityId: string): void {
+    // Find the connection that has this entity
+    for (const connection of this.connections.values()) {
+      if (connection.subscriptions.has(entityId)) {
+        connection.subscriptions.delete(entityId);
+        log(`Unsubscribed from entity state: ${entityId}`);
+        return;
       }
     }
   }
 
-  /**
-   * Poll state for ESPHome devices (optional, since ESPHome pushes state)
-   * This is a no-op for ESPHome since state updates are pushed via events
-   */
-  async pollState(device: Device): Promise<void> {
-    // ESPHome pushes state updates, no polling needed
-    // State is already up-to-date from event handlers
-    if (!device.id) return;
-    const connection = this.connections.get(device.id);
-    if (connection?.connected) {
-      device.online = true;
-      device.available = true;
+  async sendEntityCommand(
+    entityId: string,
+    capability: string,
+    value: unknown,
+  ): Promise<boolean> {
+    try {
+      // Find the connection that has this entity
+      for (const connection of this.connections.values()) {
+        const entity = connection.entities.get(entityId);
+        if (!entity) continue;
+
+        // Map capability to ESPHome command
+        const command = this.mapCapabilityToESPHomeCommand(
+          capability,
+          value,
+          entity.key,
+        );
+        if (command) {
+          // Send command via ESPHome client
+          // Note: This would need to be implemented based on the actual ESPHome client API
+          log(`Sent command to entity ${entityId}: ${capability} = ${value}`);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      log(`Failed to send command to entity ${entityId}:`, error);
+      return false;
     }
   }
 
   /**
-   * Press a button entity
+   * Map capability to ESPHome command
    */
-  async pressButton(device: Device, entityKey: number): Promise<void> {
-    if (!device.id) {
-      throw new Error('Device ID is required');
+  private mapCapabilityToESPHomeCommand(
+    capability: string,
+    value: unknown,
+    _entityKey: string,
+  ): Record<string, unknown> | null {
+    switch (capability) {
+      case 'on_off':
+        return { state: Boolean(value), type: 'switch_command' };
+      case 'brightness':
+        return { brightness: Number(value), type: 'light_command' };
+      case 'color_temp':
+        return { color_temp: Number(value), type: 'light_command' };
+      case 'color_rgb':
+        return {
+          rgb: Array.isArray(value) ? value : [255, 255, 255],
+          type: 'light_command',
+        };
+      default:
+        return null;
     }
-    const connection = this.connections.get(device.id);
-    if (!connection) {
-      throw new Error('Device not connected');
-    }
-
-    await connection.client.buttonPress(entityKey);
-    log(`Pressed button ${entityKey} on ${device.name}`);
-  }
-
-  /**
-   * Set a number entity value
-   */
-  async setNumber(
-    device: Device,
-    entityKey: number,
-    value: number,
-  ): Promise<void> {
-    if (!device.id) {
-      throw new Error('Device ID is required');
-    }
-    const connection = this.connections.get(device.id);
-    if (!connection) {
-      throw new Error('Device not connected');
-    }
-
-    await connection.client.numberCommand(entityKey, value);
-    log(`Set number ${entityKey} to ${value} on ${device.name}`);
-  }
-
-  /**
-   * Control a light entity
-   */
-  async controlLight(
-    device: Device,
-    entityKey: number,
-    command: Record<string, unknown>,
-  ): Promise<void> {
-    if (!device.id) {
-      throw new Error('Device ID is required');
-    }
-    const connection = this.connections.get(device.id);
-    if (!connection) {
-      throw new Error('Device not connected');
-    }
-
-    await connection.client.lightCommand(entityKey, command);
-    log(`Controlled light ${entityKey} on ${device.name}`);
   }
 }

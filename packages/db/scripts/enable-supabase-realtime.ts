@@ -2,48 +2,117 @@ import { sql } from 'drizzle-orm';
 import { db } from '../src/client';
 
 const tablesToEnableRealtime = [
-  'events',
-  'states',
-  'commands',
-  'devices',
+  'entityState',
+  'entityStateHistory',
+  'event',
+  'device',
+  'entity',
+  'automationTrace',
 ] as const;
 
 // RLS policies for realtime authorization
 const realtimePolicies = [
-  // Policy for authenticated users to read postgres changes on events table
+  // Policy for authenticated users to read postgres changes on entityState table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'events-%'
+      AND realtime.topic() LIKE 'entityState-%'
       AND EXISTS (
-        SELECT 1 FROM public.events e
-        WHERE e."webhookId" = split_part(realtime.topic(), '-', 2)
-        AND e."webhookId" IN (
-          SELECT w.id FROM public.webhooks w
-          WHERE w."orgId" = (SELECT requesting_org_id())
-        )
+        SELECT 1 FROM public."entityState" es
+        JOIN public.entity e ON e.id = es."entityId"
+        JOIN public.device d ON d.id = e."deviceId"
+        JOIN public.users u ON u."homeId" = d."homeId"
+        WHERE u.id = (SELECT requesting_user_id())
+        AND es."entityId" = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_events_changes',
+    name: 'authenticated_can_read_entityState_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
   },
-  // Policy for authenticated users to read postgres changes on requests table
+  // Policy for authenticated users to read postgres changes on entityStateHistory table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'requests-%'
+      AND realtime.topic() LIKE 'entityStateHistory-%'
       AND EXISTS (
-        SELECT 1 FROM public.requests r
-        WHERE r."webhookId" = split_part(realtime.topic(), '-', 2)
-        AND r."webhookId" IN (
-          SELECT w.id FROM public.webhooks w
-          WHERE w."orgId" = (SELECT requesting_org_id())
-        )
+        SELECT 1 FROM public."entityStateHistory" esh
+        JOIN public.users u ON u."homeId" = esh."homeId"
+        WHERE u.id = (SELECT requesting_user_id())
+        AND esh."homeId" = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_requests_changes',
+    name: 'authenticated_can_read_entityStateHistory_changes',
+    operation: 'select',
+    table: 'realtime.messages',
+    target: 'authenticated',
+  },
+  // Policy for authenticated users to read postgres changes on event table
+  {
+    condition: `
+      realtime.messages.extension = 'postgres_changes'
+      AND realtime.topic() LIKE 'event-%'
+      AND EXISTS (
+        SELECT 1 FROM public.event e
+        JOIN public.users u ON u."homeId" = e."homeId"
+        WHERE u.id = (SELECT requesting_user_id())
+        AND e."homeId" = split_part(realtime.topic(), '-', 2)
+      )
+    `,
+    name: 'authenticated_can_read_event_changes',
+    operation: 'select',
+    table: 'realtime.messages',
+    target: 'authenticated',
+  },
+  // Policy for authenticated users to read postgres changes on device table
+  {
+    condition: `
+      realtime.messages.extension = 'postgres_changes'
+      AND realtime.topic() LIKE 'device-%'
+      AND EXISTS (
+        SELECT 1 FROM public.device d
+        JOIN public.users u ON u."homeId" = d."homeId"
+        WHERE u.id = (SELECT requesting_user_id())
+        AND d."homeId" = split_part(realtime.topic(), '-', 2)
+      )
+    `,
+    name: 'authenticated_can_read_device_changes',
+    operation: 'select',
+    table: 'realtime.messages',
+    target: 'authenticated',
+  },
+  // Policy for authenticated users to read postgres changes on entity table
+  {
+    condition: `
+      realtime.messages.extension = 'postgres_changes'
+      AND realtime.topic() LIKE 'entity-%'
+      AND EXISTS (
+        SELECT 1 FROM public.entity e
+        JOIN public.device d ON d.id = e."deviceId"
+        JOIN public.users u ON u."homeId" = d."homeId"
+        WHERE u.id = (SELECT requesting_user_id())
+        AND e.id = split_part(realtime.topic(), '-', 2)
+      )
+    `,
+    name: 'authenticated_can_read_entity_changes',
+    operation: 'select',
+    table: 'realtime.messages',
+    target: 'authenticated',
+  },
+  // Policy for authenticated users to read postgres changes on automationTrace table
+  {
+    condition: `
+      realtime.messages.extension = 'postgres_changes'
+      AND realtime.topic() LIKE 'automationTrace-%'
+      AND EXISTS (
+        SELECT 1 FROM public."automationTrace" at
+        JOIN public.users u ON u."homeId" = at."homeId"
+        WHERE u.id = (SELECT requesting_user_id())
+        AND at."homeId" = split_part(realtime.topic(), '-', 2)
+      )
+    `,
+    name: 'authenticated_can_read_automationTrace_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
@@ -52,7 +121,14 @@ const realtimePolicies = [
   {
     condition: `
       realtime.messages.extension = 'broadcast'
-      AND realtime.topic() LIKE 'events-%' OR realtime.topic() LIKE 'requests-%'
+      AND (
+        realtime.topic() LIKE 'entityState-%'
+        OR realtime.topic() LIKE 'entityStateHistory-%'
+        OR realtime.topic() LIKE 'event-%'
+        OR realtime.topic() LIKE 'device-%'
+        OR realtime.topic() LIKE 'entity-%'
+        OR realtime.topic() LIKE 'automationTrace-%'
+      )
     `,
     name: 'authenticated_can_send_broadcast',
     operation: 'insert',
@@ -63,7 +139,14 @@ const realtimePolicies = [
   {
     condition: `
       realtime.messages.extension = 'broadcast'
-      AND realtime.topic() LIKE 'events-%' OR realtime.topic() LIKE 'requests-%'
+      AND (
+        realtime.topic() LIKE 'entityState-%'
+        OR realtime.topic() LIKE 'entityStateHistory-%'
+        OR realtime.topic() LIKE 'event-%'
+        OR realtime.topic() LIKE 'device-%'
+        OR realtime.topic() LIKE 'entity-%'
+        OR realtime.topic() LIKE 'automationTrace-%'
+      )
     `,
     name: 'authenticated_can_read_broadcast',
     operation: 'select',
@@ -139,7 +222,7 @@ async function createRealtimePolicy(policy: (typeof realtimePolicies)[0]) {
   console.log(`Policy ${policy.name} created successfully`);
 }
 
-async function _setupRealtimePolicies() {
+async function setupRealtimePolicies() {
   console.log('Setting up realtime authorization policies...');
 
   try {
@@ -163,7 +246,7 @@ async function _setupRealtimePolicies() {
   }
 }
 
-async function _disablePublicRealtimeAccess() {
+async function disablePublicRealtimeAccess() {
   console.log('Disabling public access to realtime...');
 
   try {
@@ -190,10 +273,10 @@ async function setupAllRealtime() {
     console.log('All realtime subscriptions have been set up successfully');
 
     // Set up authorization policies
-    // await setupRealtimePolicies();
+    await setupRealtimePolicies();
 
     // Disable public access
-    // await disablePublicRealtimeAccess();
+    await disablePublicRealtimeAccess();
   } catch (error) {
     console.error('Error setting up realtime subscriptions:', error);
     throw error;

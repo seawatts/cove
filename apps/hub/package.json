@@ -11,6 +11,7 @@
     "@cove/types": "workspace:*",
     "@supabase/supabase-js": "catalog:",
     "@t3-oss/env-core": "catalog:",
+    "drizzle-orm": "catalog:",
     "zod": "catalog:"
   },
   "description": "Cove Hub - Core daemon for home automation",

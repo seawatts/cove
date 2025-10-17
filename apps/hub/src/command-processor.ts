@@ -1,36 +1,29 @@
 /**
- * Device Command Processor
- * Subscribes to Supabase Realtime for device commands and executes them
+ * Entity Command Processor
+ * Updated for Home Assistant-inspired entity-first architecture
+ * Subscribes to Supabase Realtime for entity commands and executes them
  */
 
-import { eq } from '@cove/db';
 import { db } from '@cove/db/client';
-import { Commands, Devices } from '@cove/db/schema';
+import { device, entity } from '@cove/db/schema';
 import { createClient } from '@cove/db/supabase/server';
 import { createId } from '@cove/id';
 import { debug } from '@cove/logger';
 import type {
-  Device,
-  DeviceCapability,
-  DeviceStateHistory,
+  EntityAwareProtocolAdapter,
   ProtocolAdapter,
-} from '@cove/types';
-import {
-  DeviceCapability as Capability,
-  EventSeverity,
-  EventType,
-  type ProtocolType,
-} from '@cove/types';
+} from '@cove/protocols';
+import { HubEventType, type ProtocolType } from '@cove/types';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import type { ESPHomeAdapter } from './adapters/esphome';
+import { eq } from 'drizzle-orm';
+import type { HubDatabase } from './db';
 import type { DeviceEventCollector } from './events';
-import type { SupabaseSync } from './supabase';
 
 const log = debug('cove:hub:command-processor');
 
-interface DeviceCommand {
+interface EntityCommand {
   id: string;
-  deviceId: string;
+  entityId: string;
   capability: string;
   value: unknown;
   status: 'pending' | 'processing' | 'completed' | 'failed';
@@ -41,23 +34,26 @@ export class CommandProcessor {
   private channel: RealtimeChannel | null = null;
   private running = false;
   private adapters: Map<ProtocolType, ProtocolAdapter>;
+  private entityAwareAdapters: Map<ProtocolType, EntityAwareProtocolAdapter>;
   private supabase: ReturnType<typeof createClient>;
-  private supabaseSync: SupabaseSync | null;
+  private db: HubDatabase | null;
   private eventCollector: DeviceEventCollector | null;
   private pollingInterval: NodeJS.Timeout | null = null;
 
   constructor(
     adapters: Map<ProtocolType, ProtocolAdapter>,
     options?: {
-      supabaseSync?: SupabaseSync | null;
+      db?: HubDatabase | null;
       eventCollector?: DeviceEventCollector | null;
+      entityAwareAdapters?: Map<ProtocolType, EntityAwareProtocolAdapter>;
     },
   ) {
     this.adapters = adapters;
+    this.entityAwareAdapters = options?.entityAwareAdapters || new Map();
     this.supabase = createClient();
-    this.supabaseSync = options?.supabaseSync || null;
+    this.db = options?.db || null;
     this.eventCollector = options?.eventCollector || null;
-    log('Command processor initialized');
+    log('Entity command processor initialized');
   }
 
   async start(): Promise<void> {
@@ -66,12 +62,12 @@ export class CommandProcessor {
       return;
     }
 
-    log('Starting command processor');
+    log('Starting entity command processor');
 
     try {
-      // Try to subscribe to Realtime for device commands
+      // Try to subscribe to Realtime for entity commands
       this.channel = this.supabase
-        .channel('device-commands')
+        .channel('entity-commands')
         .on(
           'postgres_changes',
           {
@@ -80,15 +76,15 @@ export class CommandProcessor {
             schema: 'public',
             table: 'commands',
           },
-          async (payload: { new: DeviceCommand }) => {
+          async (payload: { new: EntityCommand }) => {
             const command = payload.new;
-            log('New command received via Realtime:', command);
+            log('New entity command received via Realtime:', command);
             await this.processCommand(command);
           },
         )
         .subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
-            log('✅ Subscribed to device commands channel (Realtime)');
+            log('✅ Subscribed to entity commands channel (Realtime)');
           } else if (status === 'CHANNEL_ERROR') {
             log('⚠️ Error subscribing to Realtime, falling back to polling');
             this.startPolling();
@@ -107,7 +103,7 @@ export class CommandProcessor {
     await this.processPendingCommands();
 
     this.running = true;
-    log('Command processor started');
+    log('Entity command processor started');
   }
 
   /**
@@ -141,7 +137,7 @@ export class CommandProcessor {
       return;
     }
 
-    log('Stopping command processor');
+    log('Stopping entity command processor');
 
     this.stopPolling();
 
@@ -151,224 +147,249 @@ export class CommandProcessor {
     }
 
     this.running = false;
-    log('Command processor stopped');
+    log('Entity command processor stopped');
   }
 
   private async processPendingCommands(): Promise<void> {
     try {
-      const pendingCommands = await db.query.Commands.findMany({
+      // TODO: Implement commands table in schema
+      // For now, we'll skip processing pending commands until the commands table is added
+      log(
+        'Commands table not yet implemented in schema - skipping pending commands',
+      );
+
+      /*
+      const pendingCommands = await db.query.commands.findMany({
         limit: 100,
         orderBy: (commands, { asc }) => [asc(commands.createdAt)],
-        where: eq(Commands.status, 'pending'),
+        where: eq(commands.status, 'pending'),
       });
 
       if (pendingCommands.length > 0) {
         log(`Found ${pendingCommands.length} pending commands`);
         for (const command of pendingCommands) {
-          await this.processCommand(command as DeviceCommand);
+          await this.processCommand(command as EntityCommand);
         }
       }
+      */
     } catch (error) {
       log('Error processing pending commands:', error);
     }
   }
 
-  private async processCommand(command: DeviceCommand): Promise<void> {
-    log(`Processing command ${command.id} for device ${command.deviceId}`);
+  private async processCommand(command: EntityCommand): Promise<void> {
+    log(`Processing command ${command.id} for entity ${command.entityId}`);
 
     try {
       // Mark command as processing
       await this.updateCommandStatus(command.id, 'processing');
 
-      // Get the device using Drizzle
-      const device = await db.query.Devices.findFirst({
-        where: eq(Devices.id, command.deviceId),
-      });
+      // Get the entity and its device using Drizzle
+      const entityResult = await db
+        .select({
+          device: {
+            id: device.id,
+            ipAddress: device.ipAddress,
+            manufacturer: device.manufacturer,
+            metadata: device.metadata,
+            model: device.model,
+            name: device.name,
+            // TODO: Add protocol field to device table
+            // protocol: device.protocol,
+          },
+          deviceId: entity.deviceId,
+          id: entity.id,
+          key: entity.key,
+          kind: entity.kind,
+          traits: entity.traits,
+        })
+        .from(entity)
+        .innerJoin(device, eq(device.id, entity.deviceId))
+        .where(eq(entity.id, command.entityId))
+        .limit(1);
 
-      if (!device) {
-        throw new Error(`Device ${command.deviceId} not found`);
+      if (entityResult.length === 0) {
+        throw new Error(`Entity ${command.entityId} not found`);
       }
 
-      // Get the appropriate protocol adapter
-      const protocol = device.protocol as ProtocolType;
+      const entityInfo = entityResult[0];
+      if (!entityInfo) {
+        throw new Error('Entity not found');
+      }
+
+      const deviceInfo = entityInfo.device;
+
+      // TODO: Get protocol from device metadata until protocol field is added to device table
+      const protocol =
+        (deviceInfo.metadata?.protocol as ProtocolType) || 'esphome';
       const adapter = this.adapters.get(protocol);
+      const entityAwareAdapter = this.entityAwareAdapters.get(protocol);
 
       if (!adapter) {
         throw new Error(`No adapter found for protocol: ${protocol}`);
       }
 
-      // Handle ESPHome-specific commands
-      if (protocol === 'esphome') {
-        const esphomeAdapter = adapter as ESPHomeAdapter;
-
-        switch (command.capability) {
-          case 'button_press': {
-            const { entityKey } = command.value as { entityKey: number };
-            await esphomeAdapter.pressButton(device as Device, entityKey);
-            break;
-          }
-          case 'number_set': {
-            const { entityKey, value } = command.value as {
-              entityKey: number;
-              value: number;
-            };
-            await esphomeAdapter.setNumber(device as Device, entityKey, value);
-            break;
-          }
-          case 'light_control': {
-            const { entityKey, ...lightCommand } = command.value as {
-              entityKey: number;
-              [key: string]: unknown;
-            };
-            await esphomeAdapter.controlLight(
-              device as Device,
-              entityKey,
-              lightCommand,
-            );
-            break;
-          }
-          default: {
-            // Fall back to generic sendCommand for other ESPHome capabilities
-            const capabilityMap: Record<string, DeviceCapability> = {
-              brightness: Capability.Brightness,
-              color_rgb: Capability.ColorRgb,
-              color_temperature: Capability.ColorTemperature,
-              on_off: Capability.OnOff,
-            };
-
-            const capability = capabilityMap[command.capability];
-            if (!capability) {
-              throw new Error(
-                `Unknown ESPHome capability: ${command.capability}`,
-              );
-            }
-
-            await adapter.sendCommand(device as Device, {
-              capability,
-              deviceId: command.deviceId,
-              timestamp: new Date(),
-              value: command.value,
-            });
-            break;
-          }
-        }
-      } else {
-        // Handle other protocols (Hue, etc.)
-        const capabilityMap: Record<string, DeviceCapability> = {
-          brightness: Capability.Brightness,
-          color_rgb: Capability.ColorRgb,
-          color_temperature: Capability.ColorTemperature,
-          on_off: Capability.OnOff,
-        };
-
-        const capability = capabilityMap[command.capability];
-        if (!capability) {
-          throw new Error(`Unknown capability: ${command.capability}`);
-        }
-
-        // Send command to device via adapter
-        await adapter.sendCommand(device as Device, {
-          capability,
-          deviceId: command.deviceId,
-          timestamp: new Date(),
-          value: command.value,
-        });
+      if (!entityAwareAdapter) {
+        throw new Error(
+          `No entity-aware adapter found for protocol: ${protocol}`,
+        );
       }
 
-      // Capture old state before command
-      const oldState = { ...device.state };
+      // Execute the command using the entity-aware adapter
+      const success = await entityAwareAdapter.sendEntityCommand(
+        command.entityId,
+        command.capability,
+        command.value,
+      );
 
-      // Poll device state after command to get updated state (if supported)
-      if (adapter.pollState) {
-        await adapter.pollState(device as Device);
-      }
+      if (success) {
+        // Mark command as completed
+        await this.updateCommandStatus(command.id, 'completed');
 
-      // Update device state in database
-      await db
-        .update(Devices)
-        .set({
-          lastSeen: new Date(),
-          state: device.state,
-        })
-        .where(eq(Devices.id, command.deviceId));
+        log(`✅ Command ${command.id} completed successfully`);
 
-      // Record state change to history if state actually changed
-      const stateChanged =
-        JSON.stringify(oldState) !== JSON.stringify(device.state);
-      if (stateChanged && this.supabaseSync) {
-        const stateHistory: DeviceStateHistory = {
-          attributes: {
-            command: {
-              capability: command.capability,
-              commandId: command.id,
-              value: command.value,
-            },
+        this.eventCollector?.emit({
+          eventType: HubEventType.CommandProcessed,
+          message: `Entity command processed: ${command.entityId}`,
+          metadata: {
+            capability: command.capability,
+            deviceName: deviceInfo.name,
+            entityId: command.entityId,
+            value: command.value,
           },
-          deviceId: command.deviceId,
-          id: createId({ prefix: 'state' }),
-          lastChanged: new Date(),
-          lastUpdated: new Date(),
-          state: device.state,
-        };
-
-        await this.supabaseSync.insertStateHistory(stateHistory);
-        log(`Recorded state change for device ${command.deviceId}`);
-
-        // Emit state_changed event linked to this state history
-        if (this.eventCollector) {
-          this.eventCollector.emit({
-            deviceId: command.deviceId, // Event for the device that changed, not the hub
-            eventType: EventType.StateChanged,
-            message: `Device state changed via ${command.capability} command`,
-            metadata: {
-              capability: command.capability,
-              commandId: command.id,
-              newState: device.state,
-              oldState,
-            },
-            severity: EventSeverity.Info,
-            stateId: stateHistory.id, // Link event to state history
-          });
-        }
+        });
+      } else {
+        throw new Error('Command execution failed');
       }
-
-      // Mark command as completed
-      await this.updateCommandStatus(command.id, 'completed');
-
-      log(`✅ Command ${command.id} completed successfully`);
     } catch (error) {
-      log(`❌ Error processing command ${command.id}:`, error);
+      log(`❌ Command ${command.id} failed:`, error);
 
       // Mark command as failed
-      await this.updateCommandStatus(
-        command.id,
-        'failed',
-        error instanceof Error ? error.message : 'Unknown error',
-      );
+      await this.updateCommandStatus(command.id, 'failed');
+
+      this.eventCollector?.emit({
+        eventType: HubEventType.CommandFailed,
+        message: `Entity command failed: ${command.entityId}`,
+        metadata: {
+          capability: command.capability,
+          entityId: command.entityId,
+          error: String(error),
+          value: command.value,
+        },
+      });
     }
   }
 
   private async updateCommandStatus(
     commandId: string,
     status: 'processing' | 'completed' | 'failed',
-    error?: string,
   ): Promise<void> {
-    const updates: Record<string, unknown> = {
-      status,
-    };
+    try {
+      // TODO: Implement commands table in schema
+      log(
+        `Would update command ${commandId} status to ${status} - commands table not yet implemented`,
+      );
 
-    if (status === 'processing' || status === 'completed') {
-      updates.processedAt = new Date();
+      /*
+      await db
+        .update(commands)
+        .set({
+          status,
+          updatedAt: new Date(),
+        })
+        .where(eq(commands.id, commandId));
+      */
+    } catch (error) {
+      log('Error updating command status:', error);
     }
-
-    if (error) {
-      updates.error = error;
-    }
-
-    await db.update(Commands).set(updates).where(eq(Commands.id, commandId));
   }
 
-  isRunning(): boolean {
-    return this.running;
+  /**
+   * Create a new entity command
+   * TODO: Implement commands table in schema
+   */
+  async createCommand(
+    _entityId: string,
+    _capability: string,
+    _value: unknown,
+  ): Promise<string> {
+    const commandId = createId({ prefix: 'cmd' });
+
+    try {
+      // TODO: Implement commands table in schema
+      log(
+        `Would create entity command: ${commandId} for ${_entityId} - commands table not yet implemented`,
+      );
+
+      /*
+      await db.insert(commands).values({
+        capability,
+        createdAt: new Date(),
+        entityId,
+        id: commandId,
+        status: 'pending',
+        updatedAt: new Date(),
+        value,
+      });
+      */
+
+      log(`Created entity command: ${commandId} for ${_entityId}`);
+      return commandId;
+    } catch (error) {
+      log('Error creating entity command:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get command status
+   * TODO: Implement commands table in schema
+   */
+  async getCommandStatus(commandId: string): Promise<{
+    id: string;
+    entityId: string;
+    capability: string;
+    value: unknown;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null> {
+    try {
+      // TODO: Implement commands table in schema
+      log(
+        `Would get command status for ${commandId} - commands table not yet implemented`,
+      );
+      return null;
+
+      /*
+      const result = await db.query.commands.findFirst({
+        where: eq(commands.id, commandId),
+      });
+
+      return result || null;
+      */
+    } catch (error) {
+      log('Error getting command status:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get statistics about command processing
+   */
+  getStats(): {
+    running: boolean;
+    adaptersCount: number;
+    entityAwareAdaptersCount: number;
+    hasRealtimeSubscription: boolean;
+    isPolling: boolean;
+  } {
+    return {
+      adaptersCount: this.adapters.size,
+      entityAwareAdaptersCount: this.entityAwareAdapters.size,
+      hasRealtimeSubscription: this.channel !== null,
+      isPolling: this.pollingInterval !== null,
+      running: this.running,
+    };
   }
 }

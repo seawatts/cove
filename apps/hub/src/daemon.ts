@@ -1,40 +1,40 @@
 /**
  * Core Hub Daemon
- * Orchestrates discovery, device management, and telemetry
+ * Updated for Home Assistant++ entity-first architecture
+ * Orchestrates discovery, device management, entity discovery, and telemetry
  */
 
 import { DiscoveryManager } from '@cove/discovery';
 import { createId } from '@cove/id';
 import { debug } from '@cove/logger';
-import type { Device, ProtocolAdapter } from '@cove/types';
-import {
-  DeviceCapability,
-  type DeviceDiscovery,
-  DeviceType,
-  EventSeverity,
-  EventType,
-  ProtocolType,
-} from '@cove/types';
+import type {
+  EntityAwareProtocolAdapter,
+  ProtocolAdapter,
+} from '@cove/protocols';
+import { type DeviceDiscovery, HubEventType, ProtocolType } from '@cove/types';
 import { ESPHomeAdapter, HueAdapter } from './adapters';
 import { CommandProcessor } from './command-processor';
+import { HubDatabase } from './db';
 import { env } from './env';
 import { DeviceEventCollector } from './events';
 import { getSystemInfo } from './health';
 import { DeviceMetricsCollector } from './metrics';
 import { StateManager } from './state-manager';
-import { SupabaseSync } from './supabase';
 
 const log = debug('cove:daemon');
 
 export class HubDaemon {
   private discoveryManager: DiscoveryManager;
-  private supabaseSync: SupabaseSync | null = null;
+  private db: HubDatabase | null = null;
   private stateManager: StateManager | null = null;
-  private commandProcessor: CommandProcessor | null = null;
   private protocolAdapters: Map<ProtocolType, ProtocolAdapter> = new Map();
+  private entityAwareAdapters: Map<ProtocolType, EntityAwareProtocolAdapter> =
+    new Map();
+  private commandProcessor: CommandProcessor | null = null;
   private running = false;
   private hubId: string;
-  private hubDeviceId: string | null = null; // Hub's device ID in Devices table
+  private hubDeviceId: string | null = null; // Hub's device ID in device table
+  private homeId: string | null = null; // Home ID for entity management
   private eventCollector: DeviceEventCollector | null = null;
   private metricsCollector: DeviceMetricsCollector | null = null;
 
@@ -46,25 +46,17 @@ export class HubDaemon {
 
     this.discoveryManager = new DiscoveryManager();
 
-    // Only initialize Supabase if URL and key are configured
-    const hasSupabaseConfig =
-      env.NEXT_PUBLIC_SUPABASE_URL &&
-      (env.SUPABASE_SERVICE_ROLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    // Initialize database layer
+    try {
+      this.db = new HubDatabase();
+      log('Database layer initialized');
 
-    if (hasSupabaseConfig) {
-      try {
-        this.supabaseSync = new SupabaseSync(env.HUB_USER_ID, env.HUB_ORG_ID);
-        log('Supabase sync enabled');
-
-        // Initialize StateManager with Supabase sync
-        this.stateManager = new StateManager(this.supabaseSync);
-        log('StateManager initialized');
-      } catch (error) {
-        log('Failed to initialize Supabase sync:', error);
-        log('Running in local-only mode');
-      }
-    } else {
-      log('Running in local-only mode (no cloud sync)');
+      // Initialize StateManager with database
+      this.stateManager = new StateManager(this.db);
+      log('StateManager initialized');
+    } catch (error) {
+      log('Failed to initialize database layer:', error);
+      log('Running in local-only mode');
     }
 
     // Wire up discovery events
@@ -86,17 +78,16 @@ export class HubDaemon {
     log('Initializing protocol adapters');
 
     try {
-      // Register ESPHome adapter with StateManager and SupabaseSync
-      const esphomeAdapter = new ESPHomeAdapter(
-        this.stateManager,
-        this.supabaseSync,
-      );
+      // Register ESPHome adapter with StateManager and database
+      const esphomeAdapter = new ESPHomeAdapter(this.stateManager, this.db);
       this.protocolAdapters.set(ProtocolType.ESPHome, esphomeAdapter);
+      this.entityAwareAdapters.set(ProtocolType.ESPHome, esphomeAdapter);
       log('Registered ESPHome adapter');
 
-      // Register Hue adapter with StateManager
-      const hueAdapter = new HueAdapter(this.stateManager);
+      // Register Hue adapter with StateManager and database
+      const hueAdapter = new HueAdapter(this.stateManager, this.db);
       this.protocolAdapters.set(ProtocolType.Hue, hueAdapter);
+      this.entityAwareAdapters.set(ProtocolType.Hue, hueAdapter);
       log('Registered Hue adapter');
 
       // TODO: Register other adapters (Matter, Zigbee, etc.)
@@ -115,18 +106,29 @@ export class HubDaemon {
 
     log('Starting hub daemon');
 
-    // Register hub as a device if Supabase is enabled
-    if (this.supabaseSync) {
+    // Create or get home if database is enabled
+    if (this.db) {
+      // For now, create a default home or get the first one
+      // In a real implementation, this would be based on user authentication
+      this.homeId = await this.db.registerHome(
+        env.HUB_NAME || 'Cove Home',
+        'America/Los_Angeles',
+      );
+
+      if (this.homeId) {
+        log(`Using home: ${this.homeId}`);
+      }
+    }
+
+    // Register hub as a device if database is enabled
+    if (this.db && this.homeId) {
       const systemInfo = getSystemInfo();
 
-      // Use hub ID as external ID for deduplication
-      // This ensures we reuse the same device record on restart
-      const hubExternalId = `hub_${this.hubId}`;
-
-      const hubDevice = await this.supabaseSync.registerHubAsDevice({
-        available: true,
-        capabilities: [],
-        config: {
+      const hubDevice = await this.db.registerHubAsDevice({
+        homeId: this.homeId,
+        ipAddress: systemInfo.ipAddress,
+        manufacturer: 'Cove',
+        metadata: {
           // Hub-specific configuration
           autoUpdate: true,
           discoveryEnabled: env.DISCOVERY_ENABLED,
@@ -138,39 +140,26 @@ export class HubDaemon {
           ...systemInfo,
           apiPort: env.PORT || 3100,
         },
-        deviceType: DeviceType.CoveHub, // Our Cove Hub (not a connected hub device)
-        externalId: hubExternalId, // External ID for deduplication
-        hubId: undefined, // Hub doesn't have a parent hub
-        ipAddress: systemInfo.ipAddress, // Use actual IP address instead of hostname
-        manufacturer: 'Cove',
         model: 'Cove Hub',
         name: env.HUB_NAME || 'Cove Hub',
-        online: true,
-        state: {
-          online: true,
-          uptime: systemInfo.uptime,
-        },
-        version: env.HUB_VERSION || '0.1.0',
       });
 
       if (hubDevice?.id) {
         this.hubDeviceId = hubDevice.id;
-        log(
-          `Hub registered as device: ${this.hubDeviceId} (external: ${hubExternalId})`,
-        );
+        log(`Hub registered as device: ${this.hubDeviceId}`);
       }
     }
 
     // Initialize event and metrics collectors after we have hub device ID
     if (this.hubDeviceId) {
       this.eventCollector = new DeviceEventCollector({
+        db: this.db,
         deviceId: this.hubDeviceId,
-        supabaseSync: this.supabaseSync,
       });
 
       this.metricsCollector = new DeviceMetricsCollector({
+        db: this.db,
         deviceId: this.hubDeviceId,
-        supabaseSync: this.supabaseSync,
       });
 
       // Start collectors
@@ -178,13 +167,16 @@ export class HubDaemon {
       this.metricsCollector.start();
 
       // Initialize command processor now that we have event collector
-      // (only if Supabase is configured)
-      if (this.supabaseSync) {
+      // (only if database is configured)
+      if (this.db) {
         this.commandProcessor = new CommandProcessor(this.protocolAdapters, {
+          db: this.db,
+          entityAwareAdapters: this.entityAwareAdapters,
           eventCollector: this.eventCollector,
-          supabaseSync: this.supabaseSync,
         });
-        log('Command processor initialized with event collector');
+        log(
+          'Command processor initialized with event collector and entity-aware adapters',
+        );
       }
     }
 
@@ -195,56 +187,37 @@ export class HubDaemon {
         log(`Initialized ${protocol} adapter`);
 
         this.eventCollector?.emit({
-          eventType: EventType.AdapterInitialized,
+          eventType: HubEventType.AdapterInitialized,
           message: `${protocol} adapter initialized successfully`,
-          metadata: { protocol },
-          severity: EventSeverity.Info,
         });
       } catch (error) {
         log(`Failed to initialize ${protocol} adapter:`, error);
-
         this.eventCollector?.emit({
-          eventType: EventType.AdapterError,
+          eventType: HubEventType.AdapterError,
           message: `Failed to initialize ${protocol} adapter: ${error}`,
-          metadata: { error: String(error), protocol },
-          severity: EventSeverity.Error,
         });
       }
     }
 
-    // Start heartbeat to keep hub device updated (if cloud sync enabled)
-    if (this.supabaseSync && this.hubDeviceId) {
-      this.supabaseSync.startHeartbeat(
-        this.hubDeviceId,
-        env.TELEMETRY_INTERVAL || 30,
-      );
-      log('Cloud sync active');
+    // Start discovery
+    try {
+      await this.discoveryManager.start();
+      log('Discovery manager started');
 
       this.eventCollector?.emit({
-        eventType: EventType.SyncSuccess,
-        message: 'Cloud sync enabled and hub registered',
-        severity: EventSeverity.Info,
+        eventType: HubEventType.HubStarted,
+        message: 'Hub daemon started successfully',
+      });
+    } catch (error) {
+      log('Failed to start discovery manager:', error);
+      this.eventCollector?.emit({
+        eventType: HubEventType.SystemError,
+        message: `Failed to start discovery manager: ${error}`,
       });
     }
 
-    // Start discovery if enabled
-    if (env.DISCOVERY_ENABLED) {
-      await this.discoveryManager.start();
-    }
-
-    // Start command processor (if initialized)
-    if (this.commandProcessor) {
-      await this.commandProcessor.start();
-      log('Command processor started');
-    } else {
-      log('Command processor not initialized (no Supabase config)');
-    }
-
-    // Update metrics with initial adapter count
-    this.metricsCollector?.setActiveProtocols(this.protocolAdapters.size);
-
     this.running = true;
-    log('Hub daemon started');
+    log('Hub daemon started successfully');
   }
 
   async stop(): Promise<void> {
@@ -255,398 +228,276 @@ export class HubDaemon {
 
     log('Stopping hub daemon');
 
-    // Stop command processor
-    if (this.commandProcessor) {
-      await this.commandProcessor.stop();
-      log('Command processor stopped');
+    // Stop discovery
+    try {
+      await this.discoveryManager.stop();
+      log('Discovery manager stopped');
+    } catch (error) {
+      log('Error stopping discovery manager:', error);
     }
 
-    // Stop discovery
-    await this.discoveryManager.stop();
-
-    // Shutdown all protocol adapters
+    // Stop all protocol adapters
     for (const [protocol, adapter] of this.protocolAdapters.entries()) {
       try {
         await adapter.shutdown();
-        log(`Shut down ${protocol} adapter`);
+        log(`Stopped ${protocol} adapter`);
 
         this.eventCollector?.emit({
-          eventType: EventType.AdapterShutdown,
+          eventType: HubEventType.AdapterShutdown,
           message: `${protocol} adapter shut down`,
-          metadata: { protocol },
-          severity: EventSeverity.Info,
         });
       } catch (error) {
-        log(`Failed to shutdown ${protocol} adapter:`, error);
-
-        this.eventCollector?.emit({
-          eventType: EventType.AdapterError,
-          message: `Failed to shutdown ${protocol} adapter: ${error}`,
-          metadata: { error: String(error), protocol },
-          severity: EventSeverity.Error,
-        });
+        log(`Error stopping ${protocol} adapter:`, error);
       }
     }
 
-    // Mark hub device offline and stop heartbeat (if cloud sync enabled)
-    if (this.supabaseSync && this.hubDeviceId) {
-      await this.supabaseSync.markDeviceOffline(this.hubDeviceId);
+    // Stop collectors
+    if (this.metricsCollector) {
+      this.metricsCollector.stop();
+      log('Metrics collector stopped');
     }
 
-    // Stop collectors (this will trigger final sync)
-    if (this.metricsCollector) {
-      await this.metricsCollector.stop();
-    }
     if (this.eventCollector) {
-      await this.eventCollector.stop();
+      this.eventCollector.stop();
+      log('Event collector stopped');
     }
+
+    this.eventCollector?.emit({
+      eventType: HubEventType.HubStopped,
+      message: 'Hub daemon stopped',
+    });
 
     this.running = false;
     log('Hub daemon stopped');
   }
 
+  /**
+   * Handle device discovery - updated for entity-first architecture
+   */
   private async handleDeviceDiscovered(
     discovery: DeviceDiscovery,
   ): Promise<void> {
-    log(`New device discovered: ${discovery.name} (${discovery.protocol})`);
+    log(`Device discovered: ${discovery.name} (${discovery.protocol})`);
 
-    this.eventCollector?.emit({
-      eventType: EventType.DeviceDiscovered,
-      message: `Discovered ${discovery.protocol} device: ${discovery.name}`,
-      metadata: {
-        deviceName: discovery.name,
-        ipAddress: discovery.ipAddress,
-        protocol: discovery.protocol,
-      },
-      severity: EventSeverity.Info,
-    });
-
-    // Generate a stable, protocol-specific external ID for deduplication
-    // This is NOT the database ID - Drizzle will generate that (device_xxxxx)
-    const externalId = this.generateExternalId(discovery);
-    log(`Generated external ID: ${externalId}`);
-
-    // Determine device type, capabilities, and metadata based on protocol
-    let deviceType = discovery.deviceType || DeviceType.Other;
-    let capabilities: DeviceCapability[] = [];
-    let manufacturer: string | undefined;
-    let model: string | undefined;
-    let nativeType: string | undefined;
-
-    switch (discovery.protocol) {
-      case ProtocolType.Sonos:
-        deviceType = DeviceType.Speaker;
-        capabilities = [
-          DeviceCapability.AudioVolume,
-          DeviceCapability.AudioPlayback,
-        ];
-        manufacturer = 'Sonos, Inc.';
-        // Model will be fetched from device description XML (TODO: implement in adapter)
-        if (discovery.metadata?.txt) {
-          const txt = discovery.metadata.txt as Record<string, string>;
-          nativeType = txt.modelNumber;
-        }
-        break;
-
-      case ProtocolType.Hue:
-        // Hue bridges will be detected, but actual lights are handled by adapter
-        deviceType = DeviceType.Hub;
-        manufacturer = 'Signify Netherlands B.V.';
-        model = 'Hue Bridge';
-        break;
-
-      case ProtocolType.ESPHome:
-        // ESPHome device type varies - keep as-is or Other
-        manufacturer = 'Espressif';
-        if (discovery.metadata?.txt) {
-          const txt = discovery.metadata.txt as Record<string, string>;
-          model = txt.board || 'ESP32';
-          nativeType = txt.device_class;
-        } else {
-          model = 'ESP32';
-        }
-        break;
-
-      default:
-        // Keep default behavior
-        break;
-    }
-
-    const device = {
-      available: true,
-      capabilities,
-      config: {
-        ...(discovery.metadata || {}),
-        nativeType, // Store protocol's original device type
-      },
-      createdAt: new Date(),
-      deviceType,
-      externalId,
-      host: discovery.metadata?.host as string | undefined,
-      ipAddress: discovery.ipAddress,
-      macAddress: discovery.macAddress,
-      manufacturer, // Top-level field for searching
-      model, // Top-level field for searching
-      name: discovery.name,
-      online: true,
-      orgId: undefined,
-      protocol: discovery.protocol,
-      state: {},
-      updatedAt: new Date(),
-      userId: undefined, // Will be set when user claims the device
-    };
-
-    // Sync discovered device to Supabase (if enabled)
-    let syncedDevice: Device | null = device;
-    if (this.supabaseSync) {
-      syncedDevice = await this.supabaseSync.syncDevice(device);
-    }
-
-    // Use the synced device with database-generated ID for further operations
-    if (!syncedDevice?.id) {
-      log('Failed to sync device or device ID not generated');
-      return;
-    }
-
-    // Attempt to connect to device using protocol adapter
-    const adapter = this.protocolAdapters.get(discovery.protocol);
-    if (adapter) {
-      try {
-        log(
-          `Attempting to connect to ${discovery.protocol} device: ${discovery.name}`,
-        );
-        await adapter.connect(syncedDevice);
-        log(
-          `Successfully connected to ${discovery.protocol} device: ${discovery.name}`,
-        );
-
-        this.eventCollector?.emit({
-          eventType: EventType.DeviceConnected,
-          message: `Connected to ${discovery.protocol} device: ${discovery.name}`,
-          metadata: {
-            deviceId: syncedDevice.id,
-            deviceName: discovery.name,
-            protocol: discovery.protocol,
-          },
-          severity: EventSeverity.Info,
+    try {
+      // Create device record in database
+      if (this.db && this.homeId) {
+        const device = await this.db.insertDevice({
+          homeId: this.homeId,
+          ipAddress: discovery.ipAddress,
+          manufacturer:
+            (discovery.metadata.manufacturer as string) || 'Unknown',
+          metadata: discovery.metadata,
+          model: (discovery.metadata.model as string) || 'Unknown',
+          name: discovery.name,
         });
 
-        // Update connected devices count
-        this.updateConnectedDevicesCount();
+        if (!device) {
+          log(`Failed to insert device ${discovery.name} into database`);
+          return;
+        }
 
-        // For Hue bridges, get all lights and sync them
-        if (
-          discovery.protocol === ProtocolType.Hue &&
-          adapter instanceof HueAdapter
-        ) {
-          const lights = await adapter.getDevices(syncedDevice.id);
-          log(
-            `Discovered ${lights.length} lights on Hue bridge ${syncedDevice.name}`,
-          );
+        log(`Device ${discovery.name} inserted into database`);
 
-          // Sync each light to Supabase
-          if (this.supabaseSync) {
-            for (const light of lights) {
-              await this.supabaseSync.syncDevice(light);
+        // Connect to device using appropriate adapter
+        const adapter = this.protocolAdapters.get(discovery.protocol);
+        if (adapter?.connectDevice) {
+          try {
+            await adapter.connectDevice(device);
+            log(`Connected to device: ${discovery.name}`);
+
+            // If adapter supports entity discovery, discover entities
+            const entityAwareAdapter = this.entityAwareAdapters.get(
+              discovery.protocol,
+            );
+            if (entityAwareAdapter) {
+              const entities = await entityAwareAdapter.discoverEntities(
+                device.id,
+              );
+              log(
+                `Discovered ${entities.length} entities for device: ${discovery.name}`,
+              );
+
+              // Subscribe to entity state changes
+              for (const entity of entities) {
+                entityAwareAdapter.subscribeEntityState(
+                  entity.key,
+                  (stateUpdate) => {
+                    this.handleEntityStateUpdate(stateUpdate);
+                  },
+                );
+              }
             }
+
+            this.eventCollector?.emit({
+              eventType: HubEventType.DeviceDiscovered,
+              message: `Device discovered and connected: ${discovery.name}`,
+              metadata: {
+                deviceType: discovery.deviceType,
+                ipAddress: discovery.ipAddress,
+                protocol: discovery.protocol,
+              },
+            });
+          } catch (error) {
+            log(`Failed to connect to device ${discovery.name}:`, error);
+            this.eventCollector?.emit({
+              eventType: HubEventType.DeviceDisconnected,
+              message: `Failed to connect to device: ${discovery.name}`,
+              metadata: { error: String(error) },
+            });
           }
-
-          // Update connected devices count after adding lights
-          this.updateConnectedDevicesCount();
         }
-      } catch (error) {
-        log(
-          `Failed to connect to ${discovery.protocol} device ${discovery.name}:`,
-          error,
-        );
-
-        this.eventCollector?.emit({
-          eventType: EventType.AdapterError,
-          message: `Failed to connect to ${discovery.protocol} device ${discovery.name}: ${error}`,
-          metadata: {
-            deviceName: discovery.name,
-            error: String(error),
-            protocol: discovery.protocol,
-          },
-          severity: EventSeverity.Error,
-        });
       }
-    } else {
-      log(`No adapter registered for protocol: ${discovery.protocol}`);
-
-      this.eventCollector?.emit({
-        eventType: EventType.AdapterError,
-        message: `No adapter registered for protocol: ${discovery.protocol}`,
-        metadata: {
-          protocol: discovery.protocol,
-        },
-        severity: EventSeverity.Warning,
-      });
+    } catch (error) {
+      log(`Error handling device discovery for ${discovery.name}:`, error);
     }
   }
 
+  /**
+   * Handle device lost
+   */
   private async handleDeviceLost(deviceId: string): Promise<void> {
     log(`Device lost: ${deviceId}`);
 
-    this.eventCollector?.emit({
-      eventType: EventType.DeviceLost,
-      message: `Device lost: ${deviceId}`,
-      metadata: {
-        deviceId,
-      },
-      severity: EventSeverity.Warning,
-    });
+    try {
+      // Clear entity state cache for all entities of this device
+      if (this.stateManager && this.db) {
+        // Get entities for this device and clear their state
+        const entities = await this.db.getEntitiesForDevice(deviceId);
+        if (entities) {
+          for (const entity of entities) {
+            this.stateManager.clearEntityState(entity.id);
+          }
+        }
+      }
 
-    // Update connected devices count
-    this.updateConnectedDevicesCount();
-
-    // TODO: Update device status in Supabase
-    // Mark as offline
+      this.eventCollector?.emit({
+        eventType: HubEventType.DeviceLost,
+        message: `Device lost: ${deviceId}`,
+      });
+    } catch (error) {
+      log(`Error handling device lost for ${deviceId}:`, error);
+    }
   }
 
   /**
-   * Update connected devices count in metrics collector
+   * Handle entity state update
    */
-  private updateConnectedDevicesCount(): void {
-    let totalDevices = 0;
+  private handleEntityStateUpdate(stateUpdate: {
+    entityId: string;
+    state: string;
+    attrs?: Record<string, unknown>;
+    timestamp?: Date;
+  }): void {
+    log(`Entity state update: ${stateUpdate.entityId} = ${stateUpdate.state}`);
 
-    // Count devices from all adapters
-    for (const _adapter of this.protocolAdapters.values()) {
-      // This is a simplified count - in reality, we'd need to track this more carefully
-      totalDevices += 1;
+    if (this.stateManager) {
+      this.stateManager.updateState(stateUpdate);
     }
 
-    this.metricsCollector?.setConnectedDevices(totalDevices);
-  }
-
-  getHubId(): string {
-    return this.hubId;
-  }
-
-  isRunning(): boolean {
-    return this.running;
+    this.eventCollector?.emit({
+      eventType: HubEventType.StateChanged,
+      message: `Entity state changed: ${stateUpdate.entityId}`,
+      metadata: {
+        attrs: stateUpdate.attrs,
+        entityId: stateUpdate.entityId,
+        state: stateUpdate.state,
+      },
+    });
   }
 
   /**
-   * Get a protocol adapter by type
+   * Get daemon status
    */
-  getAdapter<T extends ProtocolAdapter>(protocol: ProtocolType): T | undefined {
-    return this.protocolAdapters.get(protocol) as T | undefined;
+  getStatus(): {
+    running: boolean;
+    hubId: string;
+    hubDeviceId: string | null;
+    homeId: string | null;
+    adapters: string[];
+    discoveryActive: boolean;
+    databaseConnected: boolean;
+  } {
+    return {
+      adapters: Array.from(this.protocolAdapters.keys()),
+      databaseConnected: this.db !== null,
+      discoveryActive: this.discoveryManager.isActive(),
+      homeId: this.homeId,
+      hubDeviceId: this.hubDeviceId,
+      hubId: this.hubId,
+      running: this.running,
+    };
   }
 
   /**
-   * Get all registered protocol adapters
+   * Get state manager statistics
+   */
+  getStateManagerStats(): Record<string, unknown> | null {
+    return this.stateManager?.getStats() || null;
+  }
+
+  /**
+   * Get protocol adapter
+   */
+  getAdapter(protocol: ProtocolType): ProtocolAdapter | undefined {
+    return this.protocolAdapters.get(protocol);
+  }
+
+  /**
+   * Get all protocol adapters
    */
   getAdapters(): Map<ProtocolType, ProtocolAdapter> {
     return this.protocolAdapters;
   }
 
   /**
-   * Get all discovered devices from all discovery services
+   * Check if daemon is running
+   */
+  isRunning(): boolean {
+    return this.running;
+  }
+
+  /**
+   * Get discovered devices
    */
   getDiscoveredDevices(): DeviceDiscovery[] {
     return this.discoveryManager.getDiscoveredDevices();
   }
 
   /**
-   * Get event collector for accessing events
+   * Get event collector
    */
   getEventCollector(): DeviceEventCollector | null {
     return this.eventCollector;
   }
 
   /**
-   * Get metrics collector for accessing metrics
+   * Get metrics collector
    */
   getMetricsCollector(): DeviceMetricsCollector | null {
     return this.metricsCollector;
   }
 
   /**
-   * Get hub's device ID
+   * Get hub ID
    */
-  getHubDeviceId(): string | null {
-    return this.hubDeviceId;
+  getHubId(): string {
+    return this.hubId;
   }
 
   /**
-   * Generate a stable, protocol-specific external ID for a discovered device
-   * This is used for deduplication and is NOT the database ID
-   *
-   * Priority:
-   * 1. Protocol-specific unique identifier (e.g., Hue uniqueid, ESPHome device name)
-   * 2. MAC address
-   * 3. IP + port + protocol (for devices on unique IPs)
-   * 4. Fallback to metadata-based hash
+   * Get command processor
    */
-  private generateExternalId(discovery: DeviceDiscovery): string {
-    const metadata = discovery.metadata || {};
+  getCommandProcessor(): CommandProcessor | null {
+    return this.commandProcessor;
+  }
 
-    // Protocol-specific ID generation
-    switch (discovery.protocol) {
-      case ProtocolType.Hue:
-        // Hue devices: use bridgeId if it's a bridge, or we'll handle lights via adapter
-        // For now, use IP + protocol for bridges (adapters will handle lights)
-        if (metadata.bridgeId) {
-          return `hue_bridge_${metadata.bridgeId}`;
-        }
-        break;
-
-      case ProtocolType.ESPHome:
-        // ESPHome devices typically have a unique device name
-        if (metadata.device_name || metadata.name) {
-          const deviceName = (metadata.device_name || metadata.name) as string;
-          return `esphome_${deviceName.replace(/[^a-zA-Z0-9]/g, '_')}`;
-        }
-        break;
-
-      case ProtocolType.Matter:
-        // Matter devices have unique identifiers
-        if (metadata.uniqueId || metadata.deviceId) {
-          const matterId = (metadata.uniqueId || metadata.deviceId) as string;
-          return `matter_${matterId.replace(/[^a-zA-Z0-9]/g, '_')}`;
-        }
-        break;
-
-      case ProtocolType.MQTT:
-        // MQTT devices often have a topic or client ID
-        if (metadata.clientId || metadata.topic) {
-          const mqttId = (metadata.clientId || metadata.topic) as string;
-          return `mqtt_${mqttId.replace(/[^a-zA-Z0-9]/g, '_')}`;
-        }
-        break;
-
-      case ProtocolType.Sonos:
-        // Sonos devices have a unique RINCON identifier in TXT records
-        if (metadata.txt && typeof metadata.txt === 'object') {
-          const txt = metadata.txt as Record<string, string>;
-          if (txt.uuid) {
-            // UUID format: RINCON_7828CA22AF1C01400
-            return `sonos_${txt.uuid.replace(/[^a-zA-Z0-9]/g, '_')}`;
-          }
-        }
-        break;
-    }
-
-    // Fallback 1: MAC address (most reliable for network devices)
-    if (discovery.macAddress) {
-      const sanitizedMac = discovery.macAddress
-        .replace(/[^a-zA-Z0-9]/g, '')
-        .toLowerCase();
-      return `${discovery.protocol}_mac_${sanitizedMac}`;
-    }
-
-    // Fallback 2: IP + port + protocol
-    if (discovery.ipAddress) {
-      const sanitizedIp = discovery.ipAddress.replace(/[^a-zA-Z0-9]/g, '_');
-      const port = metadata.port ? `_port_${metadata.port}` : '';
-      return `${discovery.protocol}_ip_${sanitizedIp}${port}`;
-    }
-
-    // Fallback 3: Name-based (least reliable, but better than nothing)
-    const sanitizedName = discovery.name
-      .replace(/[^a-zA-Z0-9]/g, '_')
-      .toLowerCase();
-    return `${discovery.protocol}_name_${sanitizedName}`;
+  /**
+   * Get entity-aware protocol adapter
+   */
+  getEntityAwareAdapter(
+    protocol: ProtocolType,
+  ): EntityAwareProtocolAdapter | undefined {
+    return this.entityAwareAdapters.get(protocol);
   }
 }

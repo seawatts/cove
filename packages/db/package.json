@@ -11,7 +11,7 @@
     "date-fns": "catalog:",
     "drizzle-orm": "catalog:",
     "drizzle-seed": "0.3.1",
-    "drizzle-zod": "0.8.3",
+    "drizzle-zod": "catalog:",
     "lodash-es": "4.17.21",
     "next": "catalog:",
     "postgres": "3.4.7",
@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
-    "@happy-dom/global-registrator": "20.0.0",
+    "@happy-dom/global-registrator": "20.0.2",
     "@t3-oss/env-core": "catalog:",
     "@t3-oss/env-nextjs": "catalog:",
     "@testing-library/jest-dom": "6.9.1",

@@ -12890,3 +12890,1687 @@
 [2025-10-15T08:37:07.328Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
 [2025-10-15T08:37:07.328Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
 [2025-10-15T08:37:07.328Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:08.487Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:08.487Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:37:08.487Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:37:08.489Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:08.489Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:37:08.489Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:08.492Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:08.492Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:37:08.492Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:08.494Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:08.494Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:37:08.494Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:08.496Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:08.496Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:37:08.496Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:08.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:08.503Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:37:08.503Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:09.773Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:09.773Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.20000000298023224 µg/m³
+[2025-10-15T08:37:09.773Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.20000000298023224 (threshold exceeded (Δ0.00))
+[2025-10-15T08:37:12.397Z] [DEBUG] cove:hub:supabase: Heartbeat sent
+[2025-10-15T08:37:13.014Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:13.014Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:17.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.20000000298023224 µg/m³
+[2025-10-15T08:37:17.138Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.20000000298023224 (filtered: state unchanged)
+[2025-10-15T08:37:17.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:17.142Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:37:17.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:17.142Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:37:17.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.147Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:17.147Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:37:17.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.905000686645508 °C
+[2025-10-15T08:37:17.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.905000686645508 °C (filtered: below threshold (Δ0.14 < 0.5))
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.029998779296875 %
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.029998779296875 % (filtered: below threshold (Δ0.16 < 2))
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:37:17.159Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:17.183Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:17.183Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:37:17.183Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:17.320Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:17.320Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0.10000000894069672 µg/m³
+[2025-10-15T08:37:17.320Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0.10000000894069672 µg/m³ (filtered: below threshold (Δ0.10 < 5))
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:37:18.509Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:19.776Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:19.776Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.20000000298023224 µg/m³
+[2025-10-15T08:37:19.776Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.20000000298023224 (threshold exceeded (Δ0.00))
+[2025-10-15T08:37:22.471Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.1%, Memory 62216MB/65536MB, Devices 2
+[2025-10-15T08:37:23.034Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:23.034Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:27.136Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.136Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:27.136Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:37:27.136Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.136Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:27.136Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.30000001192092896 (filtered: state unchanged)
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.30000001192092896 (filtered: state unchanged)
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.30000001192092896 (filtered: state unchanged)
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.905000686645508 °C
+[2025-10-15T08:37:27.175Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.905000686645508 °C (filtered: below threshold (Δ0.14 < 0.5))
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.02000045776367 %
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.02000045776367 % (filtered: below threshold (Δ0.15 < 2))
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:37:27.193Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:27.321Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:27.321Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:37:27.321Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:37:28.495Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:28.498Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:28.498Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:37:28.498Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:28.498Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:28.498Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:37:28.498Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:29.771Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:29.771Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.30000001192092896 µg/m³
+[2025-10-15T08:37:29.771Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.30000001192092896 (threshold exceeded (Δ0.10))
+[2025-10-15T08:37:33.051Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:33.051Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:34.535Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:34.535Z] [DEBUG] cove:esphome:native: Sensor state: DPS310 Pressure = 1010.2427978515625 hPa
+[2025-10-15T08:37:34.535Z] [DEBUG] cove:hub:state-manager: ✗ DPS310 Pressure: 1010.2427978515625 hPa (filtered: below threshold (Δ0.19 < 1))
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:37.138Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:37:37.139Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.139Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:37.139Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:37:37.141Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.141Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.899999618530273 °C
+[2025-10-15T08:37:37.141Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.899999618530273 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:37:37.145Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.145Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.029998779296875 %
+[2025-10-15T08:37:37.145Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.029998779296875 % (filtered: below threshold (Δ0.16 < 2))
+[2025-10-15T08:37:37.146Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.146Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:37:37.146Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:37:37.151Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:37.151Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:37:37.151Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:37:37.153Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:37.153Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:37:37.153Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:37.192Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:37.192Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:37:37.192Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:37.333Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:37.333Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:37:37.333Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.159496307373047 ppm
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.159496307373047 ppm (filtered: below threshold (Δ0.04 < 1))
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:37:38.521Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:38.532Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:38.532Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:37:38.532Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:39.777Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:39.777Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:39.777Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.10))
+[2025-10-15T08:37:42.009Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:42.009Z] [DEBUG] cove:esphome:native: Sensor state: ESP Temperature = 34.35580062866211 °C
+[2025-10-15T08:37:42.009Z] [DEBUG] cove:hub:state-manager: ✗ ESP Temperature: 34.35580062866211 °C (filtered: interval not elapsed (60s < 300s))
+[2025-10-15T08:37:42.357Z] [DEBUG] cove:hub:metrics: Syncing 3 state history records to Supabase
+[2025-10-15T08:37:42.364Z] [DEBUG] cove:hub:supabase: Inserted 3 state history records
+[2025-10-15T08:37:42.364Z] [DEBUG] cove:hub:metrics: Successfully synced 3 state history records
+[2025-10-15T08:37:42.399Z] [DEBUG] cove:hub:supabase: Heartbeat sent
+[2025-10-15T08:37:43.070Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:43.070Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:44.085Z] [DEBUG] cove:esphome:native: Received message type: 7 (0 bytes)
+[2025-10-15T08:37:44.085Z] [DEBUG] cove:esphome:native: Sent message type: 8 (0 bytes)
+[2025-10-15T08:37:45.215Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:45.216Z] [DEBUG] cove:esphome:native: Sensor state: CO2 = 463 ppm
+[2025-10-15T08:37:45.216Z] [DEBUG] cove:hub:state-manager: ✗ CO2: 463 ppm (filtered: below threshold (Δ2.00 < 5))
+[2025-10-15T08:37:47.133Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.133Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:47.133Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:47.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.144Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:47.144Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:47.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.144Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:47.144Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.899999618530273 °C
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.899999618530273 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.029998779296875 %
+[2025-10-15T08:37:47.148Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.029998779296875 % (filtered: below threshold (Δ0.16 < 2))
+[2025-10-15T08:37:47.151Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.151Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:37:47.151Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:37:47.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:47.152Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:37:47.152Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:37:47.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:47.152Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:37:47.152Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:47.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:47.186Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:37:47.186Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:47.321Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:47.321Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:37:47.321Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:48.175Z] [DEBUG] cove:esphome:native: Received message type: 27 (13 bytes)
+[2025-10-15T08:37:48.175Z] [DEBUG] cove:esphome:native: Text sensor state: VOC Quality = Normal
+[2025-10-15T08:37:48.175Z] [DEBUG] cove:hub:state-manager: ✗ VOC Quality: Normal index (filtered: value unchanged)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:37:48.511Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:49.773Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:49.773Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:49.773Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:37:51.748Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:51.748Z] [DEBUG] cove:esphome:native: Sensor state: RSSI = -43 dBm
+[2025-10-15T08:37:51.748Z] [DEBUG] cove:hub:state-manager: ✗ RSSI: -43 dBm (filtered: interval not elapsed (60s < 300s))
+[2025-10-15T08:37:53.089Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:53.089Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:37:54.081Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:54.081Z] [DEBUG] cove:esphome:native: Sensor state: Uptime = 1482.60205078125 s
+[2025-10-15T08:37:54.081Z] [DEBUG] cove:hub:state-manager: ✗ Uptime: 1482.60205078125 s (filtered: interval not elapsed (120s < 300s))
+[2025-10-15T08:37:57.131Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.131Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:57.131Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:57.133Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.133Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:57.133Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:57.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:57.135Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:57.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:57.138Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:37:57.141Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.141Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.899999618530273 °C
+[2025-10-15T08:37:57.141Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.899999618530273 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.04999923706055 %
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.04999923706055 % (filtered: below threshold (Δ0.18 < 2))
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:37:57.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:37:57.154Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:57.154Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:37:57.154Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:57.183Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:57.183Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:37:57.183Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:57.348Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:57.348Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:37:57.348Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:37:58.498Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:58.498Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:37:58.498Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:37:58.498Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:58.498Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:37:58.498Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:37:58.505Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:37:59.772Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:37:59.772Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:37:59.773Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:38:02.475Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.1%, Memory 62344MB/65536MB, Devices 2
+[2025-10-15T08:38:03.107Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:03.107Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:04.479Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:04.479Z] [DEBUG] cove:esphome:native: Sensor state: DPS310 Pressure = 1010.24169921875 hPa
+[2025-10-15T08:38:04.479Z] [DEBUG] cove:hub:state-manager: ✗ DPS310 Pressure: 1010.24169921875 hPa (filtered: below threshold (Δ0.19 < 1))
+[2025-10-15T08:38:07.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:38:07.135Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:38:07.136Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.136Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:38:07.136Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.899999618530273 °C
+[2025-10-15T08:38:07.150Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.899999618530273 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.040000915527344 %
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.040000915527344 % (filtered: below threshold (Δ0.17 < 2))
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:38:07.155Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:38:07.157Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:07.157Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:38:07.157Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:07.183Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:07.183Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:38:07.183Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:07.322Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:07.322Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:38:07.322Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:38:08.488Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:38:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:09.775Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:09.775Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.30000001192092896 µg/m³
+[2025-10-15T08:38:09.775Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.30000001192092896 (threshold exceeded (Δ0.10))
+[2025-10-15T08:38:12.400Z] [DEBUG] cove:hub:supabase: Heartbeat sent
+[2025-10-15T08:38:13.125Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:13.125Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.895000457763672 °C
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.895000457763672 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.040000915527344 %
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.040000915527344 % (filtered: below threshold (Δ0.17 < 2))
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:38:17.162Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:17.185Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:17.185Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:38:17.185Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:17.320Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:17.320Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:38:17.320Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:38:18.503Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:19.795Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:19.795Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:19.795Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.10))
+[2025-10-15T08:38:23.147Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:23.147Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:27.133Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.133Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:27.133Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:38:27.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:27.138Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:38:27.139Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.139Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:27.139Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:38:27.139Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.139Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:27.139Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:38:27.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.142Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.895000457763672 °C
+[2025-10-15T08:38:27.142Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.895000457763672 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:38:27.146Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.146Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.029998779296875 %
+[2025-10-15T08:38:27.146Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.029998779296875 % (filtered: below threshold (Δ0.16 < 2))
+[2025-10-15T08:38:27.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:38:27.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:38:27.172Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:27.172Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:38:27.172Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:38:27.174Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:27.174Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:38:27.174Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:27.187Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:27.187Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:38:27.187Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:27.320Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:27.320Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:38:27.320Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:28.501Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:28.501Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:38:28.501Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:38:28.523Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:28.523Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:38:28.524Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:29.777Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:29.777Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:29.777Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:38:32.478Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.1%, Memory 62243MB/65536MB, Devices 2
+[2025-10-15T08:38:33.166Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:33.166Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:34.477Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:34.478Z] [DEBUG] cove:esphome:native: Sensor state: DPS310 Pressure = 1010.24169921875 hPa
+[2025-10-15T08:38:34.478Z] [DEBUG] cove:hub:state-manager: ✗ DPS310 Pressure: 1010.24169921875 hPa (filtered: below threshold (Δ0.19 < 1))
+[2025-10-15T08:38:37.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:37.135Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.5 (state changed)
+[2025-10-15T08:38:37.137Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.137Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:37.137Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.5 (state changed)
+[2025-10-15T08:38:37.139Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.139Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:37.139Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.5 (state changed)
+[2025-10-15T08:38:37.143Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.143Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:37.144Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.5 (state changed)
+[2025-10-15T08:38:37.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.144Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.895000457763672 °C
+[2025-10-15T08:38:37.144Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.895000457763672 °C (filtered: below threshold (Δ0.15 < 0.5))
+[2025-10-15T08:38:37.149Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.149Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.040000915527344 %
+[2025-10-15T08:38:37.149Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.040000915527344 % (filtered: below threshold (Δ0.17 < 2))
+[2025-10-15T08:38:37.150Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.150Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:38:37.150Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:38:37.153Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:37.153Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:38:37.153Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:38:37.159Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:37.159Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:38:37.159Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:37.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:37.186Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:38:37.186Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:37.320Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:37.320Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:38:37.320Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:38.486Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:38.486Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:38:38.486Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:38:38.490Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:38.490Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:38:38.490Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:38.490Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:38.490Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:38:38.490Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:38.491Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:38.491Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:38:38.491Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:38.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:38.497Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:38:38.497Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:38.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:38.497Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:38:38.497Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:39.828Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:39.828Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.5 µg/m³
+[2025-10-15T08:38:39.828Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.5 (threshold exceeded (Δ0.10))
+[2025-10-15T08:38:42.006Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:42.006Z] [DEBUG] cove:esphome:native: Sensor state: ESP Temperature = 34.79439926147461 °C
+[2025-10-15T08:38:42.006Z] [DEBUG] cove:hub:state-manager: ✗ ESP Temperature: 34.79439926147461 °C (filtered: interval not elapsed (120s < 300s))
+[2025-10-15T08:38:42.359Z] [DEBUG] cove:hub:metrics: Syncing 2 state history records to Supabase
+[2025-10-15T08:38:42.373Z] [DEBUG] cove:hub:supabase: Inserted 2 state history records
+[2025-10-15T08:38:42.373Z] [DEBUG] cove:hub:metrics: Successfully synced 2 state history records
+[2025-10-15T08:38:42.405Z] [DEBUG] cove:hub:supabase: Heartbeat sent
+[2025-10-15T08:38:43.187Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:43.187Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:44.109Z] [DEBUG] cove:esphome:native: Received message type: 7 (0 bytes)
+[2025-10-15T08:38:44.109Z] [DEBUG] cove:esphome:native: Sent message type: 8 (0 bytes)
+[2025-10-15T08:38:45.211Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:45.211Z] [DEBUG] cove:esphome:native: Sensor state: CO2 = 464 ppm
+[2025-10-15T08:38:45.211Z] [DEBUG] cove:hub:state-manager: ✗ CO2: 464 ppm (filtered: below threshold (Δ1.00 < 5))
+[2025-10-15T08:38:47.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:47.142Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.5 (filtered: state unchanged)
+[2025-10-15T08:38:47.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:47.142Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.5 (filtered: state unchanged)
+[2025-10-15T08:38:47.143Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.143Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:47.143Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.5 (filtered: state unchanged)
+[2025-10-15T08:38:47.143Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.143Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.5 µg/m³
+[2025-10-15T08:38:47.143Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.5 (filtered: state unchanged)
+[2025-10-15T08:38:47.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.152Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.889999389648438 °C
+[2025-10-15T08:38:47.152Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.889999389648438 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.060001373291016 %
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.060001373291016 % (filtered: below threshold (Δ0.19 < 2))
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:38:47.156Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:47.185Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:47.185Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:38:47.185Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:47.334Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:47.334Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:38:47.334Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:48.175Z] [DEBUG] cove:esphome:native: Received message type: 27 (13 bytes)
+[2025-10-15T08:38:48.175Z] [DEBUG] cove:esphome:native: Text sensor state: VOC Quality = Normal
+[2025-10-15T08:38:48.176Z] [DEBUG] cove:hub:state-manager: ✗ VOC Quality: Normal index (filtered: value unchanged)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:38:48.542Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:49.804Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:49.804Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.5 µg/m³
+[2025-10-15T08:38:49.804Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.5 (threshold exceeded (Δ0.00))
+[2025-10-15T08:38:51.763Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:51.763Z] [DEBUG] cove:esphome:native: Sensor state: RSSI = -44 dBm
+[2025-10-15T08:38:51.763Z] [DEBUG] cove:hub:state-manager: ✗ RSSI: -44 dBm (filtered: interval not elapsed (120s < 300s))
+[2025-10-15T08:38:53.214Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:53.214Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:38:54.082Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:54.082Z] [DEBUG] cove:esphome:native: Sensor state: Uptime = 1542.60205078125 s
+[2025-10-15T08:38:54.082Z] [DEBUG] cove:hub:state-manager: ✗ Uptime: 1542.60205078125 s (filtered: interval not elapsed (180s < 300s))
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.4000000059604645 (state changed)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.144Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.889999389648438 °C
+[2025-10-15T08:38:57.145Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.889999389648438 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:38:57.150Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.150Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.08000183105469 %
+[2025-10-15T08:38:57.150Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.08000183105469 % (filtered: below threshold (Δ0.21 < 2))
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:38:57.156Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:57.187Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:57.187Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:38:57.187Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:57.321Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:57.321Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:38:57.321Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:38:58.490Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:58.490Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:38:58.490Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:38:58.493Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:58.493Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:38:58.493Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:58.493Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:58.493Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:38:58.493Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:58.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:58.495Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:38:58.495Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:58.499Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:58.500Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:38:58.500Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:58.519Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:38:58.520Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:38:58.520Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:38:59.778Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:38:59.778Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:38:59.778Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.10))
+[2025-10-15T08:39:02.482Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.2%, Memory 62996MB/65536MB, Devices 2
+[2025-10-15T08:39:03.232Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:03.232Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:04.474Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:04.474Z] [DEBUG] cove:esphome:native: Sensor state: DPS310 Pressure = 1010.2478637695312 hPa
+[2025-10-15T08:39:04.474Z] [DEBUG] cove:hub:state-manager: ✗ DPS310 Pressure: 1010.2478637695312 hPa (filtered: below threshold (Δ0.20 < 1))
+[2025-10-15T08:39:07.134Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.134Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:07.134Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:07.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:07.135Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:07.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:07.142Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.889999389648438 °C
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.889999389648438 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.09000015258789 %
+[2025-10-15T08:39:07.146Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.09000015258789 % (filtered: below threshold (Δ0.22 < 2))
+[2025-10-15T08:39:07.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:39:07.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:39:07.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:07.152Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:39:07.152Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:39:07.154Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:07.154Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:39:07.154Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:07.184Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:07.184Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:39:07.184Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:07.345Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:07.345Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:39:07.345Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:08.485Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:08.485Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:39:08.485Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:39:08.486Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:08.486Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:39:08.486Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:08.489Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:08.489Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:39:08.489Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:39:08.500Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:09.777Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:09.777Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:09.777Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:39:12.414Z] [DEBUG] cove:hub:supabase: Heartbeat sent
+[2025-10-15T08:39:12.483Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.2%, Memory 62866MB/65536MB, Devices 2
+[2025-10-15T08:39:13.249Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:13.249Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.185Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.885000228881836 °C
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.885000228881836 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.08000183105469 %
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.08000183105469 % (filtered: below threshold (Δ0.21 < 2))
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:39:17.186Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:17.323Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:17.323Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:39:17.323Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:18.486Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:18.486Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:39:18.486Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:39:18.488Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:18.488Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:39:18.488Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:18.490Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:18.490Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:39:18.490Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:18.493Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:18.493Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:39:18.493Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:18.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:18.497Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:39:18.497Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:18.498Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:18.498Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:39:18.498Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:19.772Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:19.772Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:19.772Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:39:22.484Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.1%, Memory 63970MB/65536MB, Devices 2
+[2025-10-15T08:39:23.268Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:23.268Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:27.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:27.135Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:27.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:27.135Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:27.137Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.137Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:27.137Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:27.139Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.139Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:27.139Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:27.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.885000228881836 °C
+[2025-10-15T08:39:27.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.885000228881836 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:39:27.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.09000015258789 %
+[2025-10-15T08:39:27.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.09000015258789 % (filtered: below threshold (Δ0.22 < 2))
+[2025-10-15T08:39:27.148Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.148Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:39:27.148Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:39:27.151Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:27.151Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:39:27.151Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:39:27.154Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:27.154Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:39:27.154Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:27.186Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:27.186Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:39:27.186Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:27.321Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:27.321Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:39:27.321Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:39:28.489Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:39:28.494Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:29.776Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:29.776Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:29.776Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:39:32.485Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.1%, Memory 62942MB/65536MB, Devices 2
+[2025-10-15T08:39:33.282Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:33.282Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:34.479Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:34.479Z] [DEBUG] cove:esphome:native: Sensor state: DPS310 Pressure = 1010.2365112304688 hPa
+[2025-10-15T08:39:34.479Z] [DEBUG] cove:hub:state-manager: ✗ DPS310 Pressure: 1010.2365112304688 hPa (filtered: below threshold (Δ0.19 < 1))
+[2025-10-15T08:39:37.136Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.136Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:37.136Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:37.136Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.136Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:37.136Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:37.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:37.138Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:37.139Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.139Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:37.139Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:37.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.142Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.885000228881836 °C
+[2025-10-15T08:39:37.142Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.885000228881836 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:39:37.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.144Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.099998474121094 %
+[2025-10-15T08:39:37.144Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.099998474121094 % (filtered: below threshold (Δ0.23 < 2))
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 136 
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 136 index (filtered: below threshold (Δ2.00 < 10))
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:39:37.152Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:37.183Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:37.183Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:39:37.183Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:37.320Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:37.320Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:39:37.320Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:38.484Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:38.484Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:39:38.485Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:39:38.486Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:38.486Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:39:38.486Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:38.488Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:38.488Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:39:38.488Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:38.492Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:38.492Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:39:38.492Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:38.496Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:38.496Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:39:38.496Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:38.496Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:38.496Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:39:38.497Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:39.782Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:39.782Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:39.782Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:39:42.005Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:42.005Z] [DEBUG] cove:esphome:native: Sensor state: ESP Temperature = 34.35580062866211 °C
+[2025-10-15T08:39:42.005Z] [DEBUG] cove:hub:state-manager: ✗ ESP Temperature: 34.35580062866211 °C (filtered: interval not elapsed (180s < 300s))
+[2025-10-15T08:39:42.360Z] [DEBUG] cove:hub:metrics: Syncing 4 state history records to Supabase
+[2025-10-15T08:39:42.367Z] [DEBUG] cove:hub:supabase: Inserted 4 state history records
+[2025-10-15T08:39:42.367Z] [DEBUG] cove:hub:metrics: Successfully synced 4 state history records
+[2025-10-15T08:39:42.406Z] [DEBUG] cove:hub:supabase: Heartbeat sent
+[2025-10-15T08:39:42.487Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.2%, Memory 60483MB/65536MB, Devices 2
+[2025-10-15T08:39:43.304Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:43.304Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:44.178Z] [DEBUG] cove:esphome:native: Received message type: 7 (0 bytes)
+[2025-10-15T08:39:44.178Z] [DEBUG] cove:esphome:native: Sent message type: 8 (0 bytes)
+[2025-10-15T08:39:45.216Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:45.216Z] [DEBUG] cove:esphome:native: Sensor state: CO2 = 466 ppm
+[2025-10-15T08:39:45.216Z] [DEBUG] cove:hub:state-manager: ✗ CO2: 466 ppm (filtered: below threshold (Δ1.00 < 5))
+[2025-10-15T08:39:47.137Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.137Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:47.137Z] [DEBUG] cove:hub:state-manager: ✗ PM <1µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:47.137Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.137Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:47.137Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:47.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:47.138Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:47.153Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.153Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:47.153Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:47.156Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.156Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.885000228881836 °C
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.885000228881836 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.099998474121094 %
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.099998474121094 % (filtered: below threshold (Δ0.23 < 2))
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 135 
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 135 index (filtered: below threshold (Δ3.00 < 10))
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:39:47.157Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:47.188Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:47.188Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:39:47.188Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:47.324Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:47.324Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:39:47.324Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:48.172Z] [DEBUG] cove:esphome:native: Received message type: 27 (13 bytes)
+[2025-10-15T08:39:48.172Z] [DEBUG] cove:esphome:native: Text sensor state: VOC Quality = Normal
+[2025-10-15T08:39:48.173Z] [DEBUG] cove:hub:state-manager: ✗ VOC Quality: Normal index (filtered: value unchanged)
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:39:48.497Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:48.528Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:48.528Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:39:48.528Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:49.776Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:49.776Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:49.776Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.4000000059604645 (threshold exceeded (Δ0.00))
+[2025-10-15T08:39:51.756Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:51.756Z] [DEBUG] cove:esphome:native: Sensor state: RSSI = -43 dBm
+[2025-10-15T08:39:51.756Z] [DEBUG] cove:hub:state-manager: ✗ RSSI: -43 dBm (filtered: interval not elapsed (180s < 300s))
+[2025-10-15T08:39:52.489Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.2%, Memory 60358MB/65536MB, Devices 2
+[2025-10-15T08:39:53.048Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:39:53.321Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:53.321Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:39:54.071Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:54.071Z] [DEBUG] cove:esphome:native: Sensor state: Uptime = 1602.5970458984375 s
+[2025-10-15T08:39:54.071Z] [DEBUG] cove:hub:state-manager: ✗ Uptime: 1602.5970458984375 s (filtered: interval not elapsed (240s < 300s))
+[2025-10-15T08:39:55.044Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:39:57.043Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:39:57.134Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.134Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:39:57.134Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:39:57.135Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.135Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:57.135Z] [DEBUG] cove:hub:state-manager: ✗ PM <2.5µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:57.137Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:39:57.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:57.138Z] [DEBUG] cove:hub:state-manager: ✗ PM <4µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:57.141Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.141Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.4000000059604645 µg/m³
+[2025-10-15T08:39:57.141Z] [DEBUG] cove:hub:state-manager: ✗ PM <10µm Weight concentration: 0.4000000059604645 (filtered: state unchanged)
+[2025-10-15T08:39:57.142Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:39:57.142Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <1µm Weight concentration
+[2025-10-15T08:39:57.160Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.160Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.885000228881836 °C
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.885000228881836 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.099998474121094 %
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.099998474121094 % (filtered: below threshold (Δ0.23 < 2))
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 135 
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 135 index (filtered: below threshold (Δ3.00 < 10))
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:39:57.161Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:57.184Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:57.184Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:39:57.184Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:39:57.323Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:57.323Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0.09999999403953552 µg/m³
+[2025-10-15T08:39:57.323Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0.09999999403953552 µg/m³ (filtered: below threshold (Δ0.10 < 5))
+[2025-10-15T08:39:58.494Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:58.494Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:39:58.494Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:39:58.494Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:58.494Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:39:58.494Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:39:58.508Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:39:59.047Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:39:59.793Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:39:59.793Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.30000001192092896 µg/m³
+[2025-10-15T08:39:59.793Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.30000001192092896 (threshold exceeded (Δ0.10))
+[2025-10-15T08:39:59.799Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:39:59.802Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:39:59.802Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM 0.3 To 1 µm
+[2025-10-15T08:40:01.046Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:02.492Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.2%, Memory 60206MB/65536MB, Devices 2
+[2025-10-15T08:40:03.048Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:03.336Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:40:03.336Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:40:04.475Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:04.475Z] [DEBUG] cove:esphome:native: Sensor state: DPS310 Pressure = 1010.2351684570312 hPa
+[2025-10-15T08:40:04.475Z] [DEBUG] cove:hub:state-manager: ✗ DPS310 Pressure: 1010.2351684570312 hPa (filtered: below threshold (Δ0.18 < 1))
+[2025-10-15T08:40:05.051Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError: Failed query: select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2
+params: pending,100
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (native:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:07.048Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError: Failed query: select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2
+params: pending,100
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (native:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:07.133Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.133Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:07.133Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:07.136Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:07.137Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:07.137Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <1µm Weight concentration
+[2025-10-15T08:40:07.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:07.138Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:07.138Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.138Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:07.138Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:07.139Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:07.139Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <4µm Weight concentration
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:07.140Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <2.5µm Weight concentration
+[2025-10-15T08:40:07.142Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:07.143Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:07.143Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <10µm Weight concentration
+[2025-10-15T08:40:07.143Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.143Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.885000228881836 °C
+[2025-10-15T08:40:07.143Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.885000228881836 °C (filtered: below threshold (Δ0.16 < 0.5))
+[2025-10-15T08:40:07.147Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.147Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.09000015258789 %
+[2025-10-15T08:40:07.147Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.09000015258789 % (filtered: below threshold (Δ0.22 < 2))
+[2025-10-15T08:40:07.151Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.151Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 135 
+[2025-10-15T08:40:07.151Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 135 index (filtered: below threshold (Δ3.00 < 10))
+[2025-10-15T08:40:07.152Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:07.152Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:40:07.152Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:40:07.158Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:07.158Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:40:07.158Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:40:07.187Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:07.187Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:40:07.187Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:40:07.322Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:07.323Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:40:07.323Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.17291784286499 ppm
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.17291784286499 ppm (filtered: below threshold (Δ0.03 < 1))
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:40:08.495Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:08.501Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:08.501Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:40:08.501Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:09.048Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:09.778Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:09.778Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:09.779Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.30000001192092896 (threshold exceeded (Δ0.10))
+[2025-10-15T08:40:09.781Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:09.784Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:09.784Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM 0.3 To 1 µm
+[2025-10-15T08:40:11.052Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:12.404Z] [DEBUG] cove:hub:supabase: Heartbeat error: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:12.491Z] [DEBUG] cove:hub:metrics: Recorded state: CPU 0.2%, Memory 60434MB/65536MB, Devices 2
+[2025-10-15T08:40:13.050Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:13.351Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:40:13.351Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:40:15.051Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:17.052Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError: Failed query: select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2
+params: pending,100
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (native:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:17.141Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.141Z] [DEBUG] cove:esphome:native: Sensor state: PM <1µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:hub:state-manager: ✓ PM <1µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <2.5µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:hub:state-manager: ✓ PM <2.5µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <4µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:hub:state-manager: ✓ PM <4µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Sensor state: PM <10µm Weight concentration = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:hub:state-manager: ✓ PM <10µm Weight concentration: 0.30000001192092896 (state changed)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Temperature = 15.879999160766602 °C
+[2025-10-15T08:40:17.142Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Temperature: 15.879999160766602 °C (filtered: below threshold (Δ0.17 < 0.5))
+[2025-10-15T08:40:17.144Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.144Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 Humidity = 40.08000183105469 %
+[2025-10-15T08:40:17.144Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 Humidity: 40.08000183105469 % (filtered: below threshold (Δ0.21 < 2))
+[2025-10-15T08:40:17.145Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:17.145Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:17.145Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:17.146Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:17.146Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:17.146Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <2.5µm Weight concentration
+[2025-10-15T08:40:17.146Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:17.146Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <4µm Weight concentration
+[2025-10-15T08:40:17.147Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:17.147Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <10µm Weight concentration
+[2025-10-15T08:40:17.147Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:17.147Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM <1µm Weight concentration
+[2025-10-15T08:40:17.162Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.162Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 VOC = 135 
+[2025-10-15T08:40:17.162Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 VOC: 135 index (filtered: below threshold (Δ3.00 < 10))
+[2025-10-15T08:40:17.174Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:17.174Z] [DEBUG] cove:esphome:native: Sensor state: SEN55 NOX = 1 
+[2025-10-15T08:40:17.174Z] [DEBUG] cove:hub:state-manager: ✗ SEN55 NOX: 1 index (filtered: below threshold (Δ0.00 < 2))
+[2025-10-15T08:40:17.174Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:17.174Z] [DEBUG] cove:esphome:native: Sensor state: PM 2.5 To 4 µm = 0 µg/m³
+[2025-10-15T08:40:17.174Z] [DEBUG] cove:hub:state-manager: ✗ PM 2.5 To 4 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:40:17.194Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:17.194Z] [DEBUG] cove:esphome:native: Sensor state: PM 4 To 10 µm = 0 µg/m³
+[2025-10-15T08:40:17.194Z] [DEBUG] cove:hub:state-manager: ✗ PM 4 To 10 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:40:17.321Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:17.321Z] [DEBUG] cove:esphome:native: Sensor state: PM 1 To 2.5 µm = 0 µg/m³
+[2025-10-15T08:40:17.321Z] [DEBUG] cove:hub:state-manager: ✗ PM 1 To 2.5 µm: 0 µg/m³ (filtered: below threshold (Δ0.00 < 5))
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Sensor state: Carbon Monoxide = 4.159496307373047 ppm
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:hub:state-manager: ✗ Carbon Monoxide: 4.159496307373047 ppm (filtered: below threshold (Δ0.04 < 1))
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Sensor state: Nitrogen Dioxide = 0.164000004529953 ppm
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:hub:state-manager: ✗ Nitrogen Dioxide: 0.164000004529953 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Sensor state: Methane = 0 ppm
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:hub:state-manager: ✗ Methane: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Sensor state: Ethanol = 0 ppm
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:hub:state-manager: ✗ Ethanol: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Sensor state: Hydrogen = 0 ppm
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:hub:state-manager: ✗ Hydrogen: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Received message type: 25 (5 bytes)
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:esphome:native: Sensor state: Ammonia = 0 ppm
+[2025-10-15T08:40:18.504Z] [DEBUG] cove:hub:state-manager: ✗ Ammonia: 0 ppm (filtered: below threshold (Δ0.00 < 0.1))
+[2025-10-15T08:40:19.053Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError: Failed query: select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2
+params: pending,100
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (native:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:19.773Z] [DEBUG] cove:esphome:native: Received message type: 25 (10 bytes)
+[2025-10-15T08:40:19.773Z] [DEBUG] cove:esphome:native: Sensor state: PM 0.3 To 1 µm = 0.30000001192092896 µg/m³
+[2025-10-15T08:40:19.773Z] [DEBUG] cove:hub:state-manager: ✓ PM 0.3 To 1 µm: 0.30000001192092896 (threshold exceeded (Δ0.10))
+[2025-10-15T08:40:19.780Z] [DEBUG] cove:hub:supabase: Error updating device state: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.devices' in the schema cache"
+}
+[2025-10-15T08:40:19.782Z] [DEBUG] cove:hub:supabase: Error inserting state history: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.states' in the schema cache"
+}
+[2025-10-15T08:40:19.782Z] [DEBUG] cove:hub:state-manager: Failed to persist state for PM 0.3 To 1 µm
+[2025-10-15T08:40:21.053Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:23.055Z] [DEBUG] cove:hub:command-processor: Error processing pending commands: DrizzleQueryError
+    at queryWithCache (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/drizzle-orm@0.44.6/node_modules/drizzle-orm/pg-core/session.js:41:19)
+    at processTicksAndRejections (unknown:7:39) {
+  query: 'select "capability", "createdAt", "deviceId", "error", "id", "processedAt", "status", "userId", "value" from "commands" "Commands" where "Commands"."status" = $1 order by "Commands"."createdAt" asc limit $2',
+  params: [ 'pending', 100 ],
+  cause: PostgresError: relation "commands" does not exist
+      at ErrorResponse (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+      at handle (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:479:7)
+      at data (/Users/seawatts/src/github.com/seawatts/cove/node_modules/.bun/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+      at emit (node:events:95:22)
+      at addChunk (internal:streams/readable:265:47)
+      at readableAddChunkPushByteMode (internal:streams/readable:243:18)
+      at data (node:net:296:52) {
+    severity_local: 'ERROR',
+    severity: 'ERROR',
+    code: '42P01',
+    position: '110',
+    file: 'parse_relation.c',
+    routine: 'parserOpenTable'
+  }
+}
+[2025-10-15T08:40:23.366Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling
+[2025-10-15T08:40:23.366Z] [DEBUG] cove:hub:command-processor: ⚠️ Error subscribing to Realtime, falling back to polling

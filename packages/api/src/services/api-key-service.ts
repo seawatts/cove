@@ -5,7 +5,7 @@
 
 import { eq } from '@cove/db';
 import { db } from '@cove/db/client';
-import { ApiKeys, ApiKeyUsage } from '@cove/db/schema';
+import { apiKeys, ApiKeyUsage } from '@cove/db/schema';
 
 export type ApiKeyUsageType = 'mcp-server';
 
@@ -28,7 +28,7 @@ export async function trackApiKeyUsage({
 }) {
   try {
     // Find the API key record
-    const apiKeyRecord = await db.query.ApiKeys.findFirst({
+    const apiKeyRecord = await db.query.apiKeys.findFirst({
       where: eq(ApiKeys.key, apiKey),
     });
 

@@ -58,7 +58,6 @@ const nextConfig = {
     '@cove/id',
     '@cove/ui',
     '@cove/logger',
-    '@cove/stripe',
   ],
   typescript: { ignoreBuildErrors: true },
 };

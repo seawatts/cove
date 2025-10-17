@@ -114,10 +114,9 @@ function calculateTrend(
   };
 }
 
-export function ValueCardWidget({ deviceId, sensor, config }: WidgetProps) {
-  const { data: stateHistory = [] } = api.device.getStateHistory.useQuery({
-    deviceId,
-    stateKey: sensor.key,
+export function ValueCardWidget({ sensor, config }: WidgetProps) {
+  const { data: stateHistory = [] } = api.entity.getStateHistory.useQuery({
+    entityId: sensor.key, // sensor.key is now the entityId
     timeRange: '24h',
   });
 
