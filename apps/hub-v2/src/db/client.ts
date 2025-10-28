@@ -1,5 +1,6 @@
 import { Database } from 'bun:sqlite';
-import { join } from 'node:path';
+import { mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import type { BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
@@ -18,7 +19,19 @@ export class DatabaseWrapper {
   private initialized = false;
 
   constructor(dbPath?: string) {
-    this.sqlite = new Database(dbPath || 'hub.db');
+    const path = dbPath || 'hub.db';
+
+    // Create parent directory if it doesn't exist
+    const parentDir = dirname(path);
+    if (parentDir !== '.') {
+      try {
+        mkdirSync(parentDir, { recursive: true });
+      } catch {
+        // Ignore errors - directory might already exist
+      }
+    }
+
+    this.sqlite = new Database(path);
     this.client = drizzle(this.sqlite, { schema });
   }
 
