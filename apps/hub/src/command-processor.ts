@@ -5,7 +5,7 @@
  */
 
 import { db } from '@cove/db/client';
-import { device, entity } from '@cove/db/schema';
+import { devices, entities } from '@cove/db/schema';
 import { createClient } from '@cove/db/supabase/server';
 import { createId } from '@cove/id';
 import { debug } from '@cove/logger';
@@ -187,25 +187,25 @@ export class CommandProcessor {
       // Get the entity and its device using Drizzle
       const entityResult = await db
         .select({
+          capabilities: entities.capabilities,
           device: {
-            id: device.id,
-            ipAddress: device.ipAddress,
-            manufacturer: device.manufacturer,
-            metadata: device.metadata,
-            model: device.model,
-            name: device.name,
-            // TODO: Add protocol field to device table
-            // protocol: device.protocol,
+            id: devices.id,
+            ipAddress: devices.ipAddress,
+            manufacturer: devices.manufacturer,
+            metadata: devices.metadata,
+            model: devices.model,
+            name: devices.name,
+            protocol: devices.protocol,
           },
-          deviceId: entity.deviceId,
-          id: entity.id,
-          key: entity.key,
-          kind: entity.kind,
-          traits: entity.traits,
+          deviceClass: entities.deviceClass,
+          deviceId: entities.deviceId,
+          id: entities.id,
+          key: entities.key,
+          kind: entities.kind,
         })
-        .from(entity)
-        .innerJoin(device, eq(device.id, entity.deviceId))
-        .where(eq(entity.id, command.entityId))
+        .from(entities)
+        .innerJoin(devices, eq(devices.id, entities.deviceId))
+        .where(eq(entities.id, command.entityId))
         .limit(1);
 
       if (entityResult.length === 0) {
@@ -219,9 +219,8 @@ export class CommandProcessor {
 
       const deviceInfo = entityInfo.device;
 
-      // TODO: Get protocol from device metadata until protocol field is added to device table
-      const protocol =
-        (deviceInfo.metadata?.protocol as ProtocolType) || 'esphome';
+      // Get protocol directly from device table
+      const protocol = deviceInfo.protocol as ProtocolType;
       const adapter = this.adapters.get(protocol);
       const entityAwareAdapter = this.entityAwareAdapters.get(protocol);
 

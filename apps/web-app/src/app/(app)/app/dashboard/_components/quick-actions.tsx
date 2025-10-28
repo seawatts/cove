@@ -6,8 +6,8 @@ import { Icons } from '@cove/ui/custom/icons';
 import { Lightbulb } from 'lucide-react';
 
 export function QuickActions() {
-  // TODO: Implement actual scenes/actions
-  const scenes = [
+  // TODO: Implement actual quick actions
+  const actions = [
     { icon: 'Sunrise', id: 1, name: 'Good Morning' },
     { icon: 'Moon', id: 2, name: 'Good Night' },
     { icon: 'Tv', id: 3, name: 'Movie Time' },
@@ -20,17 +20,17 @@ export function QuickActions() {
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {scenes.map((scene) => {
+        {actions.map((action) => {
           const IconComponent =
-            Icons[scene.icon as keyof typeof Icons] || Lightbulb;
+            Icons[action.icon as keyof typeof Icons] || Lightbulb;
           return (
             <Button
               className="grid gap-2 h-auto p-4"
-              key={scene.id}
+              key={action.id}
               variant="outline"
             >
               <IconComponent className="size-6" />
-              <span className="text-sm">{scene.name}</span>
+              <span className="text-sm">{action.name}</span>
             </Button>
           );
         })}

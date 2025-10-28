@@ -1,17 +1,20 @@
 {
   "dependencies": {
+    "@bufbuild/protobuf": "2.9.0",
+    "@connectrpc/connect": "1.4.0",
     "@cove/logger": "workspace:*",
     "@cove/types": "workspace:*"
   },
   "description": "Protocol implementations for Cove home automation platform",
   "devDependencies": {
+    "@bufbuild/protoc-gen-es": "2.9.0",
+    "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@cove/tsconfig": "workspace:*",
     "typescript": "catalog:"
   },
   "exports": {
     ".": "./src/index.ts",
     "./esphome": "./src/esphome/index.ts",
-    "./esphome/native": "./src/esphome/native/index.ts",
     "./esphome/sse": "./src/esphome/sse.ts",
     "./homekit": "./src/homekit/index.ts",
     "./hue": "./src/hue/index.ts",
@@ -26,12 +29,12 @@
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist",
     "create:protocol": "bun run scripts/create-protocol.ts",
+    "generate": "buf generate",
     "test": "bun test tests/",
     "test:hue": "bun test tests/hue/*.test.ts --exclude tests/hue/integration.test.ts",
     "test:hue:integration": "RUN_HUE_INTEGRATION_TESTS=true bun test tests/hue/integration.test.ts",
     "test:watch": "bun test tests/ --watch",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "verify:hue": "bun run scripts/test-hue-bridge.ts"
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "type": "module",
   "version": "0.1.0"

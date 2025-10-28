@@ -15,13 +15,8 @@ import {
   HUE_ENTITY_MAPPINGS,
 } from '@cove/protocols';
 import { HueClient } from '@cove/protocols/hue';
-import type {
-  Device,
-  EntityKind,
-  EntityTraits,
-  ProtocolType,
-  StateUpdate,
-} from '@cove/types';
+import type { Device, ProtocolType, StateUpdate } from '@cove/types';
+import { EntityKind } from '@cove/types';
 import type { HubDatabase } from '../db';
 import type { StateManager } from '../state-manager';
 
@@ -54,6 +49,7 @@ interface HueBridgeConnection {
   device: Device; // The bridge device
   lights: Map<string, HueLight>; // Map of Hue light IDs to HueLight objects
   entities: Map<string, ProtocolEntity>; // Map of entity IDs to ProtocolEntity
+  entityToLightId: Map<string, string>; // Map of entity IDs to Hue light IDs
   subscriptions: Map<string, (state: StateUpdate) => void>; // entityId -> callback
 }
 
@@ -65,10 +61,21 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
   private initialized = false;
   private stateManager: StateManager | null = null;
   private db: HubDatabase | null = null;
+  private testMode = false;
+  private testLights: Map<string, HueLight> = new Map();
 
-  constructor(stateManager?: StateManager | null, db?: HubDatabase | null) {
+  constructor(
+    stateManager?: StateManager | null,
+    db?: HubDatabase | null,
+    testMode = false,
+  ) {
     this.stateManager = stateManager || null;
     this.db = db || null;
+    this.testMode = testMode;
+
+    if (testMode) {
+      this.initializeTestLights();
+    }
   }
 
   async initialize(): Promise<void> {
@@ -77,9 +84,80 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
       return;
     }
 
-    log('Initializing Hue adapter');
+    if (this.testMode) {
+      log('Initializing Hue adapter in test mode');
+    } else {
+      log('Initializing Hue adapter');
+    }
+
     this.initialized = true;
     log('Hue adapter initialized');
+  }
+
+  /**
+   * Initialize test lights for simulation
+   */
+  private initializeTestLights(): void {
+    // Create mock lights for testing
+    const testLight1: HueLight = {
+      id: '1',
+      manufacturername: 'Philips',
+      modelid: 'LCT015',
+      name: 'Test Living Room Light',
+      room: 'Living Room',
+      state: {
+        bri: 0,
+        ct: 500,
+        hue: 0,
+        on: false,
+        reachable: true,
+        sat: 0,
+      },
+      type: 'Extended color light',
+      uniqueid: 'test-light-1',
+    };
+
+    const testLight2: HueLight = {
+      id: '2',
+      manufacturername: 'Philips',
+      modelid: 'LWB014',
+      name: 'Test Bedroom Light',
+      room: 'Bedroom',
+      state: {
+        bri: 128,
+        on: true,
+        reachable: true,
+      },
+      type: 'Dimmable light',
+      uniqueid: 'test-light-2',
+    };
+
+    this.testLights.set('1', testLight1);
+    this.testLights.set('2', testLight2);
+  }
+
+  /**
+   * Connect to device in test mode (simulated)
+   */
+  private async connectDeviceTestMode(device: Device): Promise<void> {
+    const bridgeId = device.id;
+
+    // Create simulated connection
+    const connection: HueBridgeConnection = {
+      authenticated: true,
+      bridgeId,
+      client: null as any, // Not used in test mode
+      device,
+      entities: new Map(),
+      entityToLightId: new Map(),
+      ipAddress: device.ipAddress || '192.168.1.100',
+      lights: new Map(),
+      subscriptions: new Map(),
+      username: 'test-user',
+    };
+
+    this.bridges.set(bridgeId, connection);
+    log(`Connected to test bridge: ${device.name}`);
   }
 
   async shutdown(): Promise<void> {
@@ -114,15 +192,21 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
    * Connect to a Hue bridge device
    */
   async connectDevice(device: Device): Promise<void> {
-    if (!device.ipAddress) {
-      throw new Error('Hue bridge requires IP address');
-    }
-
     if (!device.id) {
       throw new Error('Device must have an ID to connect');
     }
 
     const bridgeId = device.id;
+
+    if (this.testMode) {
+      log(`Connecting to Hue bridge in test mode: ${device.name}`);
+      return this.connectDeviceTestMode(device);
+    }
+
+    if (!device.ipAddress) {
+      throw new Error('Hue bridge requires IP address');
+    }
+
     log(`Connecting to Hue bridge: ${device.name} at ${device.ipAddress}`);
 
     // Check if already connected
@@ -145,6 +229,7 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
       client,
       device,
       entities: new Map(),
+      entityToLightId: new Map(),
       ipAddress: device.ipAddress,
       lights: new Map(),
       subscriptions: new Map(),
@@ -256,39 +341,54 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
         light.room,
       );
 
-      // Build traits from Hue light properties
-      const traits: EntityTraits = {
-        hue_light_id: light.id,
-        manufacturer: light.manufacturername,
-        model: light.modelid,
-        reachable: light.state.reachable,
-        supports_brightness: light.state.bri !== undefined,
-        supports_color_temp: light.state.ct !== undefined,
-        supports_rgb:
-          light.state.hue !== undefined && light.state.sat !== undefined,
-        unique_id: light.uniqueid,
-      };
+      // Build capabilities from Hue light properties
+      const capabilities: import('@cove/db').EntityCapability[] = [];
+
+      // All Hue lights support on/off
+      capabilities.push({ type: 'on_off' });
+
+      // Add brightness if supported
+      if (light.state.bri !== undefined) {
+        capabilities.push({ max: 100, min: 0, type: 'brightness', unit: '%' });
+      }
+
+      // Add color temperature if supported
+      if (light.state.ct !== undefined) {
+        capabilities.push({
+          max_mireds: 500,
+          min_mireds: 153,
+          type: 'color_temp',
+        });
+      }
+
+      // Add RGB if supported
+      if (light.state.hue !== undefined && light.state.sat !== undefined) {
+        capabilities.push({ type: 'rgb' });
+      }
 
       // Create entity in database
       if (this.db && connection.device.id) {
         const entityId = await this.db.createEntity({
+          capabilities,
+          deviceClass: undefined, // Hue lights don't have a specific device class
           deviceId: connection.device.id,
           key: entityKey,
           kind: entityKind,
-          traits,
+          name: light.name,
         });
 
         if (entityId) {
           // Store in connection
           const protocolEntity: ProtocolEntity = {
+            capabilities,
             deviceId: connection.device.id,
             key: entityKey,
             kind: entityKind,
             name: light.name,
-            traits,
           };
 
           connection.entities.set(entityId, protocolEntity);
+          connection.entityToLightId.set(entityId, light.id);
           log(`Created entity: ${entityId} (${entityKind}: ${entityKey})`);
 
           // Send initial state
@@ -307,13 +407,13 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
     switch (hueType) {
       case 'Extended color light':
       case 'Color light':
-        return 'light' as EntityKind;
+        return EntityKind.Light;
       case 'Dimmable light':
-        return 'light' as EntityKind;
+        return EntityKind.Light;
       case 'On/Off light':
-        return 'light' as EntityKind;
+        return EntityKind.Light;
       default:
-        return 'light' as EntityKind;
+        return EntityKind.Light;
     }
   }
 
@@ -427,12 +527,67 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
   // EntityAwareProtocolAdapter implementation
 
   async discoverEntities(deviceId: string): Promise<ProtocolEntity[]> {
+    if (this.testMode) {
+      return this.discoverEntitiesTestMode(deviceId);
+    }
+
     const connection = this.bridges.get(deviceId);
     if (!connection) {
       return [];
     }
 
     return Array.from(connection.entities.values());
+  }
+
+  /**
+   * Discover entities in test mode (return mock entities)
+   */
+  private async discoverEntitiesTestMode(
+    deviceId: string,
+  ): Promise<ProtocolEntity[]> {
+    const connection = this.bridges.get(deviceId);
+    if (!connection) {
+      return [];
+    }
+
+    // Convert test lights to protocol entities
+    const entities: ProtocolEntity[] = [];
+
+    for (const [lightId, light] of this.testLights.entries()) {
+      const entityMapping = findEntityMapping(
+        'hue',
+        light.type,
+        HUE_ENTITY_MAPPINGS,
+      );
+      const mapping = entityMapping ||
+        HUE_ENTITY_MAPPINGS[0] || {
+          capabilities: [{ type: 'on_off' }],
+          deviceType: 'light',
+          entityKind: EntityKind.Light,
+          keyPattern: 'light.{device_name}_{entity_name}',
+          protocolType: 'hue',
+        };
+
+      const entityKey = generateEntityKey(mapping, 'hue', lightId, light.room);
+
+      const entity: ProtocolEntity = {
+        capabilities: mapping.capabilities,
+        deviceId: deviceId,
+        key: entityKey,
+        kind: mapping.entityKind,
+        name: light.name,
+      };
+
+      entities.push(entity);
+
+      // Store in connection for consistency
+      connection.entities.set(entityKey, entity);
+      connection.entityToLightId.set(entityKey, lightId);
+      connection.lights.set(lightId, light);
+    }
+
+    log(`Discovered ${entities.length} test entities for bridge: ${deviceId}`);
+    return entities;
   }
 
   subscribeEntityState(
@@ -474,7 +629,8 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
           if (!entity) continue;
 
           // Find the corresponding Hue light
-          const hueLightId = entity.traits.hue_light_id as string;
+          const hueLightId = connection.entityToLightId.get(entityId);
+          if (!hueLightId) continue;
           const light = connection.lights.get(hueLightId);
           if (!light) continue;
 
@@ -563,5 +719,34 @@ export class HueAdapter implements EntityAwareProtocolAdapter {
 
   isConnected(): boolean {
     return this.initialized && this.bridges.size > 0;
+  }
+
+  /**
+   * Reconnect to existing Hue devices
+   */
+  async reconnectDevices(devices: Device[]): Promise<void> {
+    log(`Reconnecting ${devices.length} Hue devices`);
+
+    for (const device of devices) {
+      // Skip devices that don't have IP address or aren't Hue devices
+      if (!device.ipAddress || device.protocol !== 'hue') {
+        continue;
+      }
+
+      // Skip devices that are already connected
+      if (this.bridges.has(device.id)) {
+        log(`Device ${device.name} already connected, skipping`);
+        continue;
+      }
+
+      try {
+        await this.connectDevice(device);
+        log(`Reconnected Hue device: ${device.name} at ${device.ipAddress}`);
+      } catch (error) {
+        log(`Failed to reconnect Hue device ${device.name}:`, error);
+      }
+    }
+
+    log('Finished reconnecting Hue devices');
   }
 }

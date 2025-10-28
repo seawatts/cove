@@ -24,6 +24,15 @@ interface FillGapsOptions {
    * Time range to fill to (defaults to now)
    */
   fillToTimestamp?: number;
+  /**
+   * Time range to fill from (defaults to first data point)
+   */
+  fillFromTimestamp?: number;
+  /**
+   * Default value for synthetic points when no previous data exists
+   * Default: 0
+   */
+  defaultValue?: number;
 }
 
 /**
@@ -50,6 +59,8 @@ export function fillTimeSeriesGaps<T extends TimeSeriesPoint>(
     maxGapMs = 5 * 60 * 1000, // 5 minutes
     fillIntervalMs = 60 * 1000, // 1 minute
     fillToTimestamp = Date.now(),
+    fillFromTimestamp,
+    defaultValue = 0,
   } = options;
 
   if (data.length === 0) {
@@ -59,6 +70,31 @@ export function fillTimeSeriesGaps<T extends TimeSeriesPoint>(
   // Sort by timestamp ascending
   const sorted = [...data].sort((a, b) => a.timestamp - b.timestamp);
   const result: (T | (T & { synthetic: true }))[] = [];
+
+  // Fill gaps at the beginning of the time range if fillFromTimestamp is provided
+  if (fillFromTimestamp && sorted.length > 0) {
+    const firstDataPoint = sorted[0];
+    if (firstDataPoint) {
+      const gapToFirstPoint = firstDataPoint.timestamp - fillFromTimestamp;
+
+      if (gapToFirstPoint > fillIntervalMs) {
+        // Generate synthetic points from fillFromTimestamp to first data point
+        let syntheticTime = fillFromTimestamp;
+
+        while (syntheticTime < firstDataPoint.timestamp) {
+          const syntheticPoint = {
+            ...firstDataPoint,
+            synthetic: true as const,
+            timestamp: syntheticTime,
+            value: defaultValue,
+          } as T & { synthetic: true };
+
+          result.push(syntheticPoint);
+          syntheticTime += fillIntervalMs;
+        }
+      }
+    }
+  }
 
   for (let i = 0; i < sorted.length; i++) {
     const current = sorted[i];
@@ -118,11 +154,15 @@ export function getDefaultFillInterval(timeRangeMs: number): number {
 /**
  * Get time range in milliseconds from string
  */
-export function getTimeRangeMs(timeRange: '24h' | '7d' | '30d'): number {
+export function getTimeRangeMs(
+  timeRange: '1h' | '24h' | '7d' | '30d' | '90d',
+): number {
   const ranges = {
+    '1h': 60 * 60 * 1000,
     '7d': 7 * 24 * 60 * 60 * 1000,
     '24h': 24 * 60 * 60 * 1000,
     '30d': 30 * 24 * 60 * 60 * 1000,
+    '90d': 90 * 24 * 60 * 60 * 1000,
   };
   return ranges[timeRange];
 }

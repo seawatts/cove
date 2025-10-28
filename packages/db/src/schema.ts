@@ -11,11 +11,11 @@ import {
   jsonb,
   pgEnum,
   pgTable,
-  smallint,
   text,
   timestamp,
   unique,
 } from 'drizzle-orm/pg-core';
+import type { EntityCapability } from './types';
 
 // ===================================
 // Enums
@@ -27,20 +27,43 @@ export const userRole = pgEnum('userRole', [
   'GUEST',
   'SERVICE',
 ]);
-export const homeMode = pgEnum('homeMode', [
-  'HOME',
-  'AWAY',
-  'SLEEP',
-  'VACATION',
-  'GUEST',
-  'CUSTOM',
+
+export const entityKind = pgEnum('entityKind', [
+  'alarm_control_panel',
+  'binary_sensor',
+  'button',
+  'camera',
+  'climate',
+  'color',
+  'cover',
+  'date',
+  'datetime',
+  'event',
+  'fan',
+  'light',
+  'lock',
+  'media_player',
+  'number',
+  'outlet',
+  'select',
+  'sensor',
+  'siren',
+  'speaker',
+  'switch',
+  'text',
+  'text_sensor',
+  'thermostat',
+  'time',
+  'update',
+  'valve',
+  'other',
 ]);
 
 // ===================================
 // User & Home Management
 // ===================================
 
-export const home = pgTable('home', {
+export const homes = pgTable('homes', {
   address: jsonb('address'),
   createdAt: timestamp('createdAt', { withTimezone: true })
     .notNull()
@@ -61,31 +84,13 @@ export const home = pgTable('home', {
 // Topology: floors / rooms / devices / entities
 // ===================================
 
-export const floor = pgTable(
-  'floor',
+export const rooms = pgTable(
+  'rooms',
   {
+    floor: integer('floor'),
     homeId: text('homeId')
       .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    id: text('id')
-      .$defaultFn(() => createId({ prefix: 'floor' }))
-      .notNull()
-      .primaryKey(),
-    level: integer('index').notNull(),
-    name: text('name'),
-  },
-  (t) => [unique('floorUnique').on(t.homeId, t.level)],
-);
-
-export const room = pgTable(
-  'room',
-  {
-    floorId: text('floorId').references(() => floor.id, {
-      onDelete: 'set null',
-    }),
-    homeId: text('homeId')
-      .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
+      .references(() => homes.id, { onDelete: 'cascade' }),
     id: text('id')
       .$defaultFn(() => createId({ prefix: 'room' }))
       .notNull()
@@ -95,65 +100,95 @@ export const room = pgTable(
   (t) => [unique('roomUnique').on(t.homeId, t.name)],
 );
 
-export const device = pgTable(
-  'device',
+export const devices = pgTable(
+  'devices',
   {
-    config: jsonb('config').$type<Record<string, unknown>>(),
+    // Status tracking
+    available: boolean('available').notNull().default(true), // Different from online
+    categories: jsonb('categories').$type<string[]>().default([]), // ['lighting', 'security', etc.]
+    configUrl: text('configUrl'), // Link to device config interface
+
+    // Existing fields
     createdAt: timestamp('createdAt', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    disabledBy: text('disabledBy'), // 'user', 'integration', 'config_entry'
+    entryType: text('entryType').default('device'), // 'device' or 'service'
+    externalId: text('externalId'), // For deduplication (MAC, serial, etc.)
     homeId: text('homeId')
       .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
+      .references(() => homes.id, { onDelete: 'cascade' }),
+    hostname: text('hostname'),
+
+    // Hardware/software versions
+    hwVersion: text('hwVersion'),
     id: text('id')
       .$defaultFn(() => createId({ prefix: 'device' }))
       .notNull()
       .primaryKey(),
     ipAddress: inet('ipAddress'),
     lastSeen: timestamp('lastSeen', { withTimezone: true }),
+
+    // Network info (keep simple, flatten common fields)
+    macAddress: text('macAddress'),
     manufacturer: text('manufacturer'),
     matterNodeId: bigint('matterNodeId', { mode: 'number' }),
-    metadata: jsonb('metadata').$type<Record<string, unknown>>(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>(), // Now for protocol-specific only
     model: text('model'),
     name: text('name').notNull(),
     online: boolean('online').notNull().default(false),
-    roomId: text('roomId').references(() => room.id, {
+    port: integer('port'),
+    // Core identification & protocol
+    protocol: text('protocol').notNull(), // 'esphome', 'hue', 'matter', 'sonos', etc.
+    roomId: text('roomId').references(() => rooms.id, {
       onDelete: 'set null',
     }),
-    state: jsonb('state').$type<Record<string, unknown>>(),
     swVersion: text('swVersion'),
+    type: text('type'), // 'light', 'sensor', 'hub', 'speaker', etc.
     updatedAt: timestamp('updatedAt', { withTimezone: true })
       .notNull()
       .defaultNow(),
-    viaDeviceId: text('viaDeviceId').references((): AnyPgColumn => device.id, {
+    viaDeviceId: text('viaDeviceId').references((): AnyPgColumn => devices.id, {
       onDelete: 'set null',
     }),
   },
   (t) => [
-    index('device_homeId_idx').on(t.homeId),
-    index('device_roomId_idx').on(t.roomId),
-    index('device_matterNodeId_idx').on(t.matterNodeId),
-    index('device_updatedAt_idx').on(t.updatedAt),
+    index('devices_homeId_idx').on(t.homeId),
+    index('devices_roomId_idx').on(t.roomId),
+    index('devices_matterNodeId_idx').on(t.matterNodeId),
+    index('devices_updatedAt_idx').on(t.updatedAt),
+    index('devices_protocol_idx').on(t.protocol),
+    index('devices_externalId_idx').on(t.externalId),
+    index('devices_type_idx').on(t.type),
+    index('devices_macAddress_idx').on(t.macAddress),
+    index('devices_online_idx').on(t.online),
+    index('devices_available_idx').on(t.available),
   ],
 );
 
-export const entity = pgTable(
-  'entity',
+export const entities = pgTable(
+  'entities',
   {
+    capabilities: jsonb('capabilities')
+      .$type<EntityCapability[]>()
+      .notNull()
+      .default([]), // rich capability objects with units
+    deviceClass: text('deviceClass'), // 'temperature', 'motion', 'co2', etc.
     deviceId: text('deviceId')
       .notNull()
-      .references(() => device.id, { onDelete: 'cascade' }),
+      .references(() => devices.id, { onDelete: 'cascade' }),
     id: text('id')
       .$defaultFn(() => createId({ prefix: 'entity' }))
       .notNull()
       .primaryKey(),
     key: text('key').notNull().unique(), // e.g. 'light.kitchen'
-    kind: text('kind').notNull(), // 'light','sensor','lock',...
-    traits: jsonb('traits').notNull(), // capabilities JSON
+    kind: entityKind('kind').notNull(), // 'light','sensor','lock',...
+    name: text('name'), // Friendly display name from protocol adapters
   },
   (t) => [
-    index('entity_deviceId_idx').on(t.deviceId),
-    index('entity_kind_idx').on(t.kind),
+    index('entities_deviceId_idx').on(t.deviceId),
+    index('entities_kind_idx').on(t.kind),
+    index('entities_deviceClass_idx').on(t.deviceClass), // NEW index
   ],
 );
 
@@ -161,11 +196,11 @@ export const entity = pgTable(
 // Runtime: latest snapshot
 // ===================================
 
-export const entityState = pgTable('entityState', {
+export const entityStates = pgTable('entityStates', {
   attrs: jsonb('attrs'),
   entityId: text('entityId')
     .primaryKey()
-    .references(() => entity.id, { onDelete: 'cascade' }),
+    .references(() => entities.id, { onDelete: 'cascade' }),
   state: text('state').notNull(),
   updatedAt: timestamp('updatedAt', { withTimezone: true })
     .notNull()
@@ -173,197 +208,59 @@ export const entityState = pgTable('entityState', {
 });
 
 // ===================================
-// Runtime: history (Timescale hypertable)
+// Runtime: history
 // ===================================
 
-export const entityStateHistory = pgTable(
-  'entityStateHistory',
+export const entityStateHistories = pgTable(
+  'entityStateHistories',
   {
     attrs: jsonb('attrs'),
     entityId: text('entityId')
       .notNull()
-      .references(() => entity.id, { onDelete: 'cascade' }),
+      .references(() => entities.id, { onDelete: 'cascade' }),
     homeId: text('homeId')
       .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    id: bigserial('id', { mode: 'number' }).primaryKey(),
+      .references(() => homes.id, { onDelete: 'cascade' }),
+    id: bigserial('id', { mode: 'number' }).notNull(),
     state: text('state').notNull(),
     ts: timestamp('ts', { withTimezone: true }).notNull(),
   },
   (t) => [
-    index('entityStateHistory_entityId_ts_idx').on(t.entityId, t.ts.desc()),
-    index('entityStateHistory_homeId_ts_idx').on(t.homeId, t.ts.desc()),
-    index('entityStateHistory_ts_idx').on(t.ts.desc()),
+    index('entityStateHistories_entityId_ts_idx').on(t.entityId, t.ts.desc()),
+    index('entityStateHistories_homeId_ts_idx').on(t.homeId, t.ts.desc()),
+    index('entityStateHistories_ts_idx').on(t.ts.desc()),
   ],
 );
-// NOTE: Timescale transforms this table with create_hypertable() in SQL migration.
 
 // ===================================
 // Events (non-state)
 // ===================================
 
-export const eventType = pgTable('eventType', {
-  eventType: text('eventType').notNull().unique(),
-  id: smallint('id').primaryKey().default(1), // serial smallint
-});
-
-export const eventPayload = pgTable('eventPayload', {
-  body: jsonb('body').notNull(),
-  hash: bigint('hash', { mode: 'number' }).unique(),
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
-});
-
-export const event = pgTable(
-  'event',
+export const events = pgTable(
+  'events',
   {
-    contextId: text('contextId'),
-    eventTypeId: smallint('eventTypeId')
-      .notNull()
-      .references(() => eventType.id),
+    deviceId: text('deviceId').references(() => devices.id, {
+      onDelete: 'set null',
+    }),
+    entityId: text('entityId').references(() => entities.id, {
+      onDelete: 'set null',
+    }),
+    eventType: text('eventType').notNull(), // Direct string, no FK
     homeId: text('homeId')
       .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    id: bigserial('id', { mode: 'number' }).primaryKey(),
-    originIdx: smallint('originIdx'),
-    payloadId: bigint('payloadId', { mode: 'number' }).references(
-      () => eventPayload.id,
-    ),
+      .references(() => homes.id, { onDelete: 'cascade' }),
+    id: bigserial('id', { mode: 'number' }).notNull(),
+    message: text('message').notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>(), // Combined payload
     ts: timestamp('ts', { withTimezone: true }).notNull(),
   },
   (t) => [
-    index('event_homeId_ts_idx').on(t.homeId, t.ts.desc()),
-    index('event_eventTypeId_ts_idx').on(t.eventTypeId, t.ts.desc()),
-    index('event_ts_idx').on(t.ts.desc()),
+    index('events_homeId_ts_idx').on(t.homeId, t.ts.desc()),
+    index('events_eventType_ts_idx').on(t.eventType, t.ts.desc()),
+    index('events_ts_idx').on(t.ts.desc()),
+    index('events_entityId_idx').on(t.entityId),
+    index('events_deviceId_idx').on(t.deviceId),
   ],
-);
-
-// ===================================
-// Scenes & Automations (versioned)
-// ===================================
-
-export const mode = pgTable(
-  'mode',
-  {
-    homeId: text('homeId')
-      .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    id: text('id')
-      .$defaultFn(() => createId({ prefix: 'mode' }))
-      .notNull()
-      .primaryKey(),
-    key: homeMode('key').notNull(),
-    policy: jsonb('policy'),
-  },
-  (t) => [unique('modeUnique').on(t.homeId, t.key)],
-);
-
-export const scene = pgTable('scene', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  createdBy: text('createdBy').references(() => users.id),
-  homeId: text('homeId')
-    .notNull()
-    .references(() => home.id, { onDelete: 'cascade' }),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'scene' }))
-    .notNull()
-    .primaryKey(),
-  name: text('name').notNull(),
-  userId: text('userId').references(() => users.id),
-});
-
-export const sceneVersion = pgTable(
-  'sceneVersion',
-  {
-    createdAt: timestamp('createdAt', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    homeId: text('homeId')
-      .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    note: text('note'),
-    sceneId: text('sceneId')
-      .notNull()
-      .references(() => scene.id, { onDelete: 'cascade' }),
-    sceneVersionId: text('sceneVersionId')
-      .$defaultFn(() => createId({ prefix: 'sceneVersion' }))
-      .notNull()
-      .primaryKey(),
-    steps: jsonb('steps').notNull(), // [{entityId,state,attrs}]
-    version: integer('version').notNull(),
-  },
-  (t) => [unique('sceneVersionUnique').on(t.sceneId, t.version)],
-);
-
-export const automation = pgTable('automation', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  createdBy: text('createdBy').references(() => users.id),
-  enabled: boolean('enabled').notNull().default(true),
-  homeId: text('homeId')
-    .notNull()
-    .references(() => home.id, { onDelete: 'cascade' }),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'automation' }))
-    .notNull()
-    .primaryKey(),
-  lastActivated: timestamp('lastActivated', { withTimezone: true }),
-  name: text('name').notNull(),
-  updatedAt: timestamp('updatedAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  userId: text('userId').references(() => users.id),
-});
-
-export const automationVersion = pgTable(
-  'automationVersion',
-  {
-    automationId: text('automationId')
-      .notNull()
-      .references(() => automation.id, { onDelete: 'cascade' }),
-    automationVersionId: text('automationVersionId')
-      .$defaultFn(() => createId({ prefix: 'automationVersion' }))
-      .notNull()
-      .primaryKey(),
-    createdAt: timestamp('createdAt', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    graph: jsonb('graph').notNull(), // typed in TS with Zod; stored as JSONB
-    homeId: text('homeId')
-      .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    version: integer('version').notNull(),
-  },
-  (t) => [unique('automationVersionUnique').on(t.automationId, t.version)],
-);
-
-export const automationTrace = pgTable(
-  'automationTrace',
-  {
-    automationId: text('automationId')
-      .notNull()
-      .references(() => automation.id, { onDelete: 'cascade' }),
-    finishedAt: timestamp('finishedAt', { withTimezone: true }),
-    homeId: text('homeId')
-      .notNull()
-      .references(() => home.id, { onDelete: 'cascade' }),
-    runId: text('runId')
-      .$defaultFn(() => createId({ prefix: 'run' }))
-      .notNull(),
-    spans: jsonb('spans'),
-    startedAt: timestamp('startedAt', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    status: text('status').notNull().default('running'),
-    traceId: text('traceId')
-      .$defaultFn(() => createId({ prefix: 'trace' }))
-      .notNull()
-      .primaryKey(),
-    version: integer('version').notNull(),
-  },
-  (t) => [unique('traceIdUnique').on(t.traceId)],
 );
 
 // ===================================
@@ -376,7 +273,7 @@ export const users = pgTable('users', {
     .defaultNow(),
   email: text('email').notNull().unique(),
   firstName: text('firstName'),
-  homeId: text('homeId').references(() => home.id, {
+  homeId: text('homeId').references(() => homes.id, {
     onDelete: 'set null',
   }),
   id: text('id')
@@ -395,335 +292,82 @@ export const users = pgTable('users', {
 // Relations
 // ===================================
 
-export const homeRelations = relations(home, ({ many }) => ({
-  automations: many(automation),
-  devices: many(device),
-  events: many(event),
-  floors: many(floor),
-  modes: many(mode),
-  rooms: many(room),
-  scenes: many(scene),
+export const homeRelations = relations(homes, ({ many }) => ({
+  devices: many(devices),
+  events: many(events),
+  rooms: many(rooms),
   users: many(users),
 }));
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-  createdAutomations: many(automation),
-  createdScenes: many(scene),
-  home: one(home, {
+export const usersRelations = relations(users, ({ one }) => ({
+  home: one(homes, {
     fields: [users.homeId],
-    references: [home.id],
+    references: [homes.id],
   }),
 }));
 
-export const floorRelations = relations(floor, ({ one, many }) => ({
-  home: one(home, {
-    fields: [floor.homeId],
-    references: [home.id],
-  }),
-  rooms: many(room),
-}));
-
-export const roomRelations = relations(room, ({ one, many }) => ({
-  devices: many(device),
-  floor: one(floor, {
-    fields: [room.floorId],
-    references: [floor.id],
-  }),
-  home: one(home, {
-    fields: [room.homeId],
-    references: [home.id],
+export const roomRelations = relations(rooms, ({ one, many }) => ({
+  devices: many(devices),
+  home: one(homes, {
+    fields: [rooms.homeId],
+    references: [homes.id],
   }),
 }));
 
-export const deviceRelations = relations(device, ({ one, many }) => ({
-  entities: many(entity),
-  home: one(home, {
-    fields: [device.homeId],
-    references: [home.id],
+export const deviceRelations = relations(devices, ({ one, many }) => ({
+  entities: many(entities),
+  home: one(homes, {
+    fields: [devices.homeId],
+    references: [homes.id],
   }),
-  room: one(room, {
-    fields: [device.roomId],
-    references: [room.id],
+  room: one(rooms, {
+    fields: [devices.roomId],
+    references: [rooms.id],
   }),
-  viaDevice: one(device, {
-    fields: [device.viaDeviceId],
-    references: [device.id],
+  viaDevice: one(devices, {
+    fields: [devices.viaDeviceId],
+    references: [devices.id],
     relationName: 'viaDevice',
   }),
 }));
 
-export const entityRelations = relations(entity, ({ one, many }) => ({
-  device: one(device, {
-    fields: [entity.deviceId],
-    references: [device.id],
+export const entityRelations = relations(entities, ({ one, many }) => ({
+  device: one(devices, {
+    fields: [entities.deviceId],
+    references: [devices.id],
   }),
-  state: one(entityState),
-  stateHistory: many(entityStateHistory),
+  state: one(entityStates),
+  stateHistory: many(entityStateHistories),
 }));
 
-export const entityStateRelations = relations(entityState, ({ one }) => ({
-  entity: one(entity, {
-    fields: [entityState.entityId],
-    references: [entity.id],
+export const entityStateRelations = relations(entityStates, ({ one }) => ({
+  entity: one(entities, {
+    fields: [entityStates.entityId],
+    references: [entities.id],
   }),
 }));
 
 export const entityStateHistoryRelations = relations(
-  entityStateHistory,
+  entityStateHistories,
   ({ one }) => ({
-    entity: one(entity, {
-      fields: [entityStateHistory.entityId],
-      references: [entity.id],
+    entity: one(entities, {
+      fields: [entityStateHistories.entityId],
+      references: [entities.id],
     }),
   }),
 );
 
-export const eventTypeRelations = relations(eventType, ({ many }) => ({
-  events: many(event),
-}));
-
-export const eventPayloadRelations = relations(eventPayload, ({ many }) => ({
-  events: many(event),
-}));
-
-export const eventRelations = relations(event, ({ one }) => ({
-  eventType: one(eventType, {
-    fields: [event.eventTypeId],
-    references: [eventType.id],
+export const eventRelations = relations(events, ({ one }) => ({
+  device: one(devices, {
+    fields: [events.deviceId],
+    references: [devices.id],
   }),
-  home: one(home, {
-    fields: [event.homeId],
-    references: [home.id],
+  entity: one(entities, {
+    fields: [events.entityId],
+    references: [entities.id],
   }),
-  payload: one(eventPayload, {
-    fields: [event.payloadId],
-    references: [eventPayload.id],
+  home: one(homes, {
+    fields: [events.homeId],
+    references: [homes.id],
   }),
 }));
-
-export const modeRelations = relations(mode, ({ one }) => ({
-  home: one(home, {
-    fields: [mode.id],
-    references: [home.id],
-  }),
-}));
-
-export const sceneRelations = relations(scene, ({ one, many }) => ({
-  createdBy: one(users, {
-    fields: [scene.createdBy],
-    references: [users.id],
-  }),
-  home: one(home, {
-    fields: [scene.homeId],
-    references: [home.id],
-  }),
-  versions: many(sceneVersion),
-}));
-
-export const sceneVersionRelations = relations(sceneVersion, ({ one }) => ({
-  scene: one(scene, {
-    fields: [sceneVersion.sceneId],
-    references: [scene.id],
-  }),
-}));
-
-export const automationRelations = relations(automation, ({ one, many }) => ({
-  createdBy: one(users, {
-    fields: [automation.createdBy],
-    references: [users.id],
-  }),
-  home: one(home, {
-    fields: [automation.homeId],
-    references: [home.id],
-  }),
-  traces: many(automationTrace),
-  versions: many(automationVersion),
-}));
-
-export const automationVersionRelations = relations(
-  automationVersion,
-  ({ one }) => ({
-    automation: one(automation, {
-      fields: [automationVersion.automationId],
-      references: [automation.id],
-    }),
-  }),
-);
-
-// ===================================
-// API & Organization Management
-// ===================================
-
-export const orgs = pgTable('orgs', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'org' }))
-    .notNull()
-    .primaryKey(),
-  name: text('name').notNull(),
-  stripeCustomerId: text('stripeCustomerId'),
-  updatedAt: timestamp('updatedAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
-
-export const orgMembers = pgTable('orgMembers', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'org_member' }))
-    .notNull()
-    .primaryKey(),
-  orgId: text('orgId')
-    .notNull()
-    .references(() => orgs.id, { onDelete: 'cascade' }),
-  role: text('role').notNull().default('MEMBER'),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-});
-
-export const apiKeys = pgTable('apiKeys', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'api_key' }))
-    .notNull()
-    .primaryKey(),
-  isActive: boolean('isActive').notNull().default(true),
-  key: text('key').notNull().unique(),
-  lastUsedAt: timestamp('lastUsedAt', { withTimezone: true }),
-  name: text('name').notNull(),
-  orgId: text('orgId')
-    .notNull()
-    .references(() => orgs.id, { onDelete: 'cascade' }),
-  updatedAt: timestamp('updatedAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
-
-export const apiKeyUsage = pgTable('apiKeyUsage', {
-  apiKeyId: text('apiKeyId')
-    .notNull()
-    .references(() => apiKeys.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  endpoint: text('endpoint').notNull(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'api_key_usage' }))
-    .notNull()
-    .primaryKey(),
-  method: text('method').notNull(),
-  orgId: text('orgId')
-    .notNull()
-    .references(() => orgs.id, { onDelete: 'cascade' }),
-  timestamp: timestamp('timestamp', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  type: text('type').notNull().default('api'),
-});
-
-export const authCodes = pgTable('authCodes', {
-  code: text('code').notNull().unique(),
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  expiresAt: timestamp('expiresAt', { withTimezone: true }).notNull(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'auth_code' }))
-    .notNull()
-    .primaryKey(),
-  orgId: text('orgId').references(() => orgs.id, { onDelete: 'cascade' }),
-  sessionId: text('sessionId'),
-  usedAt: timestamp('usedAt', { withTimezone: true }),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-});
-
-export const widgetPreferences = pgTable('widgetPreferences', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'widget_pref' }))
-    .notNull()
-    .primaryKey(),
-  preferences: jsonb('preferences').notNull(),
-  updatedAt: timestamp('updatedAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  widgetType: text('widgetType').notNull(),
-});
-
-export const automationTraceRelations = relations(
-  automationTrace,
-  ({ one }) => ({
-    automation: one(automation, {
-      fields: [automationTrace.automationId],
-      references: [automation.id],
-    }),
-  }),
-);
-
-// ===================================
-// Stub Tables for API Compatibility
-// ===================================
-
-export const deviceCommands = pgTable('deviceCommands', {
-  command: text('command').notNull(),
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  deviceId: text('deviceId').references(() => device.id),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'cmd' }))
-    .notNull()
-    .primaryKey(),
-});
-
-export const commands = pgTable('commands', {
-  createdAt: timestamp('createdAt', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'cmd' }))
-    .notNull()
-    .primaryKey(),
-  name: text('name').notNull(),
-});
-
-// ===================================
-// Type Exports for API Package
-// ===================================
-
-export type ApiKeyType = typeof apiKeys.$inferSelect;
-export type OrgType = typeof orgs.$inferSelect;
-export type OrgMembersType = typeof orgMembers.$inferSelect;
-export type UserType = typeof users.$inferSelect;
-
-// ===================================
-// Zod Schema Exports
-// ===================================
-
-import { createInsertSchema } from 'drizzle-zod';
-
-export const CreateApiKeySchema = createInsertSchema(apiKeys).omit({
-  createdAt: true,
-  id: true,
-});
-export const CreateApiKeyUsageSchema = createInsertSchema(apiKeyUsage).omit({
-  id: true,
-});
-export const CreateUserSchema = createInsertSchema(users).omit({
-  createdAt: true,
-  id: true,
-});

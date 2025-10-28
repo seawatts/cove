@@ -3,7 +3,7 @@
  * Updated for Home Assistant-inspired entity-first architecture
  */
 
-import type { EntityKind, EntityTraits, StateUpdate } from '@cove/types';
+import type { EntityKind, StateUpdate } from '@cove/types';
 
 export interface ProtocolClient {
   connect(): Promise<void>;
@@ -28,7 +28,11 @@ export interface ProtocolAdapter extends ProtocolClient {
   /**
    * Connect to a specific device
    */
-  connectDevice?(device: any): Promise<void>;
+  connectDevice?(device: {
+    id: string;
+    name: string;
+    [key: string]: unknown;
+  }): Promise<void>;
 }
 
 // Entity discovery interface for protocol adapters
@@ -36,7 +40,8 @@ export interface ProtocolEntity {
   key: string; // Unique key (e.g., 'sensor.temp_living_room')
   kind: EntityKind; // Entity type
   name: string; // Display name
-  traits: EntityTraits; // Capabilities and metadata
+  deviceClass?: string;
+  capabilities: import('@cove/db').EntityCapability[]; // Capabilities and metadata
   deviceId: string; // Parent device
 }
 
@@ -90,66 +95,76 @@ export interface EntityMapping {
   deviceType: string;
   entityKind: EntityKind;
   keyPattern: string; // Pattern for generating entity keys
-  traits: EntityTraits;
+  deviceClass?: string;
+  capabilities: import('@cove/db').EntityCapability[];
 }
 
 // Common entity mappings for different protocols
 export const ESPHOME_ENTITY_MAPPINGS: EntityMapping[] = [
   {
+    capabilities: [{ type: 'numeric', unit: '°C' }],
+    deviceClass: 'temperature',
     deviceType: 'sensor',
     entityKind: 'sensor' as EntityKind,
     keyPattern: 'sensor.{device_name}_{entity_name}',
     protocolType: 'esphome',
-    traits: { device_class: 'temperature', unit_of_measurement: '°C' },
   },
   {
+    capabilities: [{ type: 'on_off' }],
+    deviceClass: 'motion',
     deviceType: 'binary_sensor',
     entityKind: 'binary_sensor' as EntityKind,
     keyPattern: 'binary_sensor.{device_name}_{entity_name}',
     protocolType: 'esphome',
-    traits: { device_class: 'motion' },
   },
   {
+    capabilities: [
+      { type: 'on_off' },
+      { type: 'brightness' },
+      { type: 'color_temp' },
+    ],
     deviceType: 'light',
     entityKind: 'light' as EntityKind,
     keyPattern: 'light.{device_name}_{entity_name}',
     protocolType: 'esphome',
-    traits: { supports_brightness: true, supports_color_temp: true },
   },
   {
+    capabilities: [{ type: 'on_off' }],
     deviceType: 'switch',
     entityKind: 'switch' as EntityKind,
     keyPattern: 'switch.{device_name}_{entity_name}',
     protocolType: 'esphome',
-    traits: { supports_on_off: true },
   },
 ];
 
 export const HUE_ENTITY_MAPPINGS: EntityMapping[] = [
   {
+    capabilities: [
+      { type: 'on_off' },
+      { type: 'brightness' },
+      { type: 'color_temp' },
+      { type: 'rgb' },
+    ],
     deviceType: 'light',
     entityKind: 'light' as EntityKind,
     keyPattern: 'light.hue_{room_name}_{light_name}',
     protocolType: 'hue',
-    traits: {
-      supports_brightness: true,
-      supports_color_temp: true,
-      supports_rgb: true,
-    },
   },
   {
+    capabilities: [{ type: 'on_off' }],
+    deviceClass: 'motion',
     deviceType: 'motion_sensor',
     entityKind: 'binary_sensor' as EntityKind,
     keyPattern: 'binary_sensor.hue_{room_name}_motion',
     protocolType: 'hue',
-    traits: { device_class: 'motion' },
   },
   {
+    capabilities: [{ type: 'numeric', unit: '°C' }],
+    deviceClass: 'temperature',
     deviceType: 'temperature_sensor',
     entityKind: 'sensor' as EntityKind,
     keyPattern: 'sensor.hue_{room_name}_temperature',
     protocolType: 'hue',
-    traits: { device_class: 'temperature', unit_of_measurement: '°C' },
   },
 ];
 

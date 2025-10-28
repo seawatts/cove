@@ -34,22 +34,12 @@ export class MDNSDiscoveryService implements DiscoveryService {
 
     // Start browsing for each service type
     for (const serviceType of MDNS_SERVICE_TYPES) {
-      // Determine protocol from original service type
-      const protocol = serviceType.includes('_tcp') ? 'tcp' : 'udp';
-
-      // Clean up service type: _esphomelib._tcp.local. -> esphomelib
-      const cleanServiceType = serviceType
-        .replace('.local.', '') // Remove .local.
-        .replace(/^_/, '') // Remove leading underscore
-        .replace(/\._tcp$/, '') // Remove ._tcp suffix
-        .replace(/\._udp$/, ''); // Remove ._udp suffix
-
-      this.startBrowsing(cleanServiceType, protocol);
+      log(`Setting up browser for service type: ${serviceType}`);
+      this.startBrowsing(serviceType);
     }
 
     log(
-      'mDNS discovery service started, scanning for %d service types',
-      MDNS_SERVICE_TYPES.length,
+      `mDNS discovery service started, scanning for ${MDNS_SERVICE_TYPES.length} service types`,
     );
   }
 
@@ -73,17 +63,22 @@ export class MDNSDiscoveryService implements DiscoveryService {
     log('mDNS discovery service stopped');
   }
 
-  private startBrowsing(serviceType: string, protocol: 'tcp' | 'udp'): void {
+  private startBrowsing(serviceType: string): void {
     if (!this.bonjour) return;
 
-    log(
-      `Starting browser for service type: ${serviceType} with protocol: ${protocol}`,
-    );
+    log(`Starting browser for service type: ${serviceType}`);
 
-    const browser = this.bonjour.find({ protocol, type: serviceType });
+    // Use bonjour correctly - pass the full service type
+    const browser = this.bonjour.find({ type: serviceType });
 
     browser.on('up', (service: Service) => {
       log(`Service UP event: ${service.name} (${service.type})`);
+      log(
+        `Service details: host=${service.host}, port=${service.port}, addresses=${JSON.stringify(service.addresses)}`,
+      );
+      if (service.txt) {
+        log(`Service TXT records: ${JSON.stringify(service.txt)}`);
+      }
       this.handleServiceUp(service);
     });
 
@@ -93,7 +88,7 @@ export class MDNSDiscoveryService implements DiscoveryService {
     });
 
     this.browsers.set(serviceType, browser);
-    log(`Started browsing for ${serviceType} with protocol ${protocol}`);
+    log(`Started browsing for ${serviceType}`);
   }
 
   private handleServiceUp(service: Service): void {
@@ -106,7 +101,13 @@ export class MDNSDiscoveryService implements DiscoveryService {
 
     log(`Discovered service: ${service.name} (${service.type})`);
 
-    const protocol = this.mapServiceTypeToProtocol(service.type);
+    // Check if this is an ESPHome device and override protocol
+    let protocol = this.mapServiceTypeToProtocol(service.type);
+    if (this.isESPHomeDevice(service)) {
+      protocol = 'esphome' as ProtocolType;
+      log(`Detected ESPHome device: ${service.name} (${service.type})`);
+    }
+
     const ipAddress = service.addresses?.[0] || service.host;
 
     // Extract MAC address from TXT records if available
@@ -174,6 +175,33 @@ export class MDNSDiscoveryService implements DiscoveryService {
 
     // Default to wifi for most mDNS services
     return 'wifi' as ProtocolType;
+  }
+
+  private isESPHomeDevice(service: Service): boolean {
+    // Check if this is an ESPHome device by examining the service
+    if (service.type.includes('esphomelib')) return true;
+
+    // Check HTTP services for ESPHome characteristics
+    if (service.type.includes('http') && service.port === 80) {
+      // Check TXT records for ESPHome indicators
+      if (service.txt) {
+        const txt = service.txt as Record<string, string>;
+        if (txt.path === '/' || txt.path === '/esphome') return true;
+      }
+
+      // Check hostname patterns
+      if (
+        service.host &&
+        (service.host.includes('apollo') ||
+          service.host.includes('esphome') ||
+          service.host.includes('esp32') ||
+          service.host.includes('esp8266'))
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   getDiscoveredDevices(): DeviceDiscovery[] {

@@ -33,11 +33,13 @@ Cove uses a **Home Assistant-inspired entity-first architecture** with modern im
 
 ### Hub Daemon (Raspberry Pi / Linux)
 - **Bun Runtime**: Fast, modern TypeScript execution (sub-second startup)
+- **Hub V2 Architecture**: Simplified, event-driven architecture with EventBus, Registry, StateStore, and CommandRouter
 - **Entity Discovery**: Automatic discovery of entities within devices (sensors, lights, switches)
 - **Protocol Support**: ESPHome, Hue, Matter, Zigbee, and more
-- **TimescaleDB**: Efficient time-series storage for entity state history
+- **SQLite Database**: In-memory SQLite with WAL mode for fast entity state snapshots and telemetry
 - **Local API**: WebSocket and REST for real-time entity control
 - **Standalone Binary**: Compiles to single executable (no Node.js required)
+- **Integration Tests**: Comprehensive test suite with mock drivers for reliable testing
 
 ### Web Application
 - **Next.js 15 PWA**: Modern React 19 with server-side rendering
@@ -88,6 +90,7 @@ bun dev:next
 apps/
   web-app/          # Next.js 15 PWA control panel
   hub/              # Core hub daemon (Bun runtime)
+  hub-v2/           # Hub V2 daemon - simplified architecture
   expo/             # React Native mobile app (future)
   ios/              # Native iOS app with widgets
 
@@ -105,6 +108,7 @@ packages/
   id/               # ID generation utilities
   utils/            # Utility functions
   zustand/          # State management helpers
+  integ-test/       # Integration test utilities
 ```
 
 ## Supported Devices & Protocols
@@ -153,6 +157,21 @@ bun typecheck            # Type check all packages
 bun test                 # Run tests with Bun
 bun test:integ           # Run integration tests
 ```
+
+### Hub V2 Testing
+```bash
+cd apps/hub-v2
+bun test                 # Run Hub V2 integration tests
+bun test:watch           # Watch mode for tests
+bun test:coverage        # Run with coverage report
+```
+
+The Hub V2 integration tests cover:
+- Daemon lifecycle (initialization, running state, shutdown)
+- Device discovery and pairing workflows
+- Event bus and state management
+- Mock ESPHome driver for hardware-free testing
+- In-memory SQLite for fast, isolated test execution
 
 ## Deployment
 
@@ -227,6 +246,8 @@ vercel --prod
 - [x] Entity state history and widgets
 - [x] iOS app with widgets
 - [x] Analytics and monitoring
+- [x] Hub V2 with simplified architecture
+- [x] Hub V2 integration tests
 
 ### Phase 2 (In Progress)
 - [ ] Device control UI improvements

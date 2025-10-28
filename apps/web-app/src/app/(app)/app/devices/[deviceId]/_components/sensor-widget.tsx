@@ -18,8 +18,10 @@ import {
   detectWidgetType,
   getAvailableWidgetTypes,
 } from '@cove/utils/detect-widget-type';
+import { formatSensorValue } from '@cove/utils/format-sensor-value';
+import { useQueryState } from 'nuqs';
 // Lazy load widget components to reduce bundle size
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 
 const ChartWidget = lazy(() =>
   import('./widgets/chart-widget').then((m) => ({ default: m.ChartWidget })),
@@ -42,6 +44,7 @@ const TableWidget = lazy(() =>
 interface SensorWidgetProps {
   deviceId: string;
   sensor: SensorMetadata;
+  mode?: 'full' | 'embedded';
 }
 
 function WidgetTypeSelector({
@@ -87,48 +90,70 @@ function WidgetTypeSelector({
   );
 }
 
-export function SensorWidget({ deviceId, sensor }: SensorWidgetProps) {
-  const utils = api.useUtils();
-  const { data: preferences = [] } = api.widget.getPreferences.useQuery({
-    deviceId,
-  });
-  const setPreference = api.widget.setPreference.useMutation({
-    onSuccess: () => {
-      // Invalidate and refetch preferences after mutation
-      utils.widget.getPreferences.invalidate({ deviceId });
-    },
+export function SensorWidget({
+  deviceId,
+  sensor,
+  mode = 'full',
+}: SensorWidgetProps) {
+  const [timeRange] = useQueryState('timeRange', {
+    defaultValue: '24h',
+    parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
   });
 
-  const userPreference = preferences.find((p) => p.sensorKey === sensor.key);
-  const { data: stateHistory = [] } = api.entity.getStateHistory.useQuery({
-    entityId: sensor.key, // sensor.key is now the entityId
-    timeRange: '24h',
-  });
+  const { data: aggregatedData = [] } =
+    api.graph.getEntityAggregatedData.useQuery({
+      entityId: sensor.entityId, // Use entityId instead of key
+      timeRange: (timeRange as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
+    });
 
-  // Determine widget type: user preference > auto-detect
-  const widgetType =
-    (userPreference?.widgetType as WidgetType) ||
-    detectWidgetType(sensor.key, sensor.type, stateHistory.length > 0);
-
-  // Get available widget types for this sensor
-  const availableTypes = getAvailableWidgetTypes(
-    sensor.key,
-    sensor.type,
-    stateHistory.length > 0,
+  // Use local state for widget preferences instead of backend storage
+  const [widgetType, setWidgetType] = useState<WidgetType>(
+    detectWidgetType(sensor.type),
   );
 
+  // Get available widget types for this sensor
+  const availableTypes = getAvailableWidgetTypes(sensor.key, sensor.type);
+
   const handleWidgetTypeChange = (newType: WidgetType) => {
-    setPreference.mutate({
-      deviceId,
-      sensorKey: sensor.key,
-      widgetType: newType,
-    });
+    setWidgetType(newType);
   };
 
   const widgetProps: WidgetProps = {
-    config: userPreference?.widgetConfig || {},
+    config: {}, // No backend config storage
+    deviceId,
     sensor,
   };
+
+  // For embedded mode, always show a simple value card or mini chart
+  if (mode === 'embedded') {
+    return (
+      <Suspense
+        fallback={<div className="h-16 animate-pulse bg-muted rounded" />}
+      >
+        {aggregatedData.length > 0 ? (
+          <div className="h-16 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-lg font-semibold">
+                {formatSensorValue(sensor.currentValue, sensor.unit)}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {aggregatedData.length} data points
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="h-16 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-lg font-semibold">
+                {formatSensorValue(sensor.currentValue, sensor.unit)}
+              </div>
+              <div className="text-xs text-muted-foreground">No history</div>
+            </div>
+          </div>
+        )}
+      </Suspense>
+    );
+  }
 
   return (
     <div className="relative">

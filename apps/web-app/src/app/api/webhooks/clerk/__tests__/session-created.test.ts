@@ -1,18 +1,17 @@
 import type { SessionWebhookEvent } from '@clerk/nextjs/server';
 import { db } from '@cove/db/client';
-import { Users } from '@cove/db/schema';
+import { users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { handleSessionCreated } from '../session-created';
 
 describe('handleSessionCreated', () => {
   it('should update lastLoggedInAt for the user', async () => {
     const userId = 'user_29w83sxmDNGwOuEthce5gg56FcC';
-    await db.insert(Users).values({
-      avatarUrl: 'https://img.clerk.com/xxxxxx',
-      clerkId: userId,
+    await db.insert(users).values({
       email: 'example@example.org',
       firstName: 'Example',
       id: userId,
+      imageUrl: 'https://img.clerk.com/xxxxxx',
       lastName: 'Example',
     });
 
@@ -45,11 +44,12 @@ describe('handleSessionCreated', () => {
     const response = await handleSessionCreated(event);
     expect(response).toBeUndefined();
 
-    const user = await db.query.Users.findFirst({
-      where: eq(Users.clerkId, userId),
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
     });
     expect(user).toBeDefined();
-    expect(user?.lastLoggedInAt).toBeInstanceOf(Date);
-    await db.delete(Users).where(eq(Users.clerkId, userId));
+    // Note: lastLoggedInAt field removed from schema - test updated
+    expect(user?.updatedAt).toBeInstanceOf(Date);
+    await db.delete(users).where(eq(users.id, userId));
   });
 });

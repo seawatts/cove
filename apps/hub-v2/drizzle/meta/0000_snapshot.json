@@ -1,0 +1,644 @@
+{
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  },
+  "dialect": "sqlite",
+  "enums": {},
+  "id": "d614eff8-567c-4366-bd50-c8dcb3a998e3",
+  "internal": {
+    "indexes": {}
+  },
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "credentials": {
+      "checkConstraints": {},
+      "columns": {
+        "blob": {
+          "autoincrement": false,
+          "name": "blob",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "blob"
+        },
+        "deviceId": {
+          "autoincrement": false,
+          "name": "deviceId",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "kind": {
+          "autoincrement": false,
+          "name": "kind",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "credentials_deviceId_devices_id_fk": {
+          "columnsFrom": ["deviceId"],
+          "columnsTo": ["id"],
+          "name": "credentials_deviceId_devices_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "credentials",
+          "tableTo": "devices"
+        }
+      },
+      "indexes": {},
+      "name": "credentials",
+      "uniqueConstraints": {}
+    },
+    "devices": {
+      "checkConstraints": {},
+      "columns": {
+        "bridgeId": {
+          "autoincrement": false,
+          "name": "bridgeId",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "fingerprint": {
+          "autoincrement": false,
+          "name": "fingerprint",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "homeId": {
+          "autoincrement": false,
+          "name": "homeId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "ip": {
+          "autoincrement": false,
+          "name": "ip",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "lastSeen": {
+          "autoincrement": false,
+          "name": "lastSeen",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "model": {
+          "autoincrement": false,
+          "name": "model",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "pairedAt": {
+          "autoincrement": false,
+          "name": "pairedAt",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "protocol": {
+          "autoincrement": false,
+          "name": "protocol",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "roomId": {
+          "autoincrement": false,
+          "name": "roomId",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "vendor": {
+          "autoincrement": false,
+          "name": "vendor",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "devices_homeId_homes_id_fk": {
+          "columnsFrom": ["homeId"],
+          "columnsTo": ["id"],
+          "name": "devices_homeId_homes_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "devices",
+          "tableTo": "homes"
+        },
+        "devices_roomId_rooms_id_fk": {
+          "columnsFrom": ["roomId"],
+          "columnsTo": ["id"],
+          "name": "devices_roomId_rooms_id_fk",
+          "onDelete": "set null",
+          "onUpdate": "no action",
+          "tableFrom": "devices",
+          "tableTo": "rooms"
+        }
+      },
+      "indexes": {
+        "devices_fingerprint_idx": {
+          "columns": ["fingerprint"],
+          "isUnique": false,
+          "name": "devices_fingerprint_idx"
+        },
+        "devices_fingerprint_unique": {
+          "columns": ["fingerprint"],
+          "isUnique": true,
+          "name": "devices_fingerprint_unique"
+        },
+        "devices_homeId_idx": {
+          "columns": ["homeId"],
+          "isUnique": false,
+          "name": "devices_homeId_idx"
+        },
+        "devices_lastSeen_idx": {
+          "columns": ["lastSeen"],
+          "isUnique": false,
+          "name": "devices_lastSeen_idx"
+        },
+        "devices_protocol_idx": {
+          "columns": ["protocol"],
+          "isUnique": false,
+          "name": "devices_protocol_idx"
+        },
+        "devices_roomId_idx": {
+          "columns": ["roomId"],
+          "isUnique": false,
+          "name": "devices_roomId_idx"
+        }
+      },
+      "name": "devices",
+      "uniqueConstraints": {}
+    },
+    "entities": {
+      "checkConstraints": {},
+      "columns": {
+        "capability": {
+          "autoincrement": false,
+          "name": "capability",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "blob"
+        },
+        "deviceId": {
+          "autoincrement": false,
+          "name": "deviceId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "homeId": {
+          "autoincrement": false,
+          "name": "homeId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "key": {
+          "autoincrement": false,
+          "name": "key",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "kind": {
+          "autoincrement": false,
+          "name": "kind",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "entities_deviceId_devices_id_fk": {
+          "columnsFrom": ["deviceId"],
+          "columnsTo": ["id"],
+          "name": "entities_deviceId_devices_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "entities",
+          "tableTo": "devices"
+        },
+        "entities_homeId_homes_id_fk": {
+          "columnsFrom": ["homeId"],
+          "columnsTo": ["id"],
+          "name": "entities_homeId_homes_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "entities",
+          "tableTo": "homes"
+        }
+      },
+      "indexes": {
+        "entities_deviceId_idx": {
+          "columns": ["deviceId"],
+          "isUnique": false,
+          "name": "entities_deviceId_idx"
+        },
+        "entities_homeId_idx": {
+          "columns": ["homeId"],
+          "isUnique": false,
+          "name": "entities_homeId_idx"
+        },
+        "entities_key_idx": {
+          "columns": ["key"],
+          "isUnique": false,
+          "name": "entities_key_idx"
+        },
+        "entities_kind_idx": {
+          "columns": ["kind"],
+          "isUnique": false,
+          "name": "entities_kind_idx"
+        },
+        "entityDeviceName": {
+          "columns": ["deviceId", "name"],
+          "isUnique": true,
+          "name": "entityDeviceName"
+        }
+      },
+      "name": "entities",
+      "uniqueConstraints": {}
+    },
+    "entityState": {
+      "checkConstraints": {},
+      "columns": {
+        "entityId": {
+          "autoincrement": false,
+          "name": "entityId",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "state": {
+          "autoincrement": false,
+          "name": "state",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "blob"
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "integer"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "entityState_entityId_entities_id_fk": {
+          "columnsFrom": ["entityId"],
+          "columnsTo": ["id"],
+          "name": "entityState_entityId_entities_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "entityState",
+          "tableTo": "entities"
+        }
+      },
+      "indexes": {},
+      "name": "entityState",
+      "uniqueConstraints": {}
+    },
+    "homes": {
+      "checkConstraints": {},
+      "columns": {
+        "address": {
+          "autoincrement": false,
+          "name": "address",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "blob"
+        },
+        "createdAt": {
+          "autoincrement": false,
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "createdBy": {
+          "autoincrement": false,
+          "name": "createdBy",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "timezone": {
+          "autoincrement": false,
+          "default": "'America/Los_Angeles'",
+          "name": "timezone",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "integer"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "name": "homes",
+      "uniqueConstraints": {}
+    },
+    "rooms": {
+      "checkConstraints": {},
+      "columns": {
+        "floor": {
+          "autoincrement": false,
+          "name": "floor",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "homeId": {
+          "autoincrement": false,
+          "name": "homeId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "rooms_homeId_homes_id_fk": {
+          "columnsFrom": ["homeId"],
+          "columnsTo": ["id"],
+          "name": "rooms_homeId_homes_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "rooms",
+          "tableTo": "homes"
+        }
+      },
+      "indexes": {
+        "roomUnique": {
+          "columns": ["homeId", "name"],
+          "isUnique": true,
+          "name": "roomUnique"
+        }
+      },
+      "name": "rooms",
+      "uniqueConstraints": {}
+    },
+    "telemetry": {
+      "checkConstraints": {},
+      "columns": {
+        "entityId": {
+          "autoincrement": false,
+          "name": "entityId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "field": {
+          "autoincrement": false,
+          "name": "field",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "homeId": {
+          "autoincrement": false,
+          "name": "homeId",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "ts": {
+          "autoincrement": false,
+          "name": "ts",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "unit": {
+          "autoincrement": false,
+          "name": "unit",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "value": {
+          "autoincrement": false,
+          "name": "value",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "integer"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "telemetry_entityId_entities_id_fk": {
+          "columnsFrom": ["entityId"],
+          "columnsTo": ["id"],
+          "name": "telemetry_entityId_entities_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "telemetry",
+          "tableTo": "entities"
+        },
+        "telemetry_homeId_homes_id_fk": {
+          "columnsFrom": ["homeId"],
+          "columnsTo": ["id"],
+          "name": "telemetry_homeId_homes_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "telemetry",
+          "tableTo": "homes"
+        }
+      },
+      "indexes": {
+        "telemetry_entityId_ts_field": {
+          "columns": ["entityId", "ts", "field"],
+          "isUnique": false,
+          "name": "telemetry_entityId_ts_field"
+        },
+        "telemetry_field_idx": {
+          "columns": ["field"],
+          "isUnique": false,
+          "name": "telemetry_field_idx"
+        },
+        "telemetry_homeId_idx": {
+          "columns": ["homeId"],
+          "isUnique": false,
+          "name": "telemetry_homeId_idx"
+        },
+        "telemetry_ts_idx": {
+          "columns": ["ts"],
+          "isUnique": false,
+          "name": "telemetry_ts_idx"
+        }
+      },
+      "name": "telemetry",
+      "uniqueConstraints": {}
+    },
+    "users": {
+      "checkConstraints": {},
+      "columns": {
+        "createdAt": {
+          "autoincrement": false,
+          "name": "createdAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "integer"
+        },
+        "email": {
+          "autoincrement": false,
+          "name": "email",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "firstName": {
+          "autoincrement": false,
+          "name": "firstName",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "homeId": {
+          "autoincrement": false,
+          "name": "homeId",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "imageUrl": {
+          "autoincrement": false,
+          "name": "imageUrl",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "lastName": {
+          "autoincrement": false,
+          "name": "lastName",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "role": {
+          "autoincrement": false,
+          "default": "'ADULT'",
+          "name": "role",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updatedAt": {
+          "autoincrement": false,
+          "name": "updatedAt",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "integer"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "users_homeId_homes_id_fk": {
+          "columnsFrom": ["homeId"],
+          "columnsTo": ["id"],
+          "name": "users_homeId_homes_id_fk",
+          "onDelete": "set null",
+          "onUpdate": "no action",
+          "tableFrom": "users",
+          "tableTo": "homes"
+        }
+      },
+      "indexes": {
+        "users_email_unique": {
+          "columns": ["email"],
+          "isUnique": true,
+          "name": "users_email_unique"
+        }
+      },
+      "name": "users",
+      "uniqueConstraints": {}
+    }
+  },
+  "version": "6",
+  "views": {}
+}

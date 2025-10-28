@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
-    "@happy-dom/global-registrator": "20.0.2",
+    "@happy-dom/global-registrator": "20.0.5",
     "@t3-oss/env-core": "catalog:",
     "@t3-oss/env-nextjs": "catalog:",
     "@testing-library/jest-dom": "6.9.1",
@@ -40,6 +40,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
+    "./graph-queries": "./src/graph-queries.ts",
     "./schema": "./src/schema.ts",
     "./supabase/cli": "./src/supabase/cli.ts",
     "./supabase/client": "./src/supabase/client-exports.ts",
@@ -47,7 +48,9 @@
     "./supabase/get-realtime-record": "./src/supabase/get-realtime-record.ts",
     "./supabase/rcs": "./src/supabase/server.rcs.ts",
     "./supabase/server": "./src/supabase/server-exports.ts",
-    "./supabase/types": "./src/supabase/types.generated.ts"
+    "./supabase/types": "./src/supabase/types.generated.ts",
+    "./supabase/use-subscription": "./src/supabase/use-subscription.tsx",
+    "./types": "./src/types.ts"
   },
   "license": "MIT",
   "name": "@cove/db",

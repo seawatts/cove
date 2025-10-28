@@ -13,6 +13,7 @@ const log = debug('cove:hub:events');
 
 interface EventCollectorOptions {
   deviceId: string; // Default device ID (typically the hub)
+  homeId: string; // Home ID for events
   db?: HubDatabase | null;
   bufferSize?: number;
   syncInterval?: number; // seconds
@@ -20,14 +21,16 @@ interface EventCollectorOptions {
 
 export class DeviceEventCollector {
   private defaultDeviceId: string; // Default device ID for hub events
+  private homeId: string; // Home ID for events
   private db: HubDatabase | null;
   private eventBuffer: DeviceEvent[] = [];
   private bufferSize: number;
   private syncInterval: number;
-  private syncTimer: Timer | null = null;
+  private syncTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(options: EventCollectorOptions) {
     this.defaultDeviceId = options.deviceId;
+    this.homeId = options.homeId;
     this.db = options.db || null;
     this.bufferSize = options.bufferSize || 1000;
     this.syncInterval = options.syncInterval || 30; // 30 seconds default
@@ -124,6 +127,12 @@ export class DeviceEventCollector {
       return;
     }
 
+    // Validate that we have a home ID before syncing
+    if (!this.homeId) {
+      log('Warning: No home ID available, skipping event sync');
+      return;
+    }
+
     const eventsToSync = [...this.eventBuffer];
 
     try {
@@ -140,9 +149,8 @@ export class DeviceEventCollector {
       let successCount = 0;
       for (const event of eventsToSync) {
         const success = await this.db.insertDeviceEvent({
-          contextId: event.deviceId,
           eventType: event.eventType,
-          homeId: firstEvent?.deviceId, // TODO: Get actual home ID from device
+          homeId: this.homeId,
           message: event.message,
           metadata: event.metadata,
         });

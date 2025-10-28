@@ -33,6 +33,7 @@ interface ChartDataPoint {
   timestamp: number;
   value: number;
   synthetic?: boolean;
+  [key: string]: unknown;
 }
 
 interface SensorChartProps {
@@ -73,8 +74,8 @@ export function SensorChart({
       const value =
         typeof state.state === 'number' ? state.state : Number(state.state);
       return {
-        label: format(new Date(state.lastChanged), 'MMM dd HH:mm'),
-        timestamp: new Date(state.lastChanged).getTime(),
+        label: format(new Date(state.ts), 'MMM dd HH:mm'),
+        timestamp: new Date(state.ts).getTime(),
         value: Number.isNaN(value) ? 0 : value,
       };
     });

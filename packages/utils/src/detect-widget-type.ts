@@ -5,37 +5,17 @@
 
 import { WidgetType } from '@cove/types/widget';
 
-export function detectWidgetType(
-  sensorKey: string,
-  sensorType: string,
-  hasHistoricalData: boolean,
-): WidgetType {
-  // Binary sensors -> Value Card
+export function detectWidgetType(sensorType: string): WidgetType {
+  // Default to Chart for all sensors (unless specific exceptions below)
+
+  // Binary sensors -> Value Card (no meaningful chart data)
   if (sensorType === 'binary') return WidgetType.ValueCard;
-
-  // Percentage values (0-100) -> Radial/Gauge
-  if (sensorKey.includes('humidity') || sensorKey.includes('battery')) {
-    return WidgetType.Radial;
-  }
-
-  // WiFi signal strength (negative dBm values) -> Gauge
-  if (sensorKey.includes('rssi') || sensorKey.includes('signal')) {
-    return WidgetType.Gauge;
-  }
-
-  // Continuous sensors with history -> Chart
-  if (sensorType === 'continuous' && hasHistoricalData) {
-    return WidgetType.Chart;
-  }
-
-  // Slow changing sensors -> Value Card
-  if (sensorType === 'slow_changing') return WidgetType.ValueCard;
 
   // Event-based sensors -> Table (show recent events)
   if (sensorType === 'event') return WidgetType.Table;
 
-  // Default to Chart for continuous sensors, Value Card for others
-  return sensorType === 'continuous' ? WidgetType.Chart : WidgetType.ValueCard;
+  // Default to Chart for all other sensor types
+  return WidgetType.Chart;
 }
 
 /**
@@ -44,12 +24,11 @@ export function detectWidgetType(
 export function getAvailableWidgetTypes(
   sensorKey: string,
   sensorType: string,
-  hasHistoricalData: boolean,
 ): WidgetType[] {
   const available: WidgetType[] = [WidgetType.ValueCard]; // Always available
 
-  // Add Chart if we have historical data or it's a continuous sensor
-  if (hasHistoricalData || sensorType === 'continuous') {
+  // Always add Chart for continuous sensors (default widget type)
+  if (sensorType === 'continuous') {
     available.push(WidgetType.Chart);
   }
 
@@ -68,8 +47,8 @@ export function getAvailableWidgetTypes(
     available.push(WidgetType.Gauge);
   }
 
-  // Add Table for event-based or if we have historical data
-  if (sensorType === 'event' || hasHistoricalData) {
+  // Add Table only for event-based sensors
+  if (sensorType === 'event') {
     available.push(WidgetType.Table);
   }
 

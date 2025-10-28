@@ -39,17 +39,17 @@ const createRequestingUserIdFunction = async () => {
 const policyConditions = {
   deviceHomeAccess: (columnName = 'deviceId') =>
     `EXISTS (
-      SELECT 1 FROM device
-      JOIN users ON users."homeId" = device."homeId"
-      WHERE device.id = ("${columnName}")::text
+      SELECT 1 FROM devices
+      JOIN users ON users."homeId" = devices."homeId"
+      WHERE devices.id = ("${columnName}")::text
       AND users.id = (SELECT requesting_user_id())
     )`,
   entityHomeAccess: (columnName = 'entityId') =>
     `EXISTS (
-      SELECT 1 FROM entity
-      JOIN device ON device.id = entity."deviceId"
-      JOIN users ON users."homeId" = device."homeId"
-      WHERE entity.id = ("${columnName}")::text
+      SELECT 1 FROM entities
+      JOIN devices ON devices.id = entities."deviceId"
+      JOIN users ON users."homeId" = devices."homeId"
+      WHERE entities.id = ("${columnName}")::text
       AND users.id = (SELECT requesting_user_id())
     )`,
   homeOwnership: (columnName = 'homeId') =>
@@ -73,7 +73,7 @@ const createHomeOwnershipPolicy = (
   operation: PolicyOperation,
   columnName: string,
 ): Policy => ({
-  name: `Users can ${operation.toLowerCase()} records for their home`,
+  name: `Users can ${operation === 'ALL' ? 'access' : operation.toLowerCase()} records for their home`,
   operation,
   using:
     operation === 'INSERT'
@@ -90,7 +90,7 @@ const createUserOwnershipPolicy = (
   operation: PolicyOperation,
   columnName: string,
 ): Policy => ({
-  name: `User can ${operation.toLowerCase()} their own records`,
+  name: `User can ${operation === 'ALL' ? 'access' : operation.toLowerCase()} their own records`,
   operation,
   using:
     operation === 'INSERT'
@@ -123,11 +123,12 @@ const createPolicy = async (tableName: string, policy: Policy) => {
   await db.execute(policySql);
 };
 
-const dropPolicy = async (tableName: string, policyName: string) => {
-  await db.execute(sql`
-    DROP POLICY IF EXISTS ${sql.raw(`"${policyName}"`)} ON "public"."${sql.raw(tableName)}";
-  `);
-};
+// Unused function - kept for potential future use
+// const dropPolicy = async (tableName: string, policyName: string) => {
+//   await db.execute(sql`
+//     DROP POLICY IF EXISTS ${sql.raw(`"${policyName}"`)} ON "public"."${sql.raw(tableName)}";
+//   `);
+// };
 
 const enableRLS = async (tableName: string) => {
   console.log(`Enabling RLS for table: ${tableName}`);
@@ -138,26 +139,11 @@ const enableRLS = async (tableName: string) => {
 };
 
 const policyConfigs: Record<string, PolicyConfig> = {
-  automation: {
-    policies: [
-      createHomeOwnershipPolicy('ALL', 'homeId'),
-      createUserOwnershipPolicy('ALL', 'createdBy'),
-    ],
-    tableName: 'automation',
-  },
-  automationTrace: {
+  devices: {
     policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'automationTrace',
+    tableName: 'devices',
   },
-  automationVersion: {
-    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'automationVersion',
-  },
-  device: {
-    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'device',
-  },
-  entity: {
+  entities: {
     policies: [
       {
         name: 'Users can access entities for their home devices',
@@ -181,9 +167,19 @@ const policyConfigs: Record<string, PolicyConfig> = {
         using: policyConditions.deviceHomeAccess('deviceId'),
       },
     ],
-    tableName: 'entity',
+    tableName: 'entities',
   },
-  entityState: {
+  entityStateHistories: {
+    policies: [
+      {
+        name: 'Users can view entity state history for their home',
+        operation: 'SELECT',
+        using: policyConditions.userHomeAccess('homeId'),
+      },
+    ],
+    tableName: 'entityStateHistories',
+  },
+  entityStates: {
     policies: [
       {
         name: 'Users can access entity states for their home entities',
@@ -202,55 +198,13 @@ const policyConfigs: Record<string, PolicyConfig> = {
         withCheck: policyConditions.entityHomeAccess('entityId'),
       },
     ],
-    tableName: 'entityState',
+    tableName: 'entityStates',
   },
-  entityStateHistory: {
-    policies: [
-      {
-        name: 'Users can view entity state history for their home',
-        operation: 'SELECT',
-        using: policyConditions.userHomeAccess('homeId'),
-      },
-    ],
-    tableName: 'entityStateHistory',
-  },
-  event: {
+  events: {
     policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'event',
+    tableName: 'events',
   },
-  eventPayload: {
-    policies: [
-      {
-        name: 'Users can access event payloads for their home events',
-        operation: 'SELECT',
-        using: `EXISTS (
-          SELECT 1 FROM event
-          WHERE event."payloadId" = "eventPayload".id
-          AND EXISTS (
-            SELECT 1 FROM users
-            WHERE users.id = (SELECT requesting_user_id())
-            AND users."homeId" = event."homeId"::text
-          )
-        )`,
-      },
-    ],
-    tableName: 'eventPayload',
-  },
-  eventType: {
-    policies: [
-      {
-        name: 'Authenticated users can view event types',
-        operation: 'SELECT',
-        using: 'true',
-      },
-    ],
-    tableName: 'eventType',
-  },
-  floor: {
-    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'floor',
-  },
-  home: {
+  homes: {
     policies: [
       createHomeOwnershipPolicy('SELECT', 'id'),
       createHomeOwnershipPolicy('UPDATE', 'id'),
@@ -260,26 +214,11 @@ const policyConfigs: Record<string, PolicyConfig> = {
         withCheck: `(SELECT requesting_user_id()) = "createdBy"::text`,
       },
     ],
-    tableName: 'home',
+    tableName: 'homes',
   },
-  mode: {
+  rooms: {
     policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'mode',
-  },
-  room: {
-    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'room',
-  },
-  scene: {
-    policies: [
-      createHomeOwnershipPolicy('ALL', 'homeId'),
-      createUserOwnershipPolicy('ALL', 'createdBy'),
-    ],
-    tableName: 'scene',
-  },
-  sceneVersion: {
-    policies: [createHomeOwnershipPolicy('ALL', 'homeId')],
-    tableName: 'sceneVersion',
+    tableName: 'rooms',
   },
   users: {
     policies: [
@@ -323,19 +262,20 @@ async function setupTablePolicies(config: PolicyConfig) {
   );
 }
 
-async function dropTablePolicies(config: PolicyConfig) {
-  return withErrorHandling(
-    async () => {
-      await Promise.all(
-        config.policies.map((policy) =>
-          dropPolicy(config.tableName, policy.name),
-        ),
-      );
-    },
-    `Policies for ${config.tableName} dropped successfully`,
-    `Error dropping policies for ${config.tableName}`,
-  );
-}
+// Unused function - kept for potential future use
+// async function dropTablePolicies(config: PolicyConfig) {
+//   return withErrorHandling(
+//     async () => {
+//       await Promise.all(
+//         config.policies.map((policy) =>
+//           dropPolicy(config.tableName, policy.name),
+//         ),
+//       );
+//     },
+//     `Policies for ${config.tableName} dropped successfully`,
+//     `Error dropping policies for ${config.tableName}`,
+//   );
+// }
 
 async function setupAllPolicies() {
   return withErrorHandling(
@@ -353,25 +293,17 @@ async function setupAllPolicies() {
   );
 }
 
-async function _dropAllPolicies() {
-  return withErrorHandling(
-    async () => {
-      await Promise.all(Object.values(policyConfigs).map(dropTablePolicies));
-    },
-    'All policies have been dropped successfully',
-    'Error dropping policies',
-  );
-}
+// Unused function - kept for potential future use
+// async function dropAllPolicies() {
+//   return withErrorHandling(
+//     async () => {
+//       await Promise.all(Object.values(policyConfigs).map(dropTablePolicies));
+//     },
+//     'All policies have been dropped successfully',
+//     'Error dropping policies',
+//   );
+// }
 
-// _dropAllPolicies()
-//   .then(() => {
-//     console.log('Policy setup completed');
-//     process.exit(0);
-//   })
-//   .catch((error) => {
-//     console.error('Policy setup failed:', error);
-//     process.exit(1);
-//   });
 setupAllPolicies()
   .then(() => {
     console.log('Policy setup completed');

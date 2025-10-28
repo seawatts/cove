@@ -1,15 +1,15 @@
 import type { SessionJSON, WebhookEvent } from '@clerk/nextjs/server';
 import { posthog } from '@cove/analytics/posthog/server';
 import { db } from '@cove/db/client';
-import { Users } from '@cove/db/schema';
+import { users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function handleSessionCreated(event: WebhookEvent) {
   // Narrow event.data to SessionJSON for 'session.created' events
   const sessionData = event.data as SessionJSON;
 
-  const existingUser = await db.query.Users.findFirst({
-    where: eq(Users.clerkId, sessionData.user_id),
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.id, sessionData.user_id),
   });
 
   if (!existingUser) {
@@ -18,11 +18,11 @@ export async function handleSessionCreated(event: WebhookEvent) {
   }
 
   const [user] = await db
-    .update(Users)
+    .update(users)
     .set({
-      lastLoggedInAt: new Date(),
+      updatedAt: new Date(),
     })
-    .where(eq(Users.clerkId, sessionData.user_id))
+    .where(eq(users.id, sessionData.user_id))
     .returning();
 
   if (!user) {

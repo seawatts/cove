@@ -1,9 +1,15 @@
 /**
  * ESPHome Protocol Implementation
- *
- * Provides both Native API (TCP port 6053) and SSE (HTTP events) adapters
- * for ESPHome devices.
+ * Simplified to match the reference library structure
  */
 
-export * from './native';
+export { ESPHomeNativeClient } from './client';
+export {
+  type DeviceInfoResponse,
+  type EntityState,
+  ESPHomeConnection,
+  type ESPHomeEntity,
+} from './connection';
+export * from './entities';
 export * from './sse';
+export * from './utils/message-registry';

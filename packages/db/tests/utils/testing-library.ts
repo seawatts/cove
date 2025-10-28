@@ -6,7 +6,6 @@ expect.extend(matchers);
 
 // Global mocks to prevent environment variable errors during test loading
 
-
 // Mock environment variables
 mock.module('./env.server', () => ({
   env: {

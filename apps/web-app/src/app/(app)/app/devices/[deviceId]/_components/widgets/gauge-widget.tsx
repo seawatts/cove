@@ -3,7 +3,6 @@
 import type { WidgetProps } from '@cove/types/widget';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
 import { formatSensorValue } from '@cove/utils/format-sensor-value';
-import { format } from 'date-fns';
 
 interface GaugeSegment {
   min: number;
@@ -216,12 +215,7 @@ export function GaugeWidget({ sensor }: WidgetProps) {
           </div>
         </div>
 
-        {sensor.lastChanged && (
-          <div className="text-sm text-muted-foreground text-center">
-            Last updated:{' '}
-            {format(new Date(sensor.lastChanged), 'MMM dd, HH:mm')}
-          </div>
-        )}
+        {/* Last updated info removed - not available in sensor metadata */}
       </CardContent>
     </Card>
   );

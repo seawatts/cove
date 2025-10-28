@@ -1,64 +1,85 @@
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
+import { z } from 'zod';
 import {
-	automation,
-	automationTrace,
-	automationVersion,
-	entityState,
-	entityStateHistory,
-	event,
-	eventPayload,
-	eventType,
-	floor,
-	home,
-	mode,
-	scene,
-	sceneVersion,
+  entities,
+  entityStateHistories,
+  entityStates,
+  events,
+  homes,
+  rooms,
+  users,
 } from './schema';
 
 // ===================================
 // Zod Schemas
 // ===================================
 
-export const createHomeSchema = createInsertSchema(home);
-export const updateHomeSchema = createUpdateSchema(home);
+export const createHomeSchema = createInsertSchema(homes);
+export const updateHomeSchema = createUpdateSchema(homes);
 
+export const createRoomSchema = createInsertSchema(rooms);
+export const updateRoomSchema = createUpdateSchema(rooms);
 
-export const createFloorSchema = createInsertSchema(floor);
-export const updateFloorSchema = createUpdateSchema(floor);
+export const createEntitySchema = createInsertSchema(entities);
+export const updateEntitySchema = createUpdateSchema(entities);
 
-export const createEntityStateSchema = createInsertSchema(entityState);
-export const updateEntityStateSchema = createUpdateSchema(entityState);
+export const createEntityStateSchema = createInsertSchema(entityStates);
+export const updateEntityStateSchema = createUpdateSchema(entityStates);
 
 export const createEntityStateHistorySchema =
-	createInsertSchema(entityStateHistory);
+  createInsertSchema(entityStateHistories);
 export const updateEntityStateHistorySchema =
-	createUpdateSchema(entityStateHistory);
+  createUpdateSchema(entityStateHistories);
 
-export const createEventTypeSchema = createInsertSchema(eventType);
-export const updateEventTypeSchema = createUpdateSchema(eventType);
+export const createEventSchema = createInsertSchema(events);
+export const updateEventSchema = createUpdateSchema(events);
 
-export const createEventPayloadSchema = createInsertSchema(eventPayload);
-export const updateEventPayloadSchema = createUpdateSchema(eventPayload);
+export const createUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+  id: true,
+});
 
-export const createEventSchema = createInsertSchema(event);
-export const updateEventSchema = createUpdateSchema(event);
+// ===================================
+// Entity Capability Schemas
+// ===================================
 
-export const createModeSchema = createInsertSchema(mode);
-export const updateModeSchema = createUpdateSchema(mode);
+export const numericCapabilitySchema = z.object({
+  max: z.number().optional(),
+  min: z.number().optional(),
+  precision: z.number().int().min(0).max(6).optional(),
+  step: z.number().optional(),
+  type: z.literal('numeric'),
+  unit: z.string().optional(), // '°C', 'ppm', '%', 'µg/m³', 'hPa', etc.
+});
 
-export const createSceneSchema = createInsertSchema(scene);
-export const updateSceneSchema = createUpdateSchema(scene);
+export const brightnessCapabilitySchema = z.object({
+  max: z.number().optional(),
+  min: z.number().optional(),
+  type: z.literal('brightness'),
+  unit: z.string().optional(), // '%' or 'lm'
+});
 
-export const createAutomationSchema = createInsertSchema(automation);
-export const updateAutomationSchema = createUpdateSchema(automation);
+export const colorTempCapabilitySchema = z.object({
+  max_mireds: z.number().optional(),
+  min_mireds: z.number().optional(),
+  type: z.literal('color_temp'),
+  unit: z.string().optional(), // 'mireds' or 'K'
+});
 
-export const createAutomationTraceSchema = createInsertSchema(automationTrace);
-export const updateAutomationTraceSchema = createUpdateSchema(automationTrace);
+export const rgbCapabilitySchema = z.object({
+  type: z.literal('rgb'),
+});
 
-export const createAutomationVersionSchema =
-	createInsertSchema(automationVersion);
-export const updateAutomationVersionSchema =
-	createUpdateSchema(automationVersion);
+export const onOffCapabilitySchema = z.object({
+  type: z.literal('on_off'),
+});
 
-export const createSceneVersionSchema = createInsertSchema(sceneVersion);
-export const updateSceneVersionSchema = createUpdateSchema(sceneVersion);
+export const entityCapabilitySchema = z.discriminatedUnion('type', [
+  numericCapabilitySchema,
+  brightnessCapabilitySchema,
+  colorTempCapabilitySchema,
+  rgbCapabilitySchema,
+  onOffCapabilitySchema,
+]);
+
+export const entityCapabilitiesSchema = z.array(entityCapabilitySchema);

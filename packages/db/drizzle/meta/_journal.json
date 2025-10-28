@@ -1,13 +1,13 @@
 {
-  "version": "7",
   "dialect": "postgresql",
   "entries": [
     {
+      "breakpoints": true,
       "idx": 0,
+      "tag": "0000_remarkable_sandman",
       "version": "7",
-      "when": 1760595042881,
-      "tag": "0000_rainy_forge",
-      "breakpoints": true
+      "when": 1760906416824
     }
-  ]
+  ],
+  "version": "7"
 }

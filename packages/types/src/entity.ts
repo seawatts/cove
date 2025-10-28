@@ -21,10 +21,17 @@ export enum EntityKind {
   Select = 'select',
   Button = 'button',
   Text = 'text',
+  TextSensor = 'text_sensor',
   Time = 'time',
   Date = 'date',
   DateTime = 'datetime',
   Color = 'color',
+  MediaPlayer = 'media_player',
+  Siren = 'siren',
+  AlarmControlPanel = 'alarm_control_panel',
+  Valve = 'valve',
+  Update = 'update',
+  Event = 'event',
   Other = 'other',
 }
 
