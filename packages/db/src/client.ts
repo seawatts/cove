@@ -8,6 +8,11 @@ import * as schema from './schema';
 
 const isProd = env.VERCEL_ENV === 'production';
 
+console.log('Database client initialization:');
+console.log('POSTGRES_URL:', env.POSTGRES_URL ? 'SET' : 'NOT SET');
+console.log('VERCEL_ENV:', env.VERCEL_ENV);
+console.log('isProd:', isProd);
+
 export const db = isProd
   ? drizzleVercel(sql, { schema })
   : drizzle(

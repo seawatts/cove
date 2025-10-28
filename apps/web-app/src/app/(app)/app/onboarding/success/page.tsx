@@ -26,14 +26,13 @@ const WebhookUrlStep = (_props: Record<string, unknown>) => (
   <div>Webhook setup coming soon...</div>
 );
 
-import { AuthCodeLoginButton } from '../../auth-code/_components/auth-code-login-button';
+// AuthCodeLoginButton removed - auth codes feature disabled
 
 export default function OnboardingSuccessPage() {
   const searchParams = useSearchParams();
   const orgName = searchParams.get('orgName');
   const webhookName = searchParams.get('webhookName');
   const redirectTo = searchParams.get('redirectTo') || undefined;
-  const source = searchParams.get('source') || undefined;
   const [isSetupComplete, setIsSetupComplete] = useState(false);
 
   if (!orgName || !webhookName) {
@@ -86,39 +85,31 @@ export default function OnboardingSuccessPage() {
                 <WebhookUrlStep webhookUrl={webhookUrl} />
               </CardContent>
               <CardFooter className="flex justify-end">
-                {source ? (
-                  <AuthCodeLoginButton
-                    disabled={!isSetupComplete}
-                    loadingText="Redirecting..."
-                    text="Complete Setup"
-                  />
-                ) : (
-                  <Button
-                    asChild
-                    className={cn(
-                      !isSetupComplete &&
-                        webhookUrl &&
-                        'opacity-50 pointer-events-none w-40',
-                    )}
-                    disabled={!isSetupComplete && !!webhookUrl}
-                    variant="secondary"
+                <Button
+                  asChild
+                  className={cn(
+                    !isSetupComplete &&
+                      webhookUrl &&
+                      'opacity-50 pointer-events-none w-40',
+                  )}
+                  disabled={!isSetupComplete && !!webhookUrl}
+                  variant="secondary"
+                >
+                  <MetricLink
+                    href={redirectTo ?? '/app/dashboard'}
+                    metric="onboarding_complete_setup_clicked"
+                    properties={{
+                      destination: redirectTo ?? '/app/dashboard',
+                      location: 'onboarding',
+                    }}
                   >
-                    <MetricLink
-                      href={redirectTo ?? '/app/dashboard'}
-                      metric="onboarding_complete_setup_clicked"
-                      properties={{
-                        destination: redirectTo ?? '/app/dashboard',
-                        location: 'onboarding',
-                      }}
-                    >
-                      {!webhookUrl
-                        ? 'Go to Dashboard'
-                        : isSetupComplete
-                          ? 'Complete Setup'
-                          : 'Waiting for events...'}
-                    </MetricLink>
-                  </Button>
-                )}
+                    {!webhookUrl
+                      ? 'Go to Dashboard'
+                      : isSetupComplete
+                        ? 'Complete Setup'
+                        : 'Waiting for events...'}
+                  </MetricLink>
+                </Button>
               </CardFooter>
             </Card>
           </motion.div>

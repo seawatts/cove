@@ -2,117 +2,99 @@ import { sql } from 'drizzle-orm';
 import { db } from '../src/client';
 
 const tablesToEnableRealtime = [
-  'entityState',
-  'entityStateHistory',
-  'event',
-  'device',
-  'entity',
-  'automationTrace',
+  'entityStates',
+  'entityStateHistories',
+  'events',
+  'devices',
+  'entities',
 ] as const;
 
 // RLS policies for realtime authorization
 const realtimePolicies = [
-  // Policy for authenticated users to read postgres changes on entityState table
+  // Policy for authenticated users to read postgres changes on entityStates table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'entityState-%'
+      AND realtime.topic() LIKE 'entityStates-%'
       AND EXISTS (
-        SELECT 1 FROM public."entityState" es
-        JOIN public.entity e ON e.id = es."entityId"
-        JOIN public.device d ON d.id = e."deviceId"
+        SELECT 1 FROM public."entityStates" es
+        JOIN public.entities e ON e.id = es."entityId"
+        JOIN public.devices d ON d.id = e."deviceId"
         JOIN public.users u ON u."homeId" = d."homeId"
         WHERE u.id = (SELECT requesting_user_id())
         AND es."entityId" = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_entityState_changes',
+    name: 'authenticated_can_read_entityStates_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
   },
-  // Policy for authenticated users to read postgres changes on entityStateHistory table
+  // Policy for authenticated users to read postgres changes on entityStateHistories table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'entityStateHistory-%'
+      AND realtime.topic() LIKE 'entityStateHistories-%'
       AND EXISTS (
-        SELECT 1 FROM public."entityStateHistory" esh
+        SELECT 1 FROM public."entityStateHistories" esh
         JOIN public.users u ON u."homeId" = esh."homeId"
         WHERE u.id = (SELECT requesting_user_id())
         AND esh."homeId" = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_entityStateHistory_changes',
+    name: 'authenticated_can_read_entityStateHistories_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
   },
-  // Policy for authenticated users to read postgres changes on event table
+  // Policy for authenticated users to read postgres changes on events table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'event-%'
+      AND realtime.topic() LIKE 'events-%'
       AND EXISTS (
-        SELECT 1 FROM public.event e
+        SELECT 1 FROM public.events e
         JOIN public.users u ON u."homeId" = e."homeId"
         WHERE u.id = (SELECT requesting_user_id())
         AND e."homeId" = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_event_changes',
+    name: 'authenticated_can_read_events_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
   },
-  // Policy for authenticated users to read postgres changes on device table
+  // Policy for authenticated users to read postgres changes on devices table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'device-%'
+      AND realtime.topic() LIKE 'devices-%'
       AND EXISTS (
-        SELECT 1 FROM public.device d
+        SELECT 1 FROM public.devices d
         JOIN public.users u ON u."homeId" = d."homeId"
         WHERE u.id = (SELECT requesting_user_id())
         AND d."homeId" = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_device_changes',
+    name: 'authenticated_can_read_devices_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
   },
-  // Policy for authenticated users to read postgres changes on entity table
+  // Policy for authenticated users to read postgres changes on entities table
   {
     condition: `
       realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'entity-%'
+      AND realtime.topic() LIKE 'entities-%'
       AND EXISTS (
-        SELECT 1 FROM public.entity e
-        JOIN public.device d ON d.id = e."deviceId"
+        SELECT 1 FROM public.entities e
+        JOIN public.devices d ON d.id = e."deviceId"
         JOIN public.users u ON u."homeId" = d."homeId"
         WHERE u.id = (SELECT requesting_user_id())
         AND e.id = split_part(realtime.topic(), '-', 2)
       )
     `,
-    name: 'authenticated_can_read_entity_changes',
-    operation: 'select',
-    table: 'realtime.messages',
-    target: 'authenticated',
-  },
-  // Policy for authenticated users to read postgres changes on automationTrace table
-  {
-    condition: `
-      realtime.messages.extension = 'postgres_changes'
-      AND realtime.topic() LIKE 'automationTrace-%'
-      AND EXISTS (
-        SELECT 1 FROM public."automationTrace" at
-        JOIN public.users u ON u."homeId" = at."homeId"
-        WHERE u.id = (SELECT requesting_user_id())
-        AND at."homeId" = split_part(realtime.topic(), '-', 2)
-      )
-    `,
-    name: 'authenticated_can_read_automationTrace_changes',
+    name: 'authenticated_can_read_entities_changes',
     operation: 'select',
     table: 'realtime.messages',
     target: 'authenticated',
@@ -122,12 +104,11 @@ const realtimePolicies = [
     condition: `
       realtime.messages.extension = 'broadcast'
       AND (
-        realtime.topic() LIKE 'entityState-%'
-        OR realtime.topic() LIKE 'entityStateHistory-%'
-        OR realtime.topic() LIKE 'event-%'
-        OR realtime.topic() LIKE 'device-%'
-        OR realtime.topic() LIKE 'entity-%'
-        OR realtime.topic() LIKE 'automationTrace-%'
+        realtime.topic() LIKE 'entityStates-%'
+        OR realtime.topic() LIKE 'entityStateHistories-%'
+        OR realtime.topic() LIKE 'events-%'
+        OR realtime.topic() LIKE 'devices-%'
+        OR realtime.topic() LIKE 'entities-%'
       )
     `,
     name: 'authenticated_can_send_broadcast',
@@ -140,12 +121,11 @@ const realtimePolicies = [
     condition: `
       realtime.messages.extension = 'broadcast'
       AND (
-        realtime.topic() LIKE 'entityState-%'
-        OR realtime.topic() LIKE 'entityStateHistory-%'
-        OR realtime.topic() LIKE 'event-%'
-        OR realtime.topic() LIKE 'device-%'
-        OR realtime.topic() LIKE 'entity-%'
-        OR realtime.topic() LIKE 'automationTrace-%'
+        realtime.topic() LIKE 'entityStates-%'
+        OR realtime.topic() LIKE 'entityStateHistories-%'
+        OR realtime.topic() LIKE 'events-%'
+        OR realtime.topic() LIKE 'devices-%'
+        OR realtime.topic() LIKE 'entities-%'
       )
     `,
     name: 'authenticated_can_read_broadcast',

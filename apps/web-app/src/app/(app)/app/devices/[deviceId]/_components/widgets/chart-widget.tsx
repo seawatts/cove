@@ -1,25 +1,8 @@
 'use client';
 
-import { api } from '@cove/api/react';
 import type { WidgetProps } from '@cove/types/widget';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@cove/ui/card';
+import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@cove/ui/chart';
-import { useIsMobile } from '@cove/ui/hooks/use-mobile';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@cove/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@cove/ui/toggle-group';
 import {
   fillTimeSeriesGaps,
   formatSensorValueForChart,
@@ -28,72 +11,137 @@ import {
   getTimeRangeMs,
 } from '@cove/utils';
 import { format } from 'date-fns';
+import { useQueryState } from 'nuqs';
 import * as React from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { useEntityData } from '../hooks/use-entity-data';
+
+function calculateStats(
+  aggregatedData: Array<{
+    timestamp: number;
+    mean: number | null;
+    min: number | null;
+    max: number | null;
+  }>,
+) {
+  if (aggregatedData.length === 0) {
+    return { avg: 0, max: 0, min: 0 };
+  }
+
+  const validValues = aggregatedData
+    .map((d) => d.mean)
+    .filter((value): value is number => value !== null && !Number.isNaN(value));
+
+  if (validValues.length === 0) {
+    return { avg: 0, max: 0, min: 0 };
+  }
+
+  const min = Math.min(...validValues);
+  const max = Math.max(...validValues);
+  const avg =
+    validValues.reduce((sum, value) => sum + value, 0) / validValues.length;
+
+  return { avg, max, min };
+}
 
 interface ChartDataPoint {
   label: string;
   timestamp: number;
   value: number;
   synthetic?: boolean;
+  [key: string]: unknown;
 }
 
 export function ChartWidget({ sensor }: WidgetProps) {
-  const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = React.useState<'24h' | '7d' | '30d'>('24h');
+  const [timeRange] = useQueryState('timeRange', {
+    defaultValue: '24h',
+    parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
+  });
 
-  React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange('24h');
-    }
-  }, [isMobile]);
+  // Use the unified data hook with polling only
+  const { aggregatedData, isLoading } = useEntityData({
+    entityId: sensor.entityId,
+    onStateChange: (newState) => {
+      console.log('New state received:', newState);
+    },
+    timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
+  });
 
-  const { data: stateHistory = [], isLoading } =
-    api.entity.getStateHistory.useQuery(
-      {
-        entityId: sensor.key, // sensor.key is now the entityId
-        timeRange,
-      },
-      {
-        refetchInterval: 30000, // Refresh every 30 seconds
-      },
-    );
-
-  // Transform state history to chart data with gap filling
+  // Transform aggregated data to chart data with gap filling
   const chartData = React.useMemo((): ChartDataPoint[] => {
-    // Convert state history to base chart data
-    const baseData = stateHistory.map((state): ChartDataPoint => {
-      const value =
-        typeof state.state === 'number' ? state.state : Number(state.state);
+    // Convert aggregated data to base chart data
+    const baseData = aggregatedData.map((point: unknown): ChartDataPoint => {
+      const p = point as {
+        timestamp: number;
+        mean: number | null;
+        min: number | null;
+        max: number | null;
+      };
+      const value = p.mean ?? 0; // Use mean value, fallback to 0 if null
       return {
-        label: format(new Date(state.lastChanged), 'MMM dd HH:mm'),
-        timestamp: new Date(state.lastChanged).getTime(),
+        label: format(new Date(p.timestamp), 'MMM dd HH:mm'),
+        timestamp: p.timestamp,
         value: Number.isNaN(value) ? 0 : value,
       };
     });
 
     // Fill gaps to show values remained constant over time
-    const timeRangeMs = getTimeRangeMs(timeRange);
+    const timeRangeMs = getTimeRangeMs(
+      (timeRange as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
+    );
     const fillIntervalMs = getDefaultFillInterval(timeRangeMs);
 
+    // Calculate the start of the time range to fill gaps from the beginning
+    const fillFromTimestamp = Date.now() - timeRangeMs;
+
     const filled = fillTimeSeriesGaps(baseData, {
+      defaultValue: 0, // Use 0 for missing historical data
+      fillFromTimestamp,
       fillIntervalMs,
       fillToTimestamp: Date.now(),
       maxGapMs: fillIntervalMs * 3, // Fill gaps larger than 3x the interval
     });
 
     // Add labels to synthetic points
-    return filled.map((point) => ({
+    const finalChartData = filled.map((point: ChartDataPoint) => ({
       ...point,
       label: format(new Date(point.timestamp), 'MMM dd HH:mm'),
     }));
-  }, [stateHistory, timeRange]);
+
+    return finalChartData;
+  }, [aggregatedData, timeRange]);
+
+  // Calculate statistics for the current time range
+  const stats = React.useMemo(() => {
+    return calculateStats(
+      aggregatedData as Array<{
+        timestamp: number;
+        mean: number | null;
+        min: number | null;
+        max: number | null;
+      }>,
+    );
+  }, [aggregatedData]);
 
   // Extract unit from attributes if not provided in sensor metadata
-  const unit =
-    sensor.unit ||
-    ((stateHistory[0]?.attributes as Record<string, unknown> | undefined)
-      ?.unit as string | undefined);
+  const unit = sensor.unit;
+
+  const getTimeRangeDescription = () => {
+    switch (timeRange) {
+      case '1h':
+        return 'Last hour';
+      case '24h':
+        return 'Last 24 hours';
+      case '7d':
+        return 'Last 7 days';
+      case '30d':
+        return 'Last 30 days';
+      case '90d':
+        return 'Last 90 days';
+      default:
+        return 'Last 24 hours';
+    }
+  };
 
   const chartConfig = {
     [sensor.key]: {
@@ -102,25 +150,16 @@ export function ChartWidget({ sensor }: WidgetProps) {
     },
   } satisfies ChartConfig;
 
-  const getTimeRangeDescription = () => {
-    switch (timeRange) {
-      case '24h':
-        return 'Last 24 hours';
-      case '7d':
-        return 'Last 7 days';
-      case '30d':
-        return 'Last 30 days';
-    }
-  };
-
   if (isLoading) {
     return (
       <Card className="@container/card">
-        <CardHeader>
-          <CardTitle>
-            {sensor.name} {unit && `(${unit})`}
-          </CardTitle>
-          <CardDescription>Loading sensor data...</CardDescription>
+        <CardHeader className="pb-2">
+          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            {sensor.name}
+          </div>
+          <div className="text-xs text-muted-foreground/70 mt-2">
+            Loading sensor data...
+          </div>
         </CardHeader>
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
           <div className="aspect-auto h-[250px] w-full animate-pulse bg-muted" />
@@ -132,11 +171,13 @@ export function ChartWidget({ sensor }: WidgetProps) {
   if (chartData.length === 0) {
     return (
       <Card className="@container/card">
-        <CardHeader>
-          <CardTitle>
-            {sensor.name} {unit && `(${unit})`}
-          </CardTitle>
-          <CardDescription>{getTimeRangeDescription()}</CardDescription>
+        <CardHeader className="pb-2">
+          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            {sensor.name}
+          </div>
+          <div className="text-xs text-muted-foreground/70 mt-2">
+            {getTimeRangeDescription()}
+          </div>
         </CardHeader>
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
           <div className="flex h-[250px] w-full items-center justify-center text-muted-foreground">
@@ -157,57 +198,32 @@ export function ChartWidget({ sensor }: WidgetProps) {
 
   return (
     <Card className="@container/card">
-      <CardHeader>
-        <CardTitle>
-          {sensor.name} {unit && `(${unit})`}
-        </CardTitle>
-        <CardDescription>
-          <span className="hidden @[540px]/card:block">
-            {getTimeRangeDescription()}
-          </span>
-          <span className="@[540px]/card:hidden">
-            {getTimeRangeDescription()}
-          </span>
-        </CardDescription>
-        <CardAction>
-          <ToggleGroup
-            className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
-            onValueChange={(value) => {
-              if (value) setTimeRange(value as '24h' | '7d' | '30d');
-            }}
-            type="single"
-            value={timeRange}
-            variant="outline"
-          >
-            <ToggleGroupItem value="24h">24 hours</ToggleGroupItem>
-            <ToggleGroupItem value="7d">7 days</ToggleGroupItem>
-            <ToggleGroupItem value="30d">30 days</ToggleGroupItem>
-          </ToggleGroup>
-          <Select
-            onValueChange={(value) =>
-              setTimeRange(value as '24h' | '7d' | '30d')
-            }
-            value={timeRange}
-          >
-            <SelectTrigger
-              aria-label="Select time range"
-              className="w-[160px] rounded-lg @[767px]/card:hidden sm:ml-auto"
-            >
-              <SelectValue placeholder="Last 3 months" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem className="rounded-lg" value="24h">
-                Last 24 hours
-              </SelectItem>
-              <SelectItem className="rounded-lg" value="7d">
-                Last 7 days
-              </SelectItem>
-              <SelectItem className="rounded-lg" value="30d">
-                Last 30 days
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </CardAction>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            {sensor.name}
+          </div>
+        </div>
+        {/* Current Value and Statistics */}
+        <div className="flex items-center justify-between mt-3">
+          <div className="text-2xl font-light tracking-tight">
+            {formatSensorValueForChart(
+              typeof sensor.currentValue === 'number'
+                ? sensor.currentValue
+                : Number(sensor.currentValue) || 0,
+            )}{' '}
+            {unit && (
+              <span className="text-sm text-muted-foreground/70 ml-1">
+                {unit}
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground/70 space-x-6">
+            <span>Min {formatSensorValueForChart(stats.min)}</span>
+            <span>Max {formatSensorValueForChart(stats.max)}</span>
+            <span>Avg {formatSensorValueForChart(stats.avg)}</span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
@@ -225,12 +241,12 @@ export function ChartWidget({ sensor }: WidgetProps) {
               >
                 <stop
                   offset="5%"
-                  stopColor={`var(--color-${sensor.key})`}
+                  stopColor="var(--chart-1)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor={`var(--color-${sensor.key})`}
+                  stopColor="var(--chart-1)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -241,6 +257,15 @@ export function ChartWidget({ sensor }: WidgetProps) {
               dataKey="label"
               tickFormatter={(value: string) => {
                 // Format based on time range
+                if (timeRange === '1h') {
+                  return format(
+                    new Date(
+                      chartData.find((d: ChartDataPoint) => d.label === value)
+                        ?.timestamp || 0,
+                    ),
+                    'HH:mm',
+                  );
+                }
                 if (timeRange === '24h') {
                   return format(
                     new Date(
@@ -251,6 +276,15 @@ export function ChartWidget({ sensor }: WidgetProps) {
                   );
                 }
                 if (timeRange === '7d') {
+                  return format(
+                    new Date(
+                      chartData.find((d: ChartDataPoint) => d.label === value)
+                        ?.timestamp || 0,
+                    ),
+                    'MMM dd',
+                  );
+                }
+                if (timeRange === '30d' || timeRange === '90d') {
                   return format(
                     new Date(
                       chartData.find((d: ChartDataPoint) => d.label === value)
@@ -282,7 +316,13 @@ export function ChartWidget({ sensor }: WidgetProps) {
               width={50}
             />
             <ChartTooltip
-              content={({ active, payload }) => {
+              content={({
+                active,
+                payload,
+              }: {
+                active?: boolean;
+                payload?: Array<{ value: number; payload: ChartDataPoint }>;
+              }) => {
                 if (!active || !payload?.[0]) return null;
 
                 const data = payload[0].payload as {
@@ -319,7 +359,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
               dataKey="value"
               fill={`url(#fill-${sensor.key})`}
               fillOpacity={1}
-              stroke={`var(--color-${sensor.key})`}
+              stroke="var(--chart-1)"
               strokeWidth={2}
               type="monotone"
             />

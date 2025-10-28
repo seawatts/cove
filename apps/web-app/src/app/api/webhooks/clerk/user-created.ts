@@ -1,7 +1,7 @@
 import type { UserJSON, WebhookEvent } from '@clerk/nextjs/server';
 import { posthog } from '@cove/analytics/posthog/server';
 import { db } from '@cove/db/client';
-import { Users } from '@cove/db/schema';
+import { users } from '@cove/db/schema';
 
 export async function handleUserCreated(event: WebhookEvent) {
   // Narrow event.data to UserJSON for 'user.created' events
@@ -19,24 +19,23 @@ export async function handleUserCreated(event: WebhookEvent) {
   }
 
   const [user] = await db
-    .insert(Users)
+    .insert(users)
     .values({
-      avatarUrl: userData.image_url,
-      clerkId: userData.id,
       email,
       firstName: userData.first_name,
       id: userData.id,
+      imageUrl: userData.image_url,
       lastName: userData.last_name,
     })
     .onConflictDoUpdate({
       set: {
-        avatarUrl: userData.image_url,
-        clerkId: userData.id,
         email,
         firstName: userData.first_name,
+        imageUrl: userData.image_url,
         lastName: userData.last_name,
+        updatedAt: new Date(),
       },
-      target: Users.clerkId,
+      target: users.id,
     })
     .returning();
 

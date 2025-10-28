@@ -3,7 +3,6 @@
 import type { WidgetProps } from '@cove/types/widget';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
 import { ChartContainer } from '@cove/ui/chart';
-import { format } from 'date-fns';
 import { RadialBar, RadialBarChart, ResponsiveContainer } from 'recharts';
 
 interface RadialData {
@@ -101,12 +100,7 @@ export function RadialWidget({ sensor }: WidgetProps) {
           </div>
         </div>
 
-        {sensor.lastChanged && (
-          <div className="text-sm text-muted-foreground text-center">
-            Last updated:{' '}
-            {format(new Date(sensor.lastChanged), 'MMM dd, HH:mm')}
-          </div>
-        )}
+        {/* Last updated info removed - not available in sensor metadata */}
 
         {/* Status indicator */}
         <div className="flex justify-center">

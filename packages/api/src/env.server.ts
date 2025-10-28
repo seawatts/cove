@@ -9,6 +9,7 @@ export const env = createEnv({
   runtimeEnv: {
     EMAIL_FROM: process.env.EMAIL_FROM,
     EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO,
+    HUB_URL: process.env.HUB_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
   },
   /**
@@ -18,6 +19,7 @@ export const env = createEnv({
   server: {
     EMAIL_FROM: z.string().default('noreply@seawatts.sh'),
     EMAIL_REPLY_TO: z.string().default('noreply@seawatts.sh'),
+    HUB_URL: z.string().default('http://localhost:3100'),
     RESEND_API_KEY: z.string(),
   },
 

@@ -2,6 +2,7 @@
  * Health Check Endpoint
  */
 
+import { createHash } from 'node:crypto';
 import { networkInterfaces, hostname as osHostname } from 'node:os';
 import type { DeviceEvent, HubHealth } from '@cove/types';
 import type { HubDaemon } from './daemon';
@@ -102,11 +103,54 @@ function getLocalIpAddress(): string {
   return osHostname();
 }
 
+/**
+ * Get the primary MAC address from network interfaces
+ */
+export function getMacAddress(): string | null {
+  const nets = networkInterfaces();
+
+  // Try to find the primary network interface (usually en0 on Mac, eth0 on Linux)
+  for (const name of Object.keys(nets)) {
+    const netInfo = nets[name];
+    if (!netInfo) continue;
+
+    for (const net of netInfo) {
+      // Skip internal (loopback) and non-IPv4 addresses
+      const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
+      if (net.family === familyV4Value && !net.internal && net.mac) {
+        return net.mac;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Generate a reproducible hardware-based unique ID
+ * Uses MAC address + hostname + platform for uniqueness
+ */
+export function getHardwareId(): string {
+  const macAddress = getMacAddress();
+  const hostname = osHostname();
+  const platform = process.platform;
+  const arch = process.arch;
+
+  // Create a deterministic hash from hardware characteristics
+  const hardwareString = `${macAddress || 'no-mac'}-${hostname}-${platform}-${arch}`;
+  const hash = createHash('sha256').update(hardwareString).digest('hex');
+
+  // Return first 12 characters for a shorter ID
+  return hash.substring(0, 12);
+}
+
 export function getSystemInfo() {
   return {
     arch: process.arch,
+    hardwareId: getHardwareId(),
     hostname: osHostname(),
     ipAddress: getLocalIpAddress(),
+    macAddress: getMacAddress(),
     memory: {
       free: Math.floor(
         (process.memoryUsage().heapTotal - process.memoryUsage().heapUsed) /

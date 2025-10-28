@@ -1,57 +1,60 @@
 /**
  * Entity Router
- * Handles entity-related API endpoints for Home Assistant-inspired architecture
+ * Handles entities-related API endpoints for Home Assistant-inspired architecture
  */
 
-import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
-import { db } from '@cove/db/client';
-import { 
-  entity, 
-  entityState, 
-  entityStateHistory, 
-  device,
-  room,
+import {
+  devices,
+  entities,
+  entityStateHistories,
+  entityStates,
+  rooms,
 } from '@cove/db/schema';
-import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
+import type { EntityKind } from '@cove/types';
+import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
+import { z } from 'zod';
+import { env } from '../env.server';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
 
-export const entityRouter = createTRPCRouter({
+export const entitiesRouter = createTRPCRouter({
   /**
-   * Get entity with current state
+   * Get entities with current state
    */
   get: protectedProcedure
     .input(z.object({ entityId: z.string() }))
     .query(async ({ ctx, input }) => {
       const { entityId } = input;
 
-      const result = await db
+      const result = await ctx.db
         .select({
-          entityId: entity.id,
-          deviceId: entity.deviceId,
-          kind: entity.kind,
-          key: entity.key,
-          traits: entity.traits,
+          capabilities: entities.capabilities,
           currentState: {
-            state: entityState.state,
-            attrs: entityState.attrs,
-            updatedAt: entityState.updatedAt,
+            attrs: entityStates.attrs,
+            state: entityStates.state,
+            updatedAt: entityStates.updatedAt,
           },
-          device: {
-            deviceId: device.id,
-            name: device.name,
-            manufacturer: device.manufacturer,
-            model: device.model,
+          deviceClass: entities.deviceClass,
+          deviceId: entities.deviceId,
+          devices: {
+            deviceId: devices.id,
+            manufacturer: devices.manufacturer,
+            model: devices.model,
+            name: devices.name,
           },
-          room: {
-            roomId: room.id,
-            name: room.name,
+          entityId: entities.id,
+          key: entities.key,
+          kind: entities.kind,
+          name: entities.name,
+          rooms: {
+            name: rooms.name,
+            roomId: rooms.id,
           },
         })
-        .from(entity)
-        .leftJoin(entityState, eq(entityState.entityId, entity.id))
-        .leftJoin(device, eq(device.id, entity.deviceId))
-        .leftJoin(room, eq(room.id, device.roomId))
-        .where(eq(entity.id, entityId))
+        .from(entities)
+        .leftJoin(entityStates, eq(entityStates.entityId, entities.id))
+        .leftJoin(devices, eq(devices.id, entities.deviceId))
+        .leftJoin(rooms, eq(rooms.id, devices.roomId))
+        .where(eq(entities.id, entityId))
         .limit(1);
 
       if (result.length === 0) {
@@ -62,21 +65,151 @@ export const entityRouter = createTRPCRouter({
     }),
 
   /**
-   * Get entity state history
+   * Get entities for a devices
+   */
+  getByDevice: protectedProcedure
+    .input(z.object({ deviceId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { deviceId } = input;
+
+      const result = await ctx.db
+        .select({
+          capabilities: entities.capabilities,
+          currentState: {
+            attrs: entityStates.attrs,
+            state: entityStates.state,
+            updatedAt: entityStates.updatedAt,
+          },
+          deviceClass: entities.deviceClass,
+          deviceId: entities.deviceId,
+          entityId: entities.id,
+          key: entities.key,
+          kind: entities.kind,
+          name: entities.name,
+        })
+        .from(entities)
+        .leftJoin(entityStates, eq(entityStates.entityId, entities.id))
+        .where(eq(entities.deviceId, deviceId))
+        .orderBy(entities.key);
+
+      return result;
+    }),
+
+  /**
+   * Get entities by kind (e.g., all lights, all sensors)
+   */
+  getByKind: protectedProcedure
+    .input(
+      z.object({
+        homeId: z.string().optional(),
+        kind: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { kind, homeId } = input;
+
+      const whereCondition = homeId
+        ? and(eq(entities.kind, kind as EntityKind), eq(devices.homeId, homeId))
+        : eq(entities.kind, kind as EntityKind);
+
+      const result = await ctx.db
+        .select({
+          capabilities: entities.capabilities,
+          currentState: {
+            attrs: entityStates.attrs,
+            state: entityStates.state,
+            updatedAt: entityStates.updatedAt,
+          },
+          deviceClass: entities.deviceClass,
+          deviceId: entities.deviceId,
+          devices: {
+            deviceId: devices.id,
+            manufacturer: devices.manufacturer,
+            model: devices.model,
+            name: devices.name,
+          },
+          entityId: entities.id,
+          key: entities.key,
+          kind: entities.kind,
+          name: entities.name,
+          rooms: {
+            name: rooms.name,
+            roomId: rooms.id,
+          },
+        })
+        .from(entities)
+        .leftJoin(entityStates, eq(entityStates.entityId, entities.id))
+        .leftJoin(devices, eq(devices.id, entities.deviceId))
+        .leftJoin(rooms, eq(rooms.id, devices.roomId))
+        .where(whereCondition)
+        .orderBy(entities.key);
+
+      return result;
+    }),
+
+  /**
+   * Get hourly aggregated data from TimescaleDB continuous aggregate
+   */
+  getHourlySeries: protectedProcedure
+    .input(
+      z.object({
+        entityId: z.string(),
+        from: z.date(),
+        to: z.date(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { entityId, from, to } = input;
+
+      // Query the continuous aggregate materialized view
+      const result = await ctx.db.execute(sql`
+        SELECT
+          "entityId",
+          hour_start,
+          mean,
+          min,
+          max,
+          last_state
+        FROM entity_state_hourly
+        WHERE "entityId" = ${entityId}
+          AND hour_start >= ${from}
+          AND hour_start < ${to}
+        ORDER BY hour_start ASC
+      `);
+
+      // Handle the result properly - db.execute returns different types
+      const rows = Array.isArray(result) ? result : result.rows || [];
+      return rows.map((row: Record<string, unknown>) => ({
+        entityId: row.entityId,
+        hourStart: row.hour_start,
+        lastState: row.last_state,
+        max: row.max,
+        mean: row.mean,
+        min: row.min,
+      }));
+    }),
+
+  /**
+   * Get entities state history
    */
   getStateHistory: protectedProcedure
-    .input(z.object({ 
-      entityId: z.string(),
-      timeRange: z.enum(['1h', '24h', '7d', '30d', '90d']).optional().default('24h'),
-      limit: z.number().min(1).max(1000).optional().default(100),
-    }))
+    .input(
+      z.object({
+        entityId: z.string(),
+        limit: z.number().min(1).max(1000).optional().default(100),
+        timeRange: z
+          .enum(['1h', '24h', '7d', '30d', '90d'])
+          .optional()
+          .default('24h'),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const { entityId, timeRange, limit } = input;
 
       // Calculate time range
       const now = new Date();
       let startTime: Date;
-      
+
       switch (timeRange) {
         case '1h':
           startTime = new Date(now.getTime() - 60 * 60 * 1000);
@@ -97,202 +230,45 @@ export const entityRouter = createTRPCRouter({
           startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       }
 
-      const result = await db
+      const result = await ctx.db
         .select({
-          id: entityStateHistory.id,
-          entityId: entityStateHistory.entityId,
-          ts: entityStateHistory.ts,
-          state: entityStateHistory.state,
-          attrs: entityStateHistory.attrs,
+          attrs: entityStateHistories.attrs,
+          entityId: entityStateHistories.entityId,
+          id: entityStateHistories.id,
+          state: entityStateHistories.state,
+          ts: entityStateHistories.ts,
         })
-        .from(entityStateHistory)
+        .from(entityStateHistories)
         .where(
           and(
-            eq(entityStateHistory.entityId, entityId),
-            gte(entityStateHistory.ts, startTime),
-            lte(entityStateHistory.ts, now),
+            eq(entityStateHistories.entityId, entityId),
+            gte(entityStateHistories.ts, startTime),
+            lte(entityStateHistories.ts, now),
           ),
         )
-        .orderBy(desc(entityStateHistory.ts))
+        .orderBy(desc(entityStateHistories.ts))
         .limit(limit);
 
       return result;
     }),
 
   /**
-   * Get hourly aggregated data from TimescaleDB continuous aggregate
-   */
-  getHourlySeries: protectedProcedure
-    .input(z.object({ 
-      entityId: z.string(),
-      from: z.date(),
-      to: z.date(),
-    }))
-    .query(async ({ ctx, input }) => {
-      const { entityId, from, to } = input;
-
-      // Query the continuous aggregate materialized view
-      const result = await db.execute(sql`
-        SELECT 
-          entity_id,
-          hour_start,
-          mean,
-          min,
-          max,
-          last_state
-        FROM entity_state_hourly
-        WHERE entity_id = ${entityId}
-          AND hour_start >= ${from}
-          AND hour_start < ${to}
-        ORDER BY hour_start ASC
-      `);
-
-      return result.rows.map((row: any) => ({
-        entityId: row.entity_id,
-        hourStart: row.hour_start,
-        mean: row.mean,
-        min: row.min,
-        max: row.max,
-        lastState: row.last_state,
-      }));
-    }),
-
-  /**
-   * Get entities for a device
-   */
-  getByDevice: protectedProcedure
-    .input(z.object({ deviceId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const { deviceId } = input;
-
-      const result = await db
-        .select({
-          entityId: entity.id,
-          deviceId: entity.deviceId,
-          kind: entity.kind,
-          key: entity.key,
-          traits: entity.traits,
-          currentState: {
-            state: entityState.state,
-            attrs: entityState.attrs,
-            updatedAt: entityState.updatedAt,
-          },
-        })
-        .from(entity)
-        .leftJoin(entityState, eq(entityState.entityId, entity.id))
-        .where(eq(entity.deviceId, deviceId))
-        .orderBy(entity.key);
-
-      return result;
-    }),
-
-  /**
-   * Get entities by kind (e.g., all lights, all sensors)
-   */
-  getByKind: protectedProcedure
-    .input(z.object({ 
-      kind: z.string(),
-      homeId: z.string().optional(),
-    }))
-    .query(async ({ ctx, input }) => {
-      const { kind, homeId } = input;
-
-      let query = db
-        .select({
-          entityId: entity.id,
-          deviceId: entity.deviceId,
-          kind: entity.kind,
-          key: entity.key,
-          traits: entity.traits,
-          currentState: {
-            state: entityState.state,
-            attrs: entityState.attrs,
-            updatedAt: entityState.updatedAt,
-          },
-          device: {
-            deviceId: device.id,
-            name: device.name,
-            manufacturer: device.manufacturer,
-            model: device.model,
-          },
-          room: {
-            roomId: room.id,
-            name: room.name,
-          },
-        })
-        .from(entity)
-        .leftJoin(entityState, eq(entityState.entityId, entity.id))
-        .leftJoin(device, eq(device.id, entity.deviceId))
-        .leftJoin(room, eq(room.id, device.roomId))
-        .where(eq(entity.kind, kind));
-
-      if (homeId) {
-        query = query.where(eq(device.homeId, homeId));
-      }
-
-      const result = await query.orderBy(entity.key);
-
-      return result;
-    }),
-
-  /**
-   * Update entity state (for testing/manual control)
-   */
-  setState: protectedProcedure
-    .input(z.object({
-      entityId: z.string(),
-      state: z.string(),
-      attrs: z.record(z.unknown()).optional(),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      const { entityId, state, attrs } = input;
-
-      // Update entity_state table
-      await db
-        .insert(entityState)
-        .values({
-          entityId,
-          state,
-          attrs,
-          updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: entityState.entityId,
-          set: {
-            state,
-            attrs,
-            updatedAt: new Date(),
-          },
-        });
-
-      // Insert into history
-      await db
-        .insert(entityStateHistory)
-        .values({
-          entityId,
-          ts: new Date(),
-          state,
-          attrs,
-        });
-
-      return { success: true };
-    }),
-
-  /**
-   * Get entity statistics
+   * Get entities statistics
    */
   getStats: protectedProcedure
-    .input(z.object({ 
-      entityId: z.string(),
-      timeRange: z.enum(['1h', '24h', '7d', '30d']).optional().default('24h'),
-    }))
+    .input(
+      z.object({
+        entityId: z.string(),
+        timeRange: z.enum(['1h', '24h', '7d', '30d']).optional().default('24h'),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const { entityId, timeRange } = input;
 
       // Calculate time range
       const now = new Date();
       let startTime: Date;
-      
+
       switch (timeRange) {
         case '1h':
           startTime = new Date(now.getTime() - 60 * 60 * 1000);
@@ -311,31 +287,141 @@ export const entityRouter = createTRPCRouter({
       }
 
       // Get statistics from history
-      const stats = await db.execute(sql`
-        SELECT 
+      const stats = await ctx.db.execute(sql`
+        SELECT
           COUNT(*) as total_records,
           MIN(ts) as first_record,
           MAX(ts) as last_record,
           AVG(CASE WHEN state ~ '^[0-9]+\.?[0-9]*$' THEN state::numeric ELSE NULL END) as avg_value,
           MIN(CASE WHEN state ~ '^[0-9]+\.?[0-9]*$' THEN state::numeric ELSE NULL END) as min_value,
           MAX(CASE WHEN state ~ '^[0-9]+\.?[0-9]*$' THEN state::numeric ELSE NULL END) as max_value
-        FROM entity_state_history
-        WHERE entity_id = ${entityId}
+        FROM entity_state_histories
+        WHERE "entityId" = ${entityId}
           AND ts >= ${startTime}
           AND ts <= ${now}
       `);
 
-      const row = stats.rows[0] as any;
-      
+      // Handle the result properly - db.execute returns different types
+      const rows = Array.isArray(stats) ? stats : stats.rows || [];
+      const row = rows[0] as Record<string, unknown>;
+
       return {
-        totalRecords: parseInt(row.total_records) || 0,
-        firstRecord: row.first_record,
-        lastRecord: row.last_record,
-        avgValue: row.avg_value ? parseFloat(row.avg_value) : null,
-        minValue: row.min_value ? parseFloat(row.min_value) : null,
-        maxValue: row.max_value ? parseFloat(row.max_value) : null,
+        avgValue: row.avg_value
+          ? Number.parseFloat(String(row.avg_value))
+          : null,
+        firstRecord: row.first_record as string | null,
+        lastRecord: row.last_record as string | null,
+        maxValue: row.max_value
+          ? Number.parseFloat(String(row.max_value))
+          : null,
+        minValue: row.min_value
+          ? Number.parseFloat(String(row.min_value))
+          : null,
         timeRange,
+        totalRecords: Number.parseInt(String(row.total_records), 10) || 0,
       };
     }),
-});
 
+  /**
+   * Send command to entity via hub
+   */
+  sendCommand: protectedProcedure
+    .input(
+      z.object({
+        capability: z.string(), // 'on_off', 'brightness', etc.
+        entityId: z.string(),
+        value: z.unknown(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { entityId, capability, value } = input;
+      const userId = ctx.auth?.userId;
+
+      try {
+        // Send command to hub
+        const hubUrl = env.HUB_URL;
+        const response = await fetch(`${hubUrl}/api/command`, {
+          body: JSON.stringify({
+            capability,
+            entityId,
+            userId,
+            value,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.error ||
+              `Hub command failed with status ${response.status}`,
+          );
+        }
+
+        const result = await response.json();
+        return {
+          latency: result.latency,
+          success: result.success,
+        };
+      } catch (error) {
+        throw new Error(
+          `Failed to send command to entity: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+    }),
+
+  /**
+   * Update entities state (for testing/manual control)
+   */
+  setState: protectedProcedure
+    .input(
+      z.object({
+        attrs: z.record(z.string(), z.unknown()).optional(),
+        entityId: z.string(),
+        state: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { entityId, state, attrs } = input;
+
+      // Update entities_state table
+      await ctx.db
+        .insert(entityStates)
+        .values({
+          attrs,
+          entityId,
+          state,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          set: {
+            attrs,
+            state,
+            updatedAt: new Date(),
+          },
+          target: entityStates.entityId,
+        });
+
+      // Get devices homeId for history record
+      const devicesInfo = await ctx.db
+        .select({ homeId: devices.homeId })
+        .from(entities)
+        .leftJoin(devices, eq(devices.id, entities.deviceId))
+        .where(eq(entities.id, entityId))
+        .limit(1);
+
+      // Insert into history
+      await ctx.db.insert(entityStateHistories).values({
+        attrs,
+        entityId,
+        homeId: devicesInfo[0]?.homeId || '',
+        state,
+        ts: new Date(),
+      });
+
+      return { success: true };
+    }),
+});

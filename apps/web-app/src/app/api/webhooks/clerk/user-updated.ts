@@ -1,7 +1,7 @@
 import type { UserJSON, WebhookEvent } from '@clerk/nextjs/server';
 import { posthog } from '@cove/analytics/posthog/server';
 import { db } from '@cove/db/client';
-import { Users } from '@cove/db/schema';
+import { users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function handleUserUpdated(event: WebhookEvent) {
@@ -13,14 +13,15 @@ export async function handleUserUpdated(event: WebhookEvent) {
   )?.email_address;
 
   const [user] = await db
-    .update(Users)
+    .update(users)
     .set({
-      avatarUrl: userData.image_url,
       email,
       firstName: userData.first_name,
+      imageUrl: userData.image_url,
       lastName: userData.last_name,
+      updatedAt: new Date(),
     })
-    .where(eq(Users.clerkId, userData.id))
+    .where(eq(users.id, userData.id))
     .returning();
 
   if (!user) {

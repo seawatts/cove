@@ -1,39 +1,18 @@
-import { apiKeyUsageRouter } from './router/api-key-usage';
-import { apiKeysRouter } from './router/api-keys';
-import { authRouter } from './router/auth';
-import { automationRouter, sceneRouter } from './router/automation';
-import { billingRouter } from './router/billing';
 import { deviceRouter } from './router/device';
-import { entityRouter } from './router/entity';
-import { esphomeRouter } from './router/esphome';
+import { entitiesRouter } from './router/entity';
+import { graphRouter } from './router/graph';
 import { homeRouter } from './router/home';
-import { hubRouter } from './router/hub';
-import { hueRouter } from './router/hue';
-import { orgRouter } from './router/org';
-import { orgMembersRouter } from './router/org-members';
 import { roomRouter } from './router/room';
 import { userRouter } from './router/user';
-import { widgetRouter } from './router/widget';
 import { createTRPCRouter } from './trpc';
 
 export const appRouter = createTRPCRouter({
-  apiKeys: apiKeysRouter,
-  apiKeyUsage: apiKeyUsageRouter,
-  auth: authRouter,
-  automation: automationRouter,
-  billing: billingRouter,
   device: deviceRouter,
-  entity: entityRouter,
-  esphome: esphomeRouter,
+  entity: entitiesRouter,
+  graph: graphRouter,
   home: homeRouter,
-  hub: hubRouter,
-  hue: hueRouter,
-  org: orgRouter,
-  orgMembers: orgMembersRouter,
   room: roomRouter,
-  scene: sceneRouter,
   user: userRouter,
-  widget: widgetRouter,
 });
 
 // export type definition of API

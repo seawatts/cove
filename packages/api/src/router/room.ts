@@ -1,4 +1,5 @@
 import { eq } from '@cove/db';
+import { rooms } from '@cove/db/schema';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
@@ -7,34 +8,29 @@ export const roomRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        color: z.string().optional(),
-        description: z.string().optional(),
-        floor: z.number().optional(),
-        icon: z.string().optional(),
+        floorId: z.number().optional(),
+        homeId: z.string(),
         name: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const [room] = await ctx.db
-        .insert(Rooms)
+      const [newRoom] = await ctx.db
+        .insert(rooms)
         .values({
-          color: input.color,
-          description: input.description,
-          floor: input.floor,
-          icon: input.icon,
+          floor: input.floorId,
+          homeId: input.homeId,
           name: input.name,
-          userId: ctx.auth.userId,
         })
         .returning();
 
-      return room;
+      return newRoom;
     }),
 
   // Delete a room
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.delete(Rooms).where(eq(Rooms.id, input.id));
+      await ctx.db.delete(rooms).where(eq(rooms.id, input.id));
       return { success: true };
     }),
 
@@ -42,50 +38,57 @@ export const roomRouter = createTRPCRouter({
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.room.findFirst({
-        where: eq(Rooms.id, input.id),
+      return ctx.db.query.rooms.findFirst({
+        where: eq(rooms.id, input.id),
         with: {
           devices: true,
         },
       });
     }),
-  // List all rooms for the current user
-  list: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.room.findMany({
-      orderBy: (rooms, { asc }) => [asc(rooms.name)],
-      where: eq(Rooms.userId, ctx.auth.userId),
-      with: {
-        devices: {
-          columns: {
-            deviceType: true,
-            id: true,
-            name: true,
-            online: true,
+
+  // List all rooms for a home
+  list: protectedProcedure
+    .input(z.object({ homeId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.rooms.findMany({
+        orderBy: (rooms, { asc }) => [asc(rooms.name)],
+        where: eq(rooms.homeId, input.homeId),
+        with: {
+          devices: {
+            columns: {
+              id: true,
+              manufacturer: true,
+              model: true,
+              name: true,
+              online: true,
+            },
           },
         },
-      },
-    });
-  }),
+      });
+    }),
 
   // Update a room
   update: protectedProcedure
     .input(
       z.object({
-        color: z.string().optional(),
-        description: z.string().optional(),
-        floor: z.number().optional(),
-        icon: z.string().optional(),
+        floorId: z.number().optional(),
         id: z.string(),
         name: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, ...updateData } = input;
+      const { id, ...updates } = input;
+      const { floorId, ...updateData } = updates;
+
+      const finalUpdateData = {
+        ...updateData,
+        ...(floorId !== undefined && { floor: floorId }),
+      };
 
       const [updated] = await ctx.db
-        .update(Rooms)
-        .set(updateData)
-        .where(eq(Rooms.id, id))
+        .update(rooms)
+        .set(finalUpdateData)
+        .where(eq(rooms.id, id))
         .returning();
 
       return updated;

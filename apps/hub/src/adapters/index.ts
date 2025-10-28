@@ -5,3 +5,4 @@
 
 export { ESPHomeAdapter } from './esphome';
 export { HueAdapter } from './hue';
+export { AdapterRegistry } from './registry';

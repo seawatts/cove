@@ -1,6 +1,6 @@
 import type { UserWebhookEvent } from '@clerk/nextjs/server';
 import { db } from '@cove/db/client';
-import { Users } from '@cove/db/schema';
+import { users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { handleUserCreated } from '../user-created';
 
@@ -76,12 +76,12 @@ describe('handleUserCreated', () => {
 
     expect(response).toBeUndefined();
 
-    const user = await db.query.Users.findFirst({
-      where: eq(Users.clerkId, event.data.id),
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, event.data.id),
     });
 
     expect(user).toBeDefined();
-    expect(user?.clerkId).toBe(event.data.id);
-    await db.delete(Users).where(eq(Users.clerkId, event.data.id));
+    expect(user?.id).toBe(event.data.id);
+    await db.delete(users).where(eq(users.id, event.data.id));
   });
 });

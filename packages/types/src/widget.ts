@@ -22,6 +22,7 @@ export interface WidgetConfig {
 
 export interface SensorMetadata {
   key: string;
+  entityId: string;
   name: string;
   unit?: string;
   type: 'continuous' | 'binary' | 'slow_changing' | 'event';
@@ -44,4 +45,5 @@ export interface WidgetProps {
   deviceId: string;
   sensor: SensorMetadata;
   config: WidgetConfig;
+  timeRange?: '1h' | '24h' | '7d' | '30d' | '90d';
 }

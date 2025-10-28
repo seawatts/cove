@@ -8,6 +8,7 @@ export enum ProtocolType {
   Hue = 'hue',
   Matter = 'matter',
   Sonos = 'sonos',
+  Cove = 'cove', // Hub protocol
   Zigbee = 'zigbee',
   ZWave = 'zwave',
   WiFi = 'wifi',
@@ -98,6 +99,9 @@ export const MDNS_SERVICE_TYPES = [
 
   // ESPHome
   '_esphomelib._tcp.local.',
+
+  // HTTP Services (for ESPHome devices that advertise as HTTP)
+  '_http._tcp.local.',
 ] as const;
 
 // Hub health status interface

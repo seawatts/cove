@@ -7,12 +7,14 @@
 
 import { cpus, freemem, totalmem } from 'node:os';
 import { debug } from '@cove/logger';
+import { EntityKind } from '@cove/types';
 import type { HubDatabase } from './db';
 
 const log = debug('cove:hub:metrics');
 
 interface MetricsCollectorOptions {
   deviceId: string; // Hub's device ID
+  homeId: string; // Home ID for entity state history
   db?: HubDatabase | null;
   bufferSize?: number;
   collectionInterval?: number; // seconds
@@ -36,13 +38,14 @@ interface HubMetrics {
 
 export class DeviceMetricsCollector {
   private deviceId: string;
+  private homeId: string;
   private db: HubDatabase | null;
   private metricsBuffer: HubMetrics[] = [];
   private bufferSize: number;
   private collectionInterval: number;
   private syncInterval: number;
-  private collectionTimer: Timer | null = null;
-  private syncTimer: Timer | null = null;
+  private collectionTimer: ReturnType<typeof setInterval> | null = null;
+  private syncTimer: ReturnType<typeof setInterval> | null = null;
   private startTime: number = Date.now();
   private connectedDevicesCount = 0;
   private activeProtocolsCount = 0;
@@ -53,6 +56,7 @@ export class DeviceMetricsCollector {
 
   constructor(options: MetricsCollectorOptions) {
     this.deviceId = options.deviceId;
+    this.homeId = options.homeId;
     this.db = options.db || null;
     this.bufferSize = options.bufferSize || 100; // ~16 minutes at 10s intervals
     this.collectionInterval = options.collectionInterval || 10; // 10 seconds default
@@ -143,14 +147,11 @@ export class DeviceMetricsCollector {
     for (const metric of metrics) {
       const entityKey = `sensor.hub_${metric.name}`;
       const entityId = await this.db.createEntity({
+        capabilities: [],
+        deviceClass: metric.deviceClass,
         deviceId: this.deviceId,
         key: entityKey,
-        kind: 'sensor',
-        traits: {
-          device_class: metric.deviceClass,
-          source: 'hub_metrics',
-          unit_of_measurement: metric.unit,
-        },
+        kind: EntityKind.Sensor,
       });
 
       if (entityId) {
@@ -244,7 +245,7 @@ export class DeviceMetricsCollector {
               unit_of_measurement: this.getMetricUnit(metricName),
             },
             entityId,
-            homeId: this.deviceId, // TODO: Get actual home ID
+            homeId: this.homeId,
             state: value.toString(),
             timestamp: now,
           });

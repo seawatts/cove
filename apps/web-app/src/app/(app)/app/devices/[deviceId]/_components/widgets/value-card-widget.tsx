@@ -1,11 +1,13 @@
 'use client';
 
-import { api } from '@cove/api/react';
 import type { WidgetProps } from '@cove/types/widget';
-import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
+import { Card, CardContent, CardHeader } from '@cove/ui/card';
+import { Icons } from '@cove/ui/custom/icons';
 import { formatSensorValue } from '@cove/utils/format-sensor-value';
 import { format } from 'date-fns';
 import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { useQueryState } from 'nuqs';
+import { useEntityData } from '../hooks/use-entity-data';
 
 interface TrendData {
   direction: 'up' | 'down' | 'stable';
@@ -42,39 +44,67 @@ function TrendIndicator({ trend }: { trend?: TrendData }) {
   );
 }
 
+function calculateStats(
+  aggregatedData: Array<{
+    timestamp: number;
+    mean: number | null;
+    min: number | null;
+    max: number | null;
+  }>,
+) {
+  if (aggregatedData.length === 0) {
+    return { avg: 0, max: 0, min: 0 };
+  }
+
+  const validValues = aggregatedData
+    .map((d) => d.mean)
+    .filter((value): value is number => value !== null && !Number.isNaN(value));
+
+  if (validValues.length === 0) {
+    return { avg: 0, max: 0, min: 0 };
+  }
+
+  const min = Math.min(...validValues);
+  const max = Math.max(...validValues);
+  const avg =
+    validValues.reduce((sum, value) => sum + value, 0) / validValues.length;
+
+  return { avg, max, min };
+}
+
 function calculateTrend(
   _currentValue: number,
-  historicalData: Array<{ lastChanged: Date | string; state: unknown }>,
+  aggregatedData: Array<{ timestamp: number; mean: number | null }>,
 ): TrendData | undefined {
-  if (historicalData.length < 2) return undefined;
+  if (aggregatedData.length < 2) return undefined;
 
-  // Get values from last hour and 24 hours ago for comparison
+  // Get values from recent and earlier periods for comparison
   const now = new Date();
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  // Find closest historical values
-  const recentData = historicalData
-    .filter((d) => new Date(d.lastChanged) >= oneHourAgo)
+  // Find closest aggregated values
+  const recentData = aggregatedData
+    .filter((d) => new Date(d.timestamp) >= oneHourAgo)
     .sort(
       (a, b) =>
-        Math.abs(new Date(a.lastChanged).getTime() - now.getTime()) -
-        Math.abs(new Date(b.lastChanged).getTime() - now.getTime()),
+        Math.abs(new Date(a.timestamp).getTime() - now.getTime()) -
+        Math.abs(new Date(b.timestamp).getTime() - now.getTime()),
     );
 
-  const oldData = historicalData
+  const oldData = aggregatedData
     .filter(
       (d) =>
-        new Date(d.lastChanged) >= twentyFourHoursAgo &&
-        new Date(d.lastChanged) < oneHourAgo,
+        new Date(d.timestamp) >= twentyFourHoursAgo &&
+        new Date(d.timestamp) < oneHourAgo,
     )
     .sort(
       (a, b) =>
         Math.abs(
-          new Date(a.lastChanged).getTime() - twentyFourHoursAgo.getTime(),
+          new Date(a.timestamp).getTime() - twentyFourHoursAgo.getTime(),
         ) -
         Math.abs(
-          new Date(b.lastChanged).getTime() - twentyFourHoursAgo.getTime(),
+          new Date(b.timestamp).getTime() - twentyFourHoursAgo.getTime(),
         ),
     );
 
@@ -85,14 +115,8 @@ function calculateTrend(
 
   if (!recentDataPoint || !oldDataPoint) return undefined;
 
-  const recentValue =
-    typeof recentDataPoint.state === 'number'
-      ? recentDataPoint.state
-      : Number(recentDataPoint.state);
-  const oldValue =
-    typeof oldDataPoint.state === 'number'
-      ? oldDataPoint.state
-      : Number(oldDataPoint.state);
+  const recentValue = recentDataPoint.mean ?? 0;
+  const oldValue = oldDataPoint.mean ?? 0;
 
   if (Number.isNaN(recentValue) || Number.isNaN(oldValue) || oldValue === 0)
     return undefined;
@@ -115,43 +139,106 @@ function calculateTrend(
 }
 
 export function ValueCardWidget({ sensor, config }: WidgetProps) {
-  const { data: stateHistory = [] } = api.entity.getStateHistory.useQuery({
-    entityId: sensor.key, // sensor.key is now the entityId
-    timeRange: '24h',
+  const [timeRange] = useQueryState('timeRange', {
+    defaultValue: '24h',
+    parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
   });
 
-  // Extract unit from attributes if not provided in sensor metadata
-  const unit =
-    sensor.unit ||
-    ((stateHistory[0]?.attributes as Record<string, unknown> | undefined)
-      ?.unit as string | undefined);
+  // Use the unified data hook with polling only
+  const { aggregatedData, status } = useEntityData({
+    entityId: sensor.entityId,
+    onStateChange: (newState) => {
+      console.log('New state received for value card:', newState);
+    },
+    timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
+  });
+
+  // Extract unit from sensor metadata
+  const unit = sensor.unit;
+
+  const getConnectionStatusIcon = () => {
+    switch (status) {
+      case 'polling':
+        return <Icons.Circle size="sm" variant="primary" />;
+      case 'error':
+        return <Icons.CircleStop size="sm" variant="destructive" />;
+      default:
+        return <Icons.CircleStop size="sm" variant="muted" />;
+    }
+  };
+
+  const getConnectionStatusText = () => {
+    switch (status) {
+      case 'polling':
+        return 'Polling';
+      case 'error':
+        return 'Error';
+      default:
+        return 'Disconnected';
+    }
+  };
 
   const formattedValue = formatSensorValue(sensor.currentValue, unit);
   const trend = calculateTrend(
     typeof sensor.currentValue === 'number'
       ? sensor.currentValue
       : Number(sensor.currentValue) || 0,
-    stateHistory,
+    aggregatedData as Array<{ timestamp: number; mean: number | null }>,
+  );
+
+  const stats = calculateStats(
+    aggregatedData as Array<{
+      timestamp: number;
+      mean: number | null;
+      min: number | null;
+      max: number | null;
+    }>,
   );
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{sensor.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="text-4xl font-bold tracking-tight">
-          {formattedValue}
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            {sensor.name}
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {getConnectionStatusIcon()}
+            <span>{getConnectionStatusText()}</span>
+          </div>
         </div>
-
+        {/* Current Value and Statistics */}
+        <div className="flex items-center justify-between mt-3">
+          <div className="text-3xl font-light tracking-tight">
+            {formattedValue}{' '}
+            {unit && (
+              <span className="text-lg text-muted-foreground/70 ml-1">
+                {unit}
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground/70 space-x-6">
+            <span>Min {formatSensorValue(stats.min, unit)}</span>
+            <span>Max {formatSensorValue(stats.max, unit)}</span>
+            <span>Avg {formatSensorValue(stats.avg, unit)}</span>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0 pb-6">
+        {/* Last Updated - Very Subtle */}
         {sensor.lastChanged && (
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs text-muted-foreground/50 text-center">
             Last updated:{' '}
             {format(new Date(sensor.lastChanged), 'MMM dd, HH:mm')}
           </div>
         )}
 
-        {config.showTrend && trend && <TrendIndicator trend={trend} />}
+        {/* Trend Indicator */}
+        {config.showTrend && trend && (
+          <div className="mt-4">
+            <TrendIndicator trend={trend} />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

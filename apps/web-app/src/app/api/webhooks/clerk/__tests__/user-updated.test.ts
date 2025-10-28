@@ -1,6 +1,6 @@
 import type { UserWebhookEvent } from '@clerk/nextjs/server';
 import { db } from '@cove/db/client';
-import { Users } from '@cove/db/schema';
+import { users } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { handleUserUpdated } from '../user-updated';
 
@@ -8,12 +8,11 @@ describe('handleUserUpdated', () => {
   it('should update a user', async () => {
     // First, insert a user to update
     const userId = 'user_29w83sxmDNGwOuEthce5gg56FcC';
-    await db.insert(Users).values({
-      avatarUrl: 'https://img.clerk.com/old.png',
-      clerkId: userId,
+    await db.insert(users).values({
       email: 'old@example.org',
       firstName: 'Old',
       id: userId,
+      imageUrl: 'https://img.clerk.com/old.png',
       lastName: 'Name',
     });
 
@@ -86,13 +85,13 @@ describe('handleUserUpdated', () => {
     const response = await handleUserUpdated(event);
     expect(response).toBeUndefined();
 
-    const user = await db.query.Users.findFirst({
-      where: eq(Users.clerkId, userId),
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
     });
     expect(user).toBeDefined();
     expect(user?.email).toBe('new@example.org');
     expect(user?.firstName).toBe('New');
-    expect(user?.avatarUrl).toBe('https://img.clerk.com/new.png');
-    await db.delete(Users).where(eq(Users.clerkId, userId));
+    expect(user?.imageUrl).toBe('https://img.clerk.com/new.png');
+    await db.delete(users).where(eq(users.id, userId));
   });
 });

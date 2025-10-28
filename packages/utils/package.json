@@ -9,9 +9,12 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./async-result": "./src/async-result.ts",
     "./detect-widget-type": "./src/detect-widget-type.ts",
     "./fill-time-series-gaps": "./src/fill-time-series-gaps.ts",
-    "./format-sensor-value": "./src/format-sensor-value.ts"
+    "./format-sensor-value": "./src/format-sensor-value.ts",
+    "./option": "./src/option.ts",
+    "./result": "./src/result.ts"
   },
   "license": "MIT",
   "name": "@cove/utils",

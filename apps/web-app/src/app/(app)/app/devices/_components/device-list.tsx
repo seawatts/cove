@@ -11,7 +11,15 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 
 export function DeviceList() {
-  const { data: devices = [], isLoading, refetch } = api.device.list.useQuery();
+  const { data: home } = api.home.get.useQuery();
+  const {
+    data: devices = [],
+    isLoading,
+    refetch,
+  } = api.device.list.useQuery(
+    { homeId: home?.id || '' },
+    { enabled: !!home?.id },
+  );
   const cleanupMutation = api.device.cleanupDuplicates.useMutation({
     onError: (error) => {
       toast.error(`Failed to cleanup duplicates: ${error.message}`);
@@ -64,7 +72,7 @@ export function DeviceList() {
         <div className="grid justify-end">
           <Button
             disabled={cleanupMutation.isPending}
-            onClick={() => cleanupMutation.mutate()}
+            onClick={() => cleanupMutation.mutate({ homeId: home?.id || '' })}
             size="sm"
             variant="outline"
           >
@@ -83,21 +91,24 @@ export function DeviceList() {
         </div>
       )}
       {devices.map((device) => (
-        <Link href={`/app/devices/${device.id}`} key={device.id}>
+        <Link href={`/app/devices/${device.deviceId}`} key={device.deviceId}>
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
               <CardTitle className="grid grid-cols-[1fr_auto] items-center gap-4">
-                <span>{device.name}</span>
-                <Badge variant={device.online ? 'default' : 'destructive'}>
-                  {device.online ? 'Online' : 'Offline'}
-                </Badge>
+                <span>{device.name || device.deviceId}</span>
+                <Badge variant="default">Online</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-2">
-              <Text variant="muted">Type: {device.deviceType}</Text>
-              {device.protocol && (
-                <Text variant="muted">Protocol: {device.protocol}</Text>
-              )}
+              <Text variant="muted">
+                Type: {String(device.metadata?.deviceType || 'unknown')}
+              </Text>
+              {Boolean(device.metadata?.protocol) &&
+                typeof device.metadata?.protocol === 'string' && (
+                  <Text variant="muted">
+                    Protocol: {String(device.metadata?.protocol)}
+                  </Text>
+                )}
               {device.room && (
                 <Text variant="muted">Room: {device.room.name}</Text>
               )}

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@clerk/chrome-extension": "2.7.5",
+    "@clerk/chrome-extension": "2.7.7",
     "@clerk/nextjs": "catalog:",
     "@cove/logger": "workspace:*",
     "@cove/ui": "workspace:*",
@@ -11,7 +11,7 @@
     "@vercel/speed-insights": "1.2.0",
     "class-variance-authority": "0.7.1",
     "nextjs-google-analytics": "2.3.7",
-    "posthog-js": "1.275.3",
+    "posthog-js": "1.276.0",
     "posthog-node": "5.10.0",
     "react": "catalog:",
     "react-dom": "catalog:",

@@ -1,11 +1,12 @@
 'use client';
 
-import { api } from '@cove/api/react';
 import type { WidgetProps } from '@cove/types/widget';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
+import { Icons } from '@cove/ui/custom/icons';
 import { formatSensorValue } from '@cove/utils/format-sensor-value';
 import { format, formatDistanceToNow } from 'date-fns';
 import * as React from 'react';
+import { useEntityData } from '../hooks/use-entity-data';
 
 interface TableRow {
   timestamp: Date;
@@ -15,24 +16,48 @@ interface TableRow {
 }
 
 export function TableWidget({ sensor }: WidgetProps) {
-  const { data: stateHistory = [], isLoading } =
-    api.entity.getStateHistory.useQuery({
-      entityId: sensor.key, // sensor.key is now the entityId
-      timeRange: '24h',
-    });
+  // Use the unified data hook with polling only
+  const { stateHistory, isLoading, status } = useEntityData({
+    entityId: sensor.entityId,
+    onStateChange: (newState) => {
+      console.log('New state received for table:', newState);
+    },
+  });
 
   // Extract unit from attributes if not provided in sensor metadata
   const unit =
     sensor.unit ||
-    ((stateHistory[0]?.attributes as Record<string, unknown> | undefined)
-      ?.unit as string | undefined);
+    ((stateHistory[0]?.attrs as Record<string, unknown> | undefined)?.unit as
+      | string
+      | undefined);
+
+  const getConnectionStatusIcon = () => {
+    switch (status) {
+      case 'polling':
+        return <Icons.Circle size="sm" variant="primary" />;
+      case 'error':
+        return <Icons.CircleStop size="sm" variant="destructive" />;
+      default:
+        return <Icons.CircleStop size="sm" variant="muted" />;
+    }
+  };
+
+  const getConnectionStatusText = () => {
+    switch (status) {
+      case 'polling':
+        return 'Polling';
+      case 'error':
+        return 'Error';
+      default:
+        return 'Disconnected';
+    }
+  };
 
   const tableData = React.useMemo((): TableRow[] => {
     return stateHistory
-      .slice(-20) // Show last 20 entries
-      .reverse() // Most recent first
-      .map((state) => {
-        const timestamp = new Date(state.lastChanged);
+      .slice(0, 20) // Show first 20 entries (most recent, since API returns desc order)
+      .map((state: { ts: Date | string; state: unknown }) => {
+        const timestamp = new Date(state.ts);
         const value = state.state;
         const formattedValue = formatSensorValue(value, unit);
         const relativeTime = formatDistanceToNow(timestamp, {
@@ -52,7 +77,13 @@ export function TableWidget({ sensor }: WidgetProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{sensor.name}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{sensor.name}</CardTitle>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {getConnectionStatusIcon()}
+              <span>{getConnectionStatusText()}</span>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -75,7 +106,13 @@ export function TableWidget({ sensor }: WidgetProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{sensor.name}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{sensor.name}</CardTitle>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {getConnectionStatusIcon()}
+              <span>{getConnectionStatusText()}</span>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="text-center text-muted-foreground py-8">
@@ -89,7 +126,13 @@ export function TableWidget({ sensor }: WidgetProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">{sensor.name}</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{sensor.name}</CardTitle>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {getConnectionStatusIcon()}
+            <span>{getConnectionStatusText()}</span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
