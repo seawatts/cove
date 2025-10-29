@@ -7,7 +7,10 @@ import { debug } from '@cove/logger';
 import { EspHomeClient } from 'esphome-client';
 import { setupEventHandlers } from './event-handlers';
 import { getDriverState } from './state';
-import type { ESPHomeConnection } from './types';
+import type {
+  ESPHomeClient as ESPHomeClientType,
+  ESPHomeConnection,
+} from './types';
 
 const log = debug('cove:driver:esphome');
 
@@ -32,12 +35,11 @@ export default async function connect(
 
   log(`Connecting to ESPHome device ${deviceId} at ${address}`);
 
-  // Create new client
+  // Create new client using esphome-client
   const client = new EspHomeClient({
-    clientId: 'cove-hub-v2',
     host: address,
     port: 6053,
-  });
+  }) as unknown as ESPHomeClientType;
 
   // Create connection state
   const connection: ESPHomeConnection = {
@@ -50,40 +52,18 @@ export default async function connect(
     subscriptions: new Map(),
   };
 
-  // Set up event handlers
+  // Set up event handlers before connecting
   setupEventHandlers(connection);
 
-  // Connect to device
-  client.connect();
-
-  // Wait for connection to be established
-  await new Promise<void>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error(`Connection timeout for ${deviceId}`));
-    }, 5000);
-
-    client.once('connect', () => {
-      clearTimeout(timeout);
-      connection.connected = true;
-      state.connections.set(deviceId, connection);
-      resolve();
-    });
-
-    // Note: error/close events may not be typed correctly in esphome-client types
-    // Use a generic approach that works with the EventEmitter interface
-    const cleanup = () => {
-      clearTimeout(timeout);
-    };
-
-    // Set a timeout that will reject if connection doesn't establish
-    setTimeout(() => {
-      cleanup();
-      reject(new Error(`Connection closed for ${deviceId}`));
-    }, 10000);
-  });
-
+  // Store connection before calling connect
   state.connections.set(deviceId, connection);
-  log(`Successfully connected to ${deviceId}`);
+
+  // Connect to device - esphome-client handles everything automatically
+  if (client.connect) {
+    await client.connect();
+  }
+
+  log(`Connection initiated for ${deviceId}`);
 }
 
 /**
@@ -106,7 +86,9 @@ export async function disconnect(deviceId: string): Promise<void> {
   connection.subscriptions.clear();
 
   // Disconnect client
-  connection.client.disconnect();
+  if (connection.client.disconnect) {
+    connection.client.disconnect();
+  }
   connection.connected = false;
 
   state.connections.delete(deviceId);

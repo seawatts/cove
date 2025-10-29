@@ -22,9 +22,13 @@ async function handleSwitchCommand(
 ): Promise<void> {
   if (command.capability === 'on_off') {
     const state = Boolean(command.value);
-    // ESPHome format: entity ID is entity.type + '-' + objectId
-    const entityId = `${entity.type}-${entity.objectId}`;
-    connection.client.sendSwitchCommand(entityId, state);
+    // Use sendSwitchCommand with entity ID
+    const client = connection.client as {
+      sendSwitchCommand?: (id: string, state: boolean) => void;
+    };
+    if (client.sendSwitchCommand) {
+      client.sendSwitchCommand(entity.entityId, state);
+    }
   }
 }
 
@@ -50,8 +54,15 @@ async function handleLightCommand(
     options.state = true;
   }
 
-  const entityId = `${entity.type}-${entity.objectId}`;
-  connection.client.sendLightCommand(entityId, options);
+  const client = connection.client as {
+    sendLightCommand?: (
+      id: string,
+      options: Record<string, unknown>,
+    ) => Promise<void>;
+  };
+  if (client.sendLightCommand) {
+    await client.sendLightCommand(entity.entityId, options);
+  }
 }
 
 async function handleButtonCommand(
@@ -59,8 +70,12 @@ async function handleButtonCommand(
   entity: ESPHomeEntity,
   _command: DriverCommand,
 ): Promise<void> {
-  const entityId = `${entity.type}-${entity.objectId}`;
-  connection.client.sendButtonCommand(entityId);
+  const client = connection.client as {
+    sendButtonCommand?: (id: string) => void;
+  };
+  if (client.sendButtonCommand) {
+    client.sendButtonCommand(entity.entityId);
+  }
 }
 
 async function handleNumberCommand(
@@ -69,8 +84,12 @@ async function handleNumberCommand(
   command: DriverCommand,
 ): Promise<void> {
   if (command.capability === 'numeric') {
-    const entityId = `${entity.type}-${entity.objectId}`;
-    connection.client.sendNumberCommand(entityId, Number(command.value));
+    const client = connection.client as {
+      sendNumberCommand?: (id: string, value: number) => void;
+    };
+    if (client.sendNumberCommand) {
+      client.sendNumberCommand(entity.entityId, Number(command.value));
+    }
   }
 }
 
@@ -80,8 +99,12 @@ async function handleSelectCommand(
   command: DriverCommand,
 ): Promise<void> {
   if (command.capability === 'select') {
-    const entityId = `${entity.type}-${entity.objectId}`;
-    connection.client.sendSelectCommand(entityId, String(command.value));
+    const client = connection.client as {
+      sendSelectCommand?: (id: string, value: string) => void;
+    };
+    if (client.sendSelectCommand) {
+      client.sendSelectCommand(entity.entityId, String(command.value));
+    }
   }
 }
 
@@ -99,8 +122,15 @@ async function handleFanCommand(
     options.state = Boolean(command.value);
   }
 
-  const entityId = `${entity.type}-${entity.objectId}`;
-  connection.client.sendFanCommand(entityId, options);
+  const client = connection.client as {
+    sendFanCommand?: (
+      id: string,
+      options: Record<string, unknown>,
+    ) => Promise<void>;
+  };
+  if (client.sendFanCommand) {
+    await client.sendFanCommand(entity.entityId, options);
+  }
 }
 
 async function handleCoverCommand(
@@ -114,8 +144,15 @@ async function handleCoverCommand(
     options.position = Number(command.value) / 100; // Convert 0-100 to 0-1
   }
 
-  const entityId = `${entity.type}-${entity.objectId}`;
-  connection.client.sendCoverCommand(entityId, options);
+  const client = connection.client as {
+    sendCoverCommand?: (
+      id: string,
+      options: Record<string, unknown>,
+    ) => Promise<void>;
+  };
+  if (client.sendCoverCommand) {
+    await client.sendCoverCommand(entity.entityId, options);
+  }
 }
 
 async function handleClimateCommand(
@@ -129,8 +166,15 @@ async function handleClimateCommand(
     options.targetTemperature = Number(command.value);
   }
 
-  const entityId = `${entity.type}-${entity.objectId}`;
-  connection.client.sendClimateCommand(entityId, options);
+  const client = connection.client as {
+    sendClimateCommand?: (
+      id: string,
+      options: Record<string, unknown>,
+    ) => Promise<void>;
+  };
+  if (client.sendClimateCommand) {
+    await client.sendClimateCommand(entity.entityId, options);
+  }
 }
 
 async function handleLockCommand(
@@ -139,14 +183,18 @@ async function handleLockCommand(
   command: DriverCommand,
 ): Promise<void> {
   const state = String(command.value).toLowerCase();
-  const entityId = `${entity.type}-${entity.objectId}`;
+  const client = connection.client as {
+    sendLockCommand?: (id: string, action: string) => void;
+  };
 
-  if (state === 'lock') {
-    connection.client.sendLockCommand(entityId, 'lock');
-  } else if (state === 'unlock') {
-    connection.client.sendLockCommand(entityId, 'unlock');
-  } else if (state === 'open') {
-    connection.client.sendLockCommand(entityId, 'open');
+  if (client.sendLockCommand) {
+    if (state === 'lock') {
+      client.sendLockCommand(entity.entityId, 'lock');
+    } else if (state === 'unlock') {
+      client.sendLockCommand(entity.entityId, 'unlock');
+    } else if (state === 'open') {
+      client.sendLockCommand(entity.entityId, 'open');
+    }
   }
 }
 

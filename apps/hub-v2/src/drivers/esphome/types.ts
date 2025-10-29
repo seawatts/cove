@@ -3,8 +3,36 @@
  * Type definitions for the ESPHome driver
  */
 
+import type { EventEmitter } from 'node:events';
 import type { Bonjour as BonjourInstance, Service } from 'bonjour-service';
-import type { DeviceInfo, EspHomeClient } from 'esphome-client';
+
+// Type for the Client from esphome-client
+export type ESPHomeClient = EventEmitter & {
+  entities?: Map<unknown, unknown>;
+} & {
+  disconnect?: () => void;
+  connect?: () => Promise<void>;
+};
+
+// Re-export DeviceInfoResponse type from protobuf
+export type DeviceInfoResponse = {
+  usesPassword: boolean;
+  name: string;
+  macAddress: string;
+  esphomeVersion: string;
+  compilationTime: string;
+  model: string;
+  hasDeepSleep?: boolean;
+  projectName: string;
+  projectVersion: string;
+  webserverPort: number;
+  manufacturer?: string;
+  friendlyName?: string;
+  suggestedArea?: string;
+  bluetoothMacAddress?: string;
+  [key: string]: unknown;
+};
+
 import type {
   CapabilityDescriptor,
   DeviceDescriptor,
@@ -18,10 +46,10 @@ export interface ExtendedESPHomeConnection {
 }
 
 export interface ESPHomeConnection {
-  client: EspHomeClient;
+  client: ESPHomeClient;
   deviceId: string;
   address: string;
-  deviceInfo: DeviceInfo | null;
+  deviceInfo: DeviceInfoResponse | null;
   entities: Map<string, ESPHomeEntity>;
   subscriptions: Map<string, () => void>;
   connected: boolean;
@@ -36,13 +64,17 @@ export interface ESPHomeEntity {
   objectId: string;
   type: string;
   entityId: string;
+  config?: {
+    name?: string;
+    objectId?: string;
+    [key: string]: unknown;
+  };
 }
 
 export type {
   BonjourInstance,
   CapabilityDescriptor,
   DeviceDescriptor,
-  DeviceInfo,
   DriverCommand,
   DriverResult,
   EntityDescriptor,

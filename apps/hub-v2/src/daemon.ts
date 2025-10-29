@@ -317,6 +317,9 @@ export class HubDaemon {
                   {},
                 );
 
+                // Wait a bit for entities to be discovered via events
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
                 // Enumerate entities
                 const entities = await driver.getEntities(deviceDesc.id);
                 for (const entityDesc of entities) {
