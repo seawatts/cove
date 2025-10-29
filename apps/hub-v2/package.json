@@ -3,6 +3,7 @@
     "cove-hub-v2": "./cove-hub-v2"
   },
   "dependencies": {
+    "@2colors/esphome-native-api": "^1.3.4",
     "@cove/db": "workspace:*",
     "@cove/id": "workspace:*",
     "@cove/logger": "workspace:*",

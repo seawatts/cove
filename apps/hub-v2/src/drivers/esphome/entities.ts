@@ -4,7 +4,6 @@
  */
 
 import { debug } from '@cove/logger';
-import type { EspHomeClient } from 'esphome-client';
 import type { DeviceDescriptor, EntityDescriptor } from '../../core/driver-kit';
 import { createCapability, mapEntityTypeToKind } from './helpers';
 import { getDriverState } from './state';
@@ -65,7 +64,7 @@ export async function getDeviceInfo(
     return null;
   }
 
-  const deviceInfo = connection.client.deviceInfo();
+  const deviceInfo = connection.deviceInfo;
   if (!deviceInfo) {
     log(`Device info not yet available for ${deviceId}`);
     return null;
@@ -84,7 +83,7 @@ export async function getDeviceInfo(
       macAddress: deviceInfo.macAddress,
       projectName: deviceInfo.projectName,
       projectVersion: deviceInfo.projectVersion,
-      webserverPort: deviceInfo.webserverPort,
+      webserverPort: deviceInfo.webserverPort || 80,
     },
     model: deviceInfo.model || 'Unknown Model',
     name: deviceName,
@@ -103,20 +102,7 @@ export function populateEntities(connection: ESPHomeConnection): void {
   try {
     // ESPHome client provides entity information through various methods
     // We'll try to access the entities from the client's internal state
-    const anyClient = client as EspHomeClient & {
-      sensors?: unknown[];
-      binarySensors?: unknown[];
-      switches?: unknown[];
-      lights?: unknown[];
-      buttons?: unknown[];
-      numbers?: unknown[];
-      selects?: unknown[];
-      fans?: unknown[];
-      covers?: unknown[];
-      climates?: unknown[];
-      locks?: unknown[];
-      textSensors?: unknown[];
-    };
+    const anyClient = client as Record<string, unknown>;
 
     // Helper function to safely access entity properties
     const getEntityProps = (entity: unknown) => {

@@ -162,8 +162,14 @@ export class Registry {
   ) {
     try {
       // Check if entity already exists by key
+      const lookupKey = entityDesc.metadata?.key
+        ? String(entityDesc.metadata.key)
+        : entityDesc.id;
       const existingEntity = await this.db.query.entities.findFirst({
-        where: eq(entities.key, entityDesc.id),
+        where: and(
+          eq(entities.deviceId, deviceId),
+          eq(entities.key, lookupKey),
+        ),
       });
 
       if (existingEntity) {
@@ -180,7 +186,9 @@ export class Registry {
           capability: entityDesc.capability,
           deviceId,
           homeId,
-          key: entityDesc.id,
+          key: entityDesc.metadata?.key
+            ? String(entityDesc.metadata.key)
+            : entityDesc.id,
           kind: entityDesc.kind,
           name: entityDesc.name,
         })
