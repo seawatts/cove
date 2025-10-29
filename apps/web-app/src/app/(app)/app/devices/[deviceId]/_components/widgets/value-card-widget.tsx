@@ -145,16 +145,25 @@ export function ValueCardWidget({ sensor, config }: WidgetProps) {
   });
 
   // Use the unified data hook with polling only
-  const { aggregatedData, status } = useEntityData({
-    entityId: sensor.entityId,
-    onStateChange: (newState) => {
-      console.log('New state received for value card:', newState);
-    },
-    timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
-  });
+  const { aggregatedData, latestState, latestTelemetryValue, status } =
+    useEntityData({
+      entityId: sensor.entityId,
+      onStateChange: (newState) => {
+        console.log('New state received for value card:', newState);
+      },
+      timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
+    });
 
   // Extract unit from sensor metadata
   const unit = sensor.unit;
+
+  // Use latest telemetry value if available (most accurate), then latest state, then fall back to initial sensor value
+  const currentValue =
+    latestTelemetryValue !== undefined && latestTelemetryValue !== null
+      ? latestTelemetryValue
+      : latestState?.state !== undefined && latestState?.state !== null
+        ? latestState.state
+        : sensor.currentValue;
 
   const getConnectionStatusIcon = () => {
     switch (status) {
@@ -178,11 +187,9 @@ export function ValueCardWidget({ sensor, config }: WidgetProps) {
     }
   };
 
-  const formattedValue = formatSensorValue(sensor.currentValue, unit);
+  const formattedValue = formatSensorValue(currentValue, unit);
   const trend = calculateTrend(
-    typeof sensor.currentValue === 'number'
-      ? sensor.currentValue
-      : Number(sensor.currentValue) || 0,
+    typeof currentValue === 'number' ? currentValue : Number(currentValue) || 0,
     aggregatedData as Array<{ timestamp: number; mean: number | null }>,
   );
 
@@ -226,10 +233,13 @@ export function ValueCardWidget({ sensor, config }: WidgetProps) {
       </CardHeader>
       <CardContent className="pt-0 pb-6">
         {/* Last Updated - Very Subtle */}
-        {sensor.lastChanged && (
+        {(latestState?.updatedAt || sensor.lastChanged) && (
           <div className="text-xs text-muted-foreground/50 text-center">
             Last updated:{' '}
-            {format(new Date(sensor.lastChanged), 'MMM dd, HH:mm')}
+            {format(
+              latestState?.updatedAt || new Date(sensor.lastChanged),
+              'MMM dd, HH:mm',
+            )}
           </div>
         )}
 

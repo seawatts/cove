@@ -1,6 +1,5 @@
 'use client';
 
-import { api } from '@cove/api/react';
 import {
   type SensorMetadata,
   type WidgetProps,
@@ -22,6 +21,7 @@ import { formatSensorValue } from '@cove/utils/format-sensor-value';
 import { useQueryState } from 'nuqs';
 // Lazy load widget components to reduce bundle size
 import { lazy, Suspense, useState } from 'react';
+import { hubApi } from '~/lib/hub-trpc';
 
 const ChartWidget = lazy(() =>
   import('./widgets/chart-widget').then((m) => ({ default: m.ChartWidget })),
@@ -100,11 +100,12 @@ export function SensorWidget({
     parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
   });
 
-  const { data: aggregatedData = [] } =
-    api.graph.getEntityAggregatedData.useQuery({
+  const { data: aggregatedData = [] } = hubApi.telemetry.getAggregated.useQuery(
+    {
       entityId: sensor.entityId, // Use entityId instead of key
       timeRange: (timeRange as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
-    });
+    },
+  );
 
   // Use local state for widget preferences instead of backend storage
   const [widgetType, setWidgetType] = useState<WidgetType>(

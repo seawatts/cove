@@ -59,13 +59,22 @@ export function ChartWidget({ sensor }: WidgetProps) {
   });
 
   // Use the unified data hook with polling only
-  const { aggregatedData, isLoading } = useEntityData({
-    entityId: sensor.entityId,
-    onStateChange: (newState) => {
-      console.log('New state received:', newState);
-    },
-    timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
-  });
+  const { aggregatedData, isLoading, latestTelemetryValue, latestState } =
+    useEntityData({
+      entityId: sensor.entityId,
+      onStateChange: (newState) => {
+        console.log('New state received:', newState);
+      },
+      timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
+    });
+
+  // Use latest telemetry value if available (most accurate), then latest state, then fall back to initial sensor value
+  const currentValue =
+    latestTelemetryValue !== undefined && latestTelemetryValue !== null
+      ? latestTelemetryValue
+      : latestState?.state !== undefined && latestState?.state !== null
+        ? latestState.state
+        : sensor.currentValue;
 
   // Transform aggregated data to chart data with gap filling
   const chartData = React.useMemo((): ChartDataPoint[] => {
@@ -208,9 +217,9 @@ export function ChartWidget({ sensor }: WidgetProps) {
         <div className="flex items-center justify-between mt-3">
           <div className="text-2xl font-light tracking-tight">
             {formatSensorValueForChart(
-              typeof sensor.currentValue === 'number'
-                ? sensor.currentValue
-                : Number(sensor.currentValue) || 0,
+              typeof currentValue === 'number'
+                ? currentValue
+                : Number(currentValue) || 0,
             )}{' '}
             {unit && (
               <span className="text-sm text-muted-foreground/70 ml-1">

@@ -16,6 +16,7 @@ import { EventBus } from './core/event-bus';
 import { Registry } from './core/registry';
 import { StateStore } from './core/state-store';
 import { type DatabaseClient, DatabaseWrapper } from './db';
+import { getDriverState as getESPHomeDriverState } from './drivers/esphome/state';
 import { env } from './env';
 
 const log = debug('cove:hub-v2:daemon');
@@ -149,6 +150,7 @@ export class HubDaemon {
           value: unknown;
           unit?: string;
         };
+        // Verbose logging removed to reduce noise
         // Get homeId from registry
         this.registry
           ?.getEntity(telemetryEvent.entityId)
@@ -161,11 +163,17 @@ export class HubDaemon {
                 telemetryEvent.value as string | number | boolean,
                 telemetryEvent.unit,
               );
+            } else {
+              log(
+                `Cannot append telemetry: entity ${telemetryEvent.entityId} not found`,
+              );
             }
           })
           .catch((error: unknown) => {
             log('Failed to append telemetry:', error);
           });
+      } else {
+        log('Received invalid telemetry event:', event);
       }
     });
 
@@ -296,8 +304,11 @@ export class HubDaemon {
 
         for await (const deviceDesc of driver.discover()) {
           try {
-            // Upsert device
-            await this.registry.upsertDevice(deviceDesc, home.id);
+            // Upsert device and get the database device ID
+            const dbDevice = await this.registry.upsertDevice(
+              deviceDesc,
+              home.id,
+            );
 
             // Auto-connect to discovered devices (ESPHome doesn't require pairing)
             if (deviceDesc.address) {
@@ -308,30 +319,48 @@ export class HubDaemon {
                 await driver.connect(deviceDesc.id, deviceDesc.address);
 
                 // Mark device as paired (ESPHome auto-pairs on connect)
-                await this.registry.markDevicePaired(deviceDesc.id);
+                // Use the database device ID, not the driver device ID
+                await this.registry.markDevicePaired(dbDevice.id);
 
-                // Store empty credentials (ESPHome doesn't need them unless encrypted)
-                await this.registry.storeCredentials(
-                  deviceDesc.id,
-                  'esphome',
-                  {},
-                );
+                // Store credentials with driver device ID for entity ID mapping
+                await this.registry.storeCredentials(dbDevice.id, 'esphome', {
+                  driverDeviceId: deviceDesc.id,
+                });
 
                 // Wait a bit for entities to be discovered via events
                 await new Promise((resolve) => setTimeout(resolve, 2000));
 
                 // Enumerate entities
+                // Use driver's device ID to get entities, but store with database device ID
                 const entities = await driver.getEntities(deviceDesc.id);
                 for (const entityDesc of entities) {
+                  // Extract objectId from original entity descriptor ID (format: driverDeviceId:objectId)
+                  const originalEntityIdParts = entityDesc.id.split(':');
+                  const objectId =
+                    originalEntityIdParts.length > 1
+                      ? originalEntityIdParts
+                          .slice(1)
+                          .join(':') // Handle objectIds that may contain colons
+                      : undefined;
+
+                  // Override the entityDesc.deviceId to use the database device ID
+                  // But preserve the objectId in metadata for subscription lookups
                   await this.registry.upsertEntity(
-                    entityDesc,
-                    deviceDesc.id,
+                    {
+                      ...entityDesc,
+                      deviceId: dbDevice.id, // Ensure entity uses database device ID
+                      metadata: {
+                        ...entityDesc.metadata,
+                        objectId, // Store objectId for entity ID reconstruction
+                      },
+                    },
+                    dbDevice.id, // Use database device ID, not driver device ID
                     home.id,
                   );
                 }
 
                 log(
-                  `Discovered ${entities.length} entities for ${deviceDesc.id}`,
+                  `Discovered ${entities.length} entities for device ${dbDevice.id} (driver: ${deviceDesc.id})`,
                 );
 
                 // Publish device lifecycle event
@@ -406,11 +435,92 @@ export class HubDaemon {
           }
 
           try {
+            // For ESPHome, construct entity ID using driver device ID + objectId
+            // We need to extract objectId from the entity metadata or lookup by key
+            let entityIdForSubscription = entity.id;
+            if (device.protocol === 'esphome') {
+              const driverDeviceId = (
+                credentials as { driverDeviceId?: string }
+              )?.driverDeviceId;
+              if (!driverDeviceId) {
+                log(
+                  `Cannot construct entity ID for ${entity.id}: missing driverDeviceId in credentials`,
+                );
+                continue;
+              }
+
+              // Try to get objectId from entity metadata (if stored during upsert)
+              // Otherwise, we'll need to look it up from the ESPHome connection using the key
+              let entityObjectId: string | undefined;
+
+              // Check if entity has a key field (the ESPHome numeric key)
+              if (entity.key) {
+                // Get the ESPHome connection to look up the objectId by key
+                // Access the ESPHome driver state directly
+                const driverState = getESPHomeDriverState();
+                const connection = driverState.connections.get(driverDeviceId);
+
+                if (connection) {
+                  // Find entity in connection by key
+                  for (const [
+                    storedEntityId,
+                    espEntity,
+                  ] of connection.entities.entries()) {
+                    // Try matching by key number first (most reliable)
+                    if (entity.key && String(espEntity.key) === entity.key) {
+                      entityObjectId =
+                        espEntity.objectId ||
+                        storedEntityId.split(':').slice(1).join(':');
+                      break;
+                    }
+                  }
+
+                  // If still not found, extract from stored entity ID
+                  if (!entityObjectId) {
+                    for (const [
+                      storedEntityId,
+                    ] of connection.entities.entries()) {
+                      if (storedEntityId.startsWith(`${driverDeviceId}:`)) {
+                        const extractedObjectId = storedEntityId
+                          .split(':')
+                          .slice(1)
+                          .join(':');
+                        if (extractedObjectId) {
+                          entityObjectId = extractedObjectId;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              if (!entityObjectId) {
+                log(
+                  `Cannot construct entity ID for ${entity.id}: could not find objectId (key: ${entity.key})`,
+                );
+                continue;
+              }
+
+              entityIdForSubscription = `${driverDeviceId}:${entityObjectId}`;
+            }
+
             // Subscribe to entity state changes
             const unsubscribe = driver.subscribe(
-              entity.id,
+              entityIdForSubscription,
               (state: unknown) => {
-                const stateObj = state as Record<string, unknown>;
+                // Ensure state is an object before processing
+                let stateObj: Record<string, unknown>;
+                if (
+                  !state ||
+                  typeof state !== 'object' ||
+                  Array.isArray(state)
+                ) {
+                  // If state is not an object, wrap it in an object for consistency
+                  stateObj = { value: state };
+                } else {
+                  stateObj = state as Record<string, unknown>;
+                }
 
                 // Publish state change
                 this.eventBus?.publishStateChanged({
@@ -567,6 +677,26 @@ export class HubDaemon {
     }
 
     return await this.stateStore.getEntityTelemetry(entityId, options);
+  }
+
+  /**
+   * Get aggregated entity telemetry for charts/graphs
+   */
+  async getEntityTelemetryAggregated(
+    entityId: string,
+    options: {
+      field?: string;
+      timeRange?: '1h' | '24h' | '7d' | '30d' | '90d';
+    } = {},
+  ) {
+    if (!this.stateStore) {
+      throw new Error('State store not initialized');
+    }
+
+    return await this.stateStore.getEntityTelemetryAggregated(
+      entityId,
+      options,
+    );
   }
 
   // Accessor methods for internal components
