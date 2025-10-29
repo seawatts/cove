@@ -56,3 +56,9 @@ apps/cli/bin
 apps/cli/certificates
 
 .plasmo
+
+# database files
+*.db
+
+# log files
+*.log
