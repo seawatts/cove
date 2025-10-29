@@ -102,7 +102,7 @@ export function populateEntities(connection: ESPHomeConnection): void {
   try {
     // ESPHome client provides entity information through various methods
     // We'll try to access the entities from the client's internal state
-    const anyClient = client as Record<string, unknown>;
+    const anyClient = client as unknown as Record<string, unknown>;
 
     // Helper function to safely access entity properties
     const getEntityProps = (entity: unknown) => {
@@ -172,7 +172,7 @@ export function populateEntities(connection: ESPHomeConnection): void {
     }>;
 
     // Process each entity type - using compact loops
-    for (const sensor of anyClient.sensors || []) {
+    for (const sensor of (anyClient.sensors as unknown[]) || []) {
       const props = getEntityProps(sensor);
       const entityId = `${deviceId}:${props.objectId}`;
       connection.entities.set(entityId, {
