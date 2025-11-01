@@ -13,7 +13,14 @@ import {
 import { format } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import {
+  Area,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { useEntityData } from '../hooks/use-entity-data';
 
 function calculateStats(
@@ -59,12 +66,15 @@ export function ChartWidget({ sensor }: WidgetProps) {
   });
 
   // Use the unified data hook with polling only
+  // Memoize the callback to prevent infinite loops
+  const onStateChangeCallback = React.useCallback((newState: unknown) => {
+    console.log('New state received:', newState);
+  }, []);
+
   const { aggregatedData, isLoading, latestTelemetryValue, latestState } =
     useEntityData({
       entityId: sensor.entityId,
-      onStateChange: (newState) => {
-        console.log('New state received:', newState);
-      },
+      onStateChange: onStateChangeCallback,
       timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
     });
 
@@ -78,6 +88,11 @@ export function ChartWidget({ sensor }: WidgetProps) {
 
   // Transform aggregated data to chart data with gap filling
   const chartData = React.useMemo((): ChartDataPoint[] => {
+    // Early return if no data
+    if (!aggregatedData || aggregatedData.length === 0) {
+      return [];
+    }
+
     // Convert aggregated data to base chart data
     const baseData = aggregatedData.map((point: unknown): ChartDataPoint => {
       const p = point as {
@@ -94,28 +109,73 @@ export function ChartWidget({ sensor }: WidgetProps) {
       };
     });
 
-    // Fill gaps to show values remained constant over time
+    // Fill gaps to show missing data periods
     const timeRangeMs = getTimeRangeMs(
       (timeRange as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
     );
     const fillIntervalMs = getDefaultFillInterval(timeRangeMs);
 
-    // Calculate the start of the time range to fill gaps from the beginning
-    const fillFromTimestamp = Date.now() - timeRangeMs;
+    // Calculate timestamps - Date.now() is fine here since useMemo only runs when dependencies change
+    const nowTimestamp = Date.now();
+    const fillFromTimestamp = nowTimestamp - timeRangeMs;
+    const fillToTimestamp = nowTimestamp;
 
     const filled = fillTimeSeriesGaps(baseData, {
       defaultValue: 0, // Use 0 for missing historical data
       fillFromTimestamp,
       fillIntervalMs,
-      fillToTimestamp: Date.now(),
+      fillToTimestamp,
       maxGapMs: fillIntervalMs * 3, // Fill gaps larger than 3x the interval
     });
 
-    // Add labels to synthetic points
-    const finalChartData = filled.map((point: ChartDataPoint) => ({
-      ...point,
-      label: format(new Date(point.timestamp), 'MMM dd HH:mm'),
-    }));
+    // Find first and last real data points to distinguish gaps from leading/trailing empty regions
+    // Important: point.synthetic might be undefined, so we need to explicitly check for false
+    const realDataPoints = filled.filter((point) => point.synthetic !== true);
+    const firstRealTimestamp = realDataPoints[0]?.timestamp;
+    const lastRealTimestamp = realDataPoints.at(-1)?.timestamp;
+
+    // Add labels to synthetic points and separate data keys for real vs missing data
+    const finalChartData = filled.map((point: ChartDataPoint) => {
+      // Explicitly check if synthetic is true (since undefined should be treated as false)
+      const isSynthetic = point.synthetic === true;
+
+      // Check if point is within the real data range (between first and last real data)
+      const isBetweenRealData =
+        firstRealTimestamp !== undefined &&
+        lastRealTimestamp !== undefined &&
+        point.timestamp >= firstRealTimestamp &&
+        point.timestamp <= lastRealTimestamp;
+
+      // For real data points: realValue has the value, missingValue is null (not rendered)
+      if (!isSynthetic) {
+        return {
+          ...point,
+          label: format(new Date(point.timestamp), 'MMM dd HH:mm'),
+          missingValue: null,
+          realValue: point.value,
+        };
+      }
+
+      // For synthetic points BETWEEN real data:
+      // - Keep realValue to maintain line continuity (forward-filled from previous real point)
+      // - Also set missingValue to show dashed line overlay
+      if (isBetweenRealData) {
+        return {
+          ...point,
+          label: format(new Date(point.timestamp), 'MMM dd HH:mm'),
+          missingValue: point.value, // Also show as dashed line
+          realValue: point.value, // Keep the forward-filled value for line continuity
+        };
+      }
+
+      // For leading/trailing synthetic points: exclude from chart (null for both)
+      return {
+        ...point,
+        label: format(new Date(point.timestamp), 'MMM dd HH:mm'),
+        missingValue: null,
+        realValue: null,
+      };
+    });
 
     return finalChartData;
   }, [aggregatedData, timeRange]);
@@ -154,6 +214,14 @@ export function ChartWidget({ sensor }: WidgetProps) {
 
   const chartConfig = {
     [sensor.key]: {
+      color: 'var(--chart-1)',
+      label: sensor.name,
+    },
+    missingValue: {
+      color: 'var(--muted-foreground)',
+      label: 'No data',
+    },
+    realValue: {
       color: 'var(--chart-1)',
       label: sensor.name,
     },
@@ -239,7 +307,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
           className="aspect-auto h-[250px] w-full"
           config={chartConfig}
         >
-          <AreaChart data={chartData}>
+          <ComposedChart data={chartData}>
             <defs>
               <linearGradient
                 id={`fill-${sensor.key}`}
@@ -257,6 +325,25 @@ export function ChartWidget({ sensor }: WidgetProps) {
                   offset="95%"
                   stopColor="var(--chart-1)"
                   stopOpacity={0.1}
+                />
+              </linearGradient>
+              {/* Separate gradient for missing data if needed */}
+              <linearGradient
+                id={`fill-missing-${sensor.key}`}
+                x1="0"
+                x2="0"
+                y1="0"
+                y2="1"
+              >
+                <stop
+                  offset="5%"
+                  stopColor="var(--muted-foreground)"
+                  stopOpacity={0.2}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--muted-foreground)"
+                  stopOpacity={0.05}
                 />
               </linearGradient>
             </defs>
@@ -338,6 +425,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
                   label: string;
                   timestamp: number;
                   value: number;
+                  synthetic?: boolean;
                 };
 
                 return (
@@ -348,7 +436,13 @@ export function ChartWidget({ sensor }: WidgetProps) {
                           {sensor.name}
                         </span>
                         <span className="font-bold">
-                          {formatSensorValueForTooltip(data.value, unit)}
+                          {data.synthetic ? (
+                            <span className="text-muted-foreground">
+                              No data
+                            </span>
+                          ) : (
+                            formatSensorValueForTooltip(data.value, unit)
+                          )}
                         </span>
                       </div>
                       <div className="flex flex-col">
@@ -364,15 +458,29 @@ export function ChartWidget({ sensor }: WidgetProps) {
                 );
               }}
             />
+            {/* Render real data as filled blue area */}
             <Area
-              dataKey="value"
-              fill={`url(#fill-${sensor.key})`}
-              fillOpacity={1}
+              connectNulls={false}
+              dataKey="realValue"
+              fill="var(--chart-1)"
+              fillOpacity={0.4}
+              name={sensor.name}
               stroke="var(--chart-1)"
               strokeWidth={2}
               type="monotone"
             />
-          </AreaChart>
+            {/* Render missing data as dashed grey line overlay on top of blue area */}
+            <Line
+              connectNulls={false}
+              dataKey="missingValue"
+              dot={false}
+              isAnimationActive={false}
+              stroke="var(--muted-foreground)"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              type="monotone"
+            />
+          </ComposedChart>
         </ChartContainer>
       </CardContent>
     </Card>

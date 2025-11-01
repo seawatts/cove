@@ -14,6 +14,7 @@ import { AnalyticsProviders } from '@cove/analytics/providers';
 import { TRPCReactProvider } from '@cove/api/react';
 import { Suspense } from 'react';
 import { env } from '~/env.server';
+import { HubTRPCProvider } from '~/lib/hub-trpc';
 
 export const metadata: Metadata = {
   description: 'Seawatts is a tool for developers to manage their webhooks',
@@ -59,14 +60,16 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           {isDevelopment && <ReactScan />}
           <NuqsAdapter>
             <TRPCReactProvider>
-              <Suspense>
-                <ClerkProvider>
-                  <AnalyticsProviders identifyUser>
-                    {props.children}
-                    <Toaster />
-                  </AnalyticsProviders>
-                </ClerkProvider>
-              </Suspense>
+              <HubTRPCProvider>
+                <Suspense>
+                  <ClerkProvider>
+                    <AnalyticsProviders identifyUser>
+                      {props.children}
+                      <Toaster />
+                    </AnalyticsProviders>
+                  </ClerkProvider>
+                </Suspense>
+              </HubTRPCProvider>
             </TRPCReactProvider>
           </NuqsAdapter>
         </ThemeProvider>

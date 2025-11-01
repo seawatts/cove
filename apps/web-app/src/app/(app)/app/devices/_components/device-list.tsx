@@ -1,38 +1,19 @@
 'use client';
 
-import { api } from '@cove/api/react';
 import { Badge } from '@cove/ui/badge';
-import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
 import { Icons } from '@cove/ui/custom/icons';
 import { Text } from '@cove/ui/custom/typography';
 import { Lightbulb } from 'lucide-react';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { hubApi } from '~/lib/hub-trpc';
 
 export function DeviceList() {
-  const { data: home } = api.home.get.useQuery();
-  const {
-    data: devices = [],
-    isLoading,
-    refetch,
-  } = api.device.list.useQuery(
+  const { data: home } = hubApi.home.get.useQuery();
+  const { data: devices = [], isLoading } = hubApi.device.list.useQuery(
     { homeId: home?.id || '' },
     { enabled: !!home?.id },
   );
-  const cleanupMutation = api.device.cleanupDuplicates.useMutation({
-    onError: (error) => {
-      toast.error(`Failed to cleanup duplicates: ${error.message}`);
-    },
-    onSuccess: (result) => {
-      if (result.deletedCount > 0) {
-        toast.success(result.message);
-        refetch();
-      } else {
-        toast.info('No duplicate devices found');
-      }
-    },
-  });
 
   if (isLoading) {
     return (
@@ -68,49 +49,40 @@ export function DeviceList() {
 
   return (
     <div className="grid gap-4">
-      {devices.length > 1 && (
-        <div className="grid justify-end">
-          <Button
-            disabled={cleanupMutation.isPending}
-            onClick={() => cleanupMutation.mutate({ homeId: home?.id || '' })}
-            size="sm"
-            variant="outline"
-          >
-            {cleanupMutation.isPending ? (
-              <>
-                <Icons.Spinner className="animate-spin" size="sm" />
-                Cleaning up...
-              </>
-            ) : (
-              <>
-                <Icons.Trash size="sm" />
-                Remove Duplicates
-              </>
-            )}
-          </Button>
-        </div>
-      )}
       {devices.map((device) => (
-        <Link href={`/app/devices/${device.deviceId}`} key={device.deviceId}>
+        <Link href={`/app/devices/${device.id}`} key={device.id}>
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader>
               <CardTitle className="grid grid-cols-[1fr_auto] items-center gap-4">
-                <span>{device.name || device.deviceId}</span>
-                <Badge variant="default">Online</Badge>
+                <span>{device.name || device.id}</span>
+                <Badge variant="default">
+                  {device.lastSeen ? 'Online' : 'Offline'}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-2">
-              <Text variant="muted">
-                Type: {String(device.metadata?.deviceType || 'unknown')}
-              </Text>
-              {Boolean(device.metadata?.protocol) &&
-                typeof device.metadata?.protocol === 'string' && (
-                  <Text variant="muted">
-                    Protocol: {String(device.metadata?.protocol)}
-                  </Text>
-                )}
+              {device.vendor && (
+                <Text variant="muted">Vendor: {device.vendor}</Text>
+              )}
+              {device.model && (
+                <Text variant="muted">Model: {device.model}</Text>
+              )}
+              {device.protocol && (
+                <Text variant="muted">Protocol: {device.protocol}</Text>
+              )}
+              {device.ip && (
+                <Text variant="muted">
+                  IP: <span className="font-mono text-sm">{device.ip}</span>
+                </Text>
+              )}
               {device.room && (
                 <Text variant="muted">Room: {device.room.name}</Text>
+              )}
+              {device.entities && device.entities.length > 0 && (
+                <Text variant="muted">
+                  {device.entities.length} entit
+                  {device.entities.length === 1 ? 'y' : 'ies'}
+                </Text>
               )}
             </CardContent>
           </Card>

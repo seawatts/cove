@@ -31,6 +31,43 @@ export function createRoutes(daemon: HubDaemon) {
         { headers: corsHeaders },
       ),
 
+    // API command endpoint (for compatibility with packages/api)
+    '/api/command': {
+      OPTIONS: () => new Response(null, { headers: corsHeaders }),
+      POST: async (req: Request) => {
+        try {
+          const body = (await req.json()) as {
+            capability: string;
+            entityId: string;
+            value: unknown;
+            userId?: string;
+          };
+
+          if (!body.capability || !body.entityId || body.value === undefined) {
+            return Response.json(
+              { error: 'capability, entityId, and value are required' },
+              { headers: corsHeaders, status: 400 },
+            );
+          }
+
+          const result = await daemon.processCommand({
+            capability: body.capability,
+            entityId: body.entityId,
+            userId: body.userId,
+            value: body.value,
+          });
+
+          return Response.json(result, { headers: corsHeaders });
+        } catch (error) {
+          log('Error processing command:', error);
+          return Response.json(
+            { error: 'Failed to process command' },
+            { headers: corsHeaders, status: 500 },
+          );
+        }
+      },
+    },
+
     // Devices
     '/devices': {
       GET: async (req: Request) => {

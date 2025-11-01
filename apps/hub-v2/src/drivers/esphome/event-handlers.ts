@@ -4,7 +4,10 @@
  */
 
 import { debug } from '@cove/logger';
-import type { ESPHomeConnection } from './types';
+import type {
+  ESPHomeConnection,
+  ESPHomeConnectionWithCallbacks,
+} from './types';
 
 const log = debug('cove:driver:esphome');
 
@@ -51,6 +54,74 @@ export function setupEventHandlers(connection: ESPHomeConnection): void {
     log(`Connected to ${deviceId} (encrypted: ${data.encrypted || false})`);
     connection.connected = true;
   });
+
+  // Listen for entity state updates - the esphome-client emits both 'sensor' and 'telemetry' events
+  client.on(
+    'sensor',
+    (data: {
+      key: number;
+      entity: string;
+      state?: unknown;
+      type: string;
+      unitOfMeasurement?: string;
+    }) => {
+      // Find the entity by key
+      for (const [entityId, entity] of connection.entities) {
+        if (entity.key === data.key) {
+          // Check if we have callbacks registered for this entity
+          const connWithCallbacks =
+            connection as ESPHomeConnectionWithCallbacks;
+          if (connWithCallbacks.entityCallbacks) {
+            const callback = connWithCallbacks.entityCallbacks.get(entityId);
+            if (callback && data.state !== undefined) {
+              // For sensors, include unit when available so downstream can persist it
+              const payload = {
+                unit: data.unitOfMeasurement,
+                value: data.state,
+              } as Record<string, unknown>;
+              log(`State update for entity ${entityId}:`, payload);
+              callback(payload);
+            }
+          }
+          break;
+        }
+      }
+    },
+  );
+
+  // Also listen for telemetry events (used for some sensor types)
+  client.on(
+    'telemetry',
+    (data: {
+      key: number;
+      entity: string;
+      state?: unknown;
+      type: string;
+      unitOfMeasurement?: string;
+    }) => {
+      // Find the entity by key
+      for (const [entityId, entity] of connection.entities) {
+        if (entity.key === data.key) {
+          // Check if we have callbacks registered for this entity
+          const connWithCallbacks =
+            connection as ESPHomeConnectionWithCallbacks;
+          if (connWithCallbacks.entityCallbacks) {
+            const callback = connWithCallbacks.entityCallbacks.get(entityId);
+            if (callback && data.state !== undefined) {
+              // Include unit when available so downstream can persist it
+              const payload = {
+                unit: data.unitOfMeasurement,
+                value: data.state,
+              } as Record<string, unknown>;
+              log(`Telemetry update for entity ${entityId}:`, payload);
+              callback(payload);
+            }
+          }
+          break;
+        }
+      }
+    },
+  );
 }
 
 /**

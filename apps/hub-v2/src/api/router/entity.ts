@@ -78,4 +78,27 @@ export const entityRouter = createTRPCRouter({
       const entities = await ctx.daemon.getEntities(filters);
       return entities;
     }),
+
+  /**
+   * Send command to an entity (alias for command to match web app expectations)
+   */
+  sendCommand: publicProcedure
+    .input(
+      z.object({
+        capability: z.string(),
+        entityId: z.string(),
+        userId: z.string().optional(),
+        value: z.unknown(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.daemon.processCommand({
+        capability: input.capability,
+        entityId: input.entityId,
+        userId: input.userId,
+        value: input.value,
+      });
+
+      return result;
+    }),
 });

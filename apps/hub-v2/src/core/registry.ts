@@ -268,16 +268,33 @@ export class Registry {
 
   /**
    * Get devices by home ID
+   * Note: entity state is excluded because it contains BLOB fields
+   * that can't be serialized to JSON.
    */
   async getDevicesByHome(homeId: string) {
     try {
-      return await this.db.query.devices.findMany({
+      const deviceList = await this.db.query.devices.findMany({
         where: eq(devices.homeId, homeId),
         with: {
-          entities: true,
           room: true,
         },
       });
+
+      // Fetch entities for each device separately without state relation
+      // to avoid BLOB serialization issues
+      const devicesWithEntities = await Promise.all(
+        deviceList.map(async (device) => {
+          const deviceEntities = await this.db.query.entities.findMany({
+            where: eq(entities.deviceId, device.id),
+          });
+          return {
+            ...device,
+            entities: deviceEntities,
+          };
+        }),
+      );
+
+      return devicesWithEntities;
     } catch (error) {
       log('Failed to get devices by home:', error);
       return [];
@@ -318,7 +335,8 @@ export class Registry {
               room: true,
             },
           },
-          state: true,
+          // Note: state is excluded because it contains BLOB fields
+          // that can't be serialized to JSON.
         },
       });
     } catch (error) {
@@ -329,6 +347,8 @@ export class Registry {
 
   /**
    * Get entity by ID
+   * Note: state is excluded because it contains BLOB fields
+   * that can't be serialized to JSON. Use StateStore.getEntityState() separately if needed.
    */
   async getEntity(entityId: string) {
     try {
@@ -340,7 +360,8 @@ export class Registry {
               room: true,
             },
           },
-          state: true,
+          // Note: state is excluded because it contains BLOB fields
+          // that can't be serialized to JSON.
         },
       });
     } catch (error) {
@@ -351,17 +372,31 @@ export class Registry {
 
   /**
    * Get device by ID
+   * Note: credentials and entity state are excluded because they contain BLOB fields
+   * that can't be serialized to JSON. Use getCredentials() separately if needed.
    */
   async getDevice(deviceId: string) {
     try {
-      return await this.db.query.devices.findFirst({
+      const device = await this.db.query.devices.findFirst({
         where: eq(devices.id, deviceId),
         with: {
-          credentials: true,
-          entities: true,
           room: true,
         },
       });
+
+      if (!device) {
+        return null;
+      }
+
+      // Fetch entities separately without state relation to avoid BLOB serialization issues
+      const deviceEntities = await this.db.query.entities.findMany({
+        where: eq(entities.deviceId, deviceId),
+      });
+
+      return {
+        ...device,
+        entities: deviceEntities,
+      };
     } catch (error) {
       log('Failed to get device:', error);
       return null;

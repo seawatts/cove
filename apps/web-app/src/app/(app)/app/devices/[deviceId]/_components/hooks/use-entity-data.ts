@@ -9,6 +9,7 @@ import { hubApi } from '~/lib/hub-trpc';
 interface EntityState {
   state: string | number | boolean | Record<string, unknown>;
   updatedAt: Date;
+  unit?: string;
 }
 
 interface UseEntityDataProps {
@@ -160,8 +161,10 @@ export function useEntityData({
           value: number | string | boolean | null;
           ts: Date;
           field: string;
+          unit?: string | null;
         }) => ({
           state: t.value ?? 0,
+          unit: t.unit ?? undefined,
           updatedAt: t.ts,
         }),
       ),

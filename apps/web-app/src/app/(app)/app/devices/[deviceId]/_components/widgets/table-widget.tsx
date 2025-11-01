@@ -24,12 +24,8 @@ export function TableWidget({ sensor }: WidgetProps) {
     },
   });
 
-  // Extract unit from attributes if not provided in sensor metadata
-  const unit =
-    sensor.unit ||
-    ((stateHistory[0]?.attrs as Record<string, unknown> | undefined)?.unit as
-      | string
-      | undefined);
+  // Extract unit from state history or sensor metadata
+  const unit = sensor.unit || stateHistory[0]?.unit;
 
   const getConnectionStatusIcon = () => {
     switch (status) {
@@ -56,10 +52,12 @@ export function TableWidget({ sensor }: WidgetProps) {
   const tableData = React.useMemo((): TableRow[] => {
     return stateHistory
       .slice(0, 20) // Show first 20 entries (most recent, since API returns desc order)
-      .map((state: { ts: Date | string; state: unknown }) => {
-        const timestamp = new Date(state.ts);
+      .map((state) => {
+        const timestamp = new Date(state.updatedAt);
         const value = state.state;
-        const formattedValue = formatSensorValue(value, unit);
+        // Use unit from this specific state entry, fallback to global unit
+        const rowUnit = state.unit || unit;
+        const formattedValue = formatSensorValue(value, rowUnit);
         const relativeTime = formatDistanceToNow(timestamp, {
           addSuffix: true,
         });

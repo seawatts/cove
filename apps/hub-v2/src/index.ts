@@ -7,6 +7,7 @@
 import { debug, defaultLogger } from '@cove/logger';
 import { ConsoleDestination } from '@cove/logger/destinations/console';
 import { RollingFileDestination } from '@cove/logger/destinations/rolling-file';
+import { createTRPCHandler } from './api/handler';
 import { createRoutes } from './api/routes';
 import { createWebSocketHandler } from './api/websocket';
 import { HubDaemon } from './daemon';
@@ -37,6 +38,9 @@ const daemon = new HubDaemon({
 
 // Create WebSocket handler
 const wsHandler = createWebSocketHandler(daemon);
+
+// Create tRPC handler
+const trpcHandler = createTRPCHandler(daemon);
 
 // Graceful shutdown handler
 const shutdown = async (signal: string) => {
@@ -73,7 +77,13 @@ async function start() {
       port: env.PORT,
 
       // Define routes - Bun handles the routing automatically
-      routes: createRoutes(daemon),
+      routes: {
+        ...createRoutes(daemon),
+        // tRPC endpoint
+        '/trpc/*': async (req: Request) => {
+          return await trpcHandler(req);
+        },
+      },
 
       // WebSocket configuration
       websocket: {
@@ -96,6 +106,7 @@ async function start() {
     log(`Hub ID: ${daemon.getStatus().hubId}`);
     log(`Database: ${env.DB_PATH}`);
     log(`Environment: ${env.NODE_ENV}`);
+    log(`tRPC endpoint: http://0.0.0.0:${env.PORT}/trpc`);
   } catch (error) {
     log('Failed to start Hub:', error);
     process.exit(1);

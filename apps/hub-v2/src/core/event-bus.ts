@@ -7,6 +7,7 @@ export type EventCallback<T = unknown> = (data: T) => void;
 
 export type EventTopics =
   | `entity/${string}/state`
+  | `entity/*/state` // Wildcard pattern for all entity state changes
   | `device/${string}/lifecycle`
   | `telemetry`
   | `command/${string}`
@@ -113,6 +114,24 @@ export class EventBus {
   }
 
   /**
+   * Check if a topic matches a pattern (supports wildcard *)
+   */
+  private topicMatches(pattern: string, topic: string): boolean {
+    // Exact match
+    if (pattern === topic) return true;
+
+    // Check wildcard patterns
+    if (pattern.includes('*')) {
+      // Convert pattern to regex
+      const regexPattern = pattern.replace(/\*/g, '[^/]+');
+      const regex = new RegExp(`^${regexPattern}$`);
+      return regex.test(topic);
+    }
+
+    return false;
+  }
+
+  /**
    * Process the message queue
    */
   private processMessageQueue(): void {
@@ -120,18 +139,37 @@ export class EventBus {
       const message = this.messageQueue.shift();
       if (!message) continue;
 
-      const topicSubscribers = this.subscribers.get(message.topic);
-      if (!topicSubscribers) continue;
+      // Get exact match subscribers
+      const exactSubscribers = this.subscribers.get(message.topic);
+      if (exactSubscribers) {
+        for (const callback of exactSubscribers) {
+          try {
+            callback(message.data);
+          } catch (error) {
+            console.error(
+              `Error in event callback for topic ${message.topic}:`,
+              error,
+            );
+          }
+        }
+      }
 
-      // Call all subscribers for this topic
-      for (const callback of topicSubscribers) {
-        try {
-          callback(message.data);
-        } catch (error) {
-          console.error(
-            `Error in event callback for topic ${message.topic}:`,
-            error,
-          );
+      // Check wildcard pattern subscribers
+      for (const [pattern, callbacks] of this.subscribers.entries()) {
+        if (
+          pattern.includes('*') &&
+          this.topicMatches(pattern, message.topic)
+        ) {
+          for (const callback of callbacks) {
+            try {
+              callback(message.data);
+            } catch (error) {
+              console.error(
+                `Error in event callback for pattern ${pattern} (topic: ${message.topic}):`,
+                error,
+              );
+            }
+          }
         }
       }
     }

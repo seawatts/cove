@@ -22,12 +22,19 @@ async function handleSwitchCommand(
 ): Promise<void> {
   if (command.capability === 'on_off') {
     const state = Boolean(command.value);
-    // Use sendSwitchCommand with entity ID
+    // ESPHome clients typically use switchCommand(key, state) with numeric key
     const client = connection.client as {
-      sendSwitchCommand?: (id: string, state: boolean) => void;
+      switchCommand?: (key: number, state: boolean) => Promise<void> | void;
+      sendSwitchCommand?: (key: number, state: boolean) => Promise<void> | void;
     };
-    if (client.sendSwitchCommand) {
-      client.sendSwitchCommand(entity.entityId, state);
+    if (client.switchCommand) {
+      await client.switchCommand(entity.key, state);
+    } else if (client.sendSwitchCommand) {
+      await client.sendSwitchCommand(entity.key, state);
+    } else {
+      log(
+        `No switchCommand method found on client for entity ${entity.entityId}`,
+      );
     }
   }
 }
@@ -46,22 +53,30 @@ async function handleLightCommand(
     options.state = true; // Turn on when setting brightness
   } else if (command.capability === 'color_rgb') {
     const color = command.value as { r?: number; g?: number; b?: number };
-    options.rgb = {
-      b: (color.b ?? 0) / 255,
-      g: (color.g ?? 0) / 255,
-      r: (color.r ?? 0) / 255,
-    };
+    // ESPHome expects red, green, blue as 0-1 values
+    options.red = (color.r ?? 0) / 255;
+    options.green = (color.g ?? 0) / 255;
+    options.blue = (color.b ?? 0) / 255;
     options.state = true;
   }
 
+  // ESPHome clients typically use lightCommand(key, command) with numeric key
   const client = connection.client as {
+    lightCommand?: (
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
     sendLightCommand?: (
-      id: string,
-      options: Record<string, unknown>,
-    ) => Promise<void>;
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
   };
-  if (client.sendLightCommand) {
-    await client.sendLightCommand(entity.entityId, options);
+  if (client.lightCommand) {
+    await client.lightCommand(entity.key, options);
+  } else if (client.sendLightCommand) {
+    await client.sendLightCommand(entity.key, options);
+  } else {
+    log(`No lightCommand method found on client for entity ${entity.entityId}`);
   }
 }
 
@@ -71,10 +86,17 @@ async function handleButtonCommand(
   _command: DriverCommand,
 ): Promise<void> {
   const client = connection.client as {
-    sendButtonCommand?: (id: string) => void;
+    buttonCommand?: (key: number) => Promise<void> | void;
+    sendButtonCommand?: (key: number) => Promise<void> | void;
   };
-  if (client.sendButtonCommand) {
-    client.sendButtonCommand(entity.entityId);
+  if (client.buttonCommand) {
+    await client.buttonCommand(entity.key);
+  } else if (client.sendButtonCommand) {
+    await client.sendButtonCommand(entity.key);
+  } else {
+    log(
+      `No buttonCommand method found on client for entity ${entity.entityId}`,
+    );
   }
 }
 
@@ -85,10 +107,17 @@ async function handleNumberCommand(
 ): Promise<void> {
   if (command.capability === 'numeric') {
     const client = connection.client as {
-      sendNumberCommand?: (id: string, value: number) => void;
+      numberCommand?: (key: number, value: number) => Promise<void> | void;
+      sendNumberCommand?: (key: number, value: number) => Promise<void> | void;
     };
-    if (client.sendNumberCommand) {
-      client.sendNumberCommand(entity.entityId, Number(command.value));
+    if (client.numberCommand) {
+      await client.numberCommand(entity.key, Number(command.value));
+    } else if (client.sendNumberCommand) {
+      await client.sendNumberCommand(entity.key, Number(command.value));
+    } else {
+      log(
+        `No numberCommand method found on client for entity ${entity.entityId}`,
+      );
     }
   }
 }
@@ -100,10 +129,17 @@ async function handleSelectCommand(
 ): Promise<void> {
   if (command.capability === 'select') {
     const client = connection.client as {
-      sendSelectCommand?: (id: string, value: string) => void;
+      selectCommand?: (key: number, value: string) => Promise<void> | void;
+      sendSelectCommand?: (key: number, value: string) => Promise<void> | void;
     };
-    if (client.sendSelectCommand) {
-      client.sendSelectCommand(entity.entityId, String(command.value));
+    if (client.selectCommand) {
+      await client.selectCommand(entity.key, String(command.value));
+    } else if (client.sendSelectCommand) {
+      await client.sendSelectCommand(entity.key, String(command.value));
+    } else {
+      log(
+        `No selectCommand method found on client for entity ${entity.entityId}`,
+      );
     }
   }
 }
@@ -123,13 +159,21 @@ async function handleFanCommand(
   }
 
   const client = connection.client as {
+    fanCommand?: (
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
     sendFanCommand?: (
-      id: string,
-      options: Record<string, unknown>,
-    ) => Promise<void>;
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
   };
-  if (client.sendFanCommand) {
-    await client.sendFanCommand(entity.entityId, options);
+  if (client.fanCommand) {
+    await client.fanCommand(entity.key, options);
+  } else if (client.sendFanCommand) {
+    await client.sendFanCommand(entity.key, options);
+  } else {
+    log(`No fanCommand method found on client for entity ${entity.entityId}`);
   }
 }
 
@@ -145,13 +189,21 @@ async function handleCoverCommand(
   }
 
   const client = connection.client as {
+    coverCommand?: (
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
     sendCoverCommand?: (
-      id: string,
-      options: Record<string, unknown>,
-    ) => Promise<void>;
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
   };
-  if (client.sendCoverCommand) {
-    await client.sendCoverCommand(entity.entityId, options);
+  if (client.coverCommand) {
+    await client.coverCommand(entity.key, options);
+  } else if (client.sendCoverCommand) {
+    await client.sendCoverCommand(entity.key, options);
+  } else {
+    log(`No coverCommand method found on client for entity ${entity.entityId}`);
   }
 }
 
@@ -167,13 +219,23 @@ async function handleClimateCommand(
   }
 
   const client = connection.client as {
+    climateCommand?: (
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
     sendClimateCommand?: (
-      id: string,
-      options: Record<string, unknown>,
-    ) => Promise<void>;
+      key: number,
+      command: Record<string, unknown>,
+    ) => Promise<void> | void;
   };
-  if (client.sendClimateCommand) {
-    await client.sendClimateCommand(entity.entityId, options);
+  if (client.climateCommand) {
+    await client.climateCommand(entity.key, options);
+  } else if (client.sendClimateCommand) {
+    await client.sendClimateCommand(entity.key, options);
+  } else {
+    log(
+      `No climateCommand method found on client for entity ${entity.entityId}`,
+    );
   }
 }
 
@@ -184,17 +246,28 @@ async function handleLockCommand(
 ): Promise<void> {
   const state = String(command.value).toLowerCase();
   const client = connection.client as {
-    sendLockCommand?: (id: string, action: string) => void;
+    lockCommand?: (key: number, action: string) => Promise<void> | void;
+    sendLockCommand?: (key: number, action: string) => Promise<void> | void;
   };
 
-  if (client.sendLockCommand) {
+  if (client.lockCommand) {
     if (state === 'lock') {
-      client.sendLockCommand(entity.entityId, 'lock');
+      await client.lockCommand(entity.key, 'lock');
     } else if (state === 'unlock') {
-      client.sendLockCommand(entity.entityId, 'unlock');
+      await client.lockCommand(entity.key, 'unlock');
     } else if (state === 'open') {
-      client.sendLockCommand(entity.entityId, 'open');
+      await client.lockCommand(entity.key, 'open');
     }
+  } else if (client.sendLockCommand) {
+    if (state === 'lock') {
+      await client.sendLockCommand(entity.key, 'lock');
+    } else if (state === 'unlock') {
+      await client.sendLockCommand(entity.key, 'unlock');
+    } else if (state === 'open') {
+      await client.sendLockCommand(entity.key, 'open');
+    }
+  } else {
+    log(`No lockCommand method found on client for entity ${entity.entityId}`);
   }
 }
 

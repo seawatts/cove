@@ -11,7 +11,7 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: z.string().url().optional(),
     NEXT_PUBLIC_APP_URL: z.string().url().optional(),
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
-    NEXT_PUBLIC_HUB_URL: z.string().url().default('http://localhost:3100'),
+    NEXT_PUBLIC_HUB_URL: z.string().url().default('http://localhost:3200'),
     NEXT_PUBLIC_IS_SELF_HOSTED: z.boolean().optional().default(false),
     NEXT_PUBLIC_POSTHOG_HOST: z.string(),
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),

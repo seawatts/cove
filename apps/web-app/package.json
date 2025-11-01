@@ -5,6 +5,7 @@
     "@cove/analytics": "workspace:*",
     "@cove/api": "workspace:*",
     "@cove/db": "workspace:*",
+    "@cove/hub-v2": "workspace:*",
     "@cove/id": "workspace:*",
     "@cove/logger": "workspace:*",
     "@cove/types": "workspace:*",
