@@ -1,6 +1,9 @@
 /**
  * Widget types and interfaces for the Cove device detail page
  * Supports multiple visualization types for sensor data
+ *
+ * NOTE: timeRange field uses TimeRange type from '@cove/db/graph-queries'
+ * When updating this package, import: import type { TimeRange } from '@cove/db/graph-queries'
  */
 
 export enum WidgetType {

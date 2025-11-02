@@ -62,30 +62,6 @@
         "typescript": "catalog:",
       },
     },
-    "apps/hub": {
-      "name": "@cove/hub",
-      "version": "0.1.0",
-      "bin": {
-        "cove-hub": "./cove-hub",
-      },
-      "dependencies": {
-        "@cove/db": "workspace:*",
-        "@cove/discovery": "workspace:*",
-        "@cove/id": "workspace:*",
-        "@cove/logger": "workspace:*",
-        "@cove/protocols": "workspace:*",
-        "@cove/types": "workspace:*",
-        "@supabase/supabase-js": "catalog:",
-        "@t3-oss/env-core": "catalog:",
-        "drizzle-orm": "catalog:",
-        "zod": "catalog:",
-      },
-      "devDependencies": {
-        "@cove/tsconfig": "workspace:*",
-        "@types/bun": "catalog:",
-        "typescript": "catalog:",
-      },
-    },
     "apps/hub-v2": {
       "name": "@cove/hub-v2",
       "version": "0.1.0",
@@ -93,24 +69,19 @@
         "cove-hub-v2": "./cove-hub-v2",
       },
       "dependencies": {
-        "@2colors/esphome-native-api": "^1.3.4",
+        "@cove/api": "workspace:*",
         "@cove/db": "workspace:*",
-        "@cove/id": "workspace:*",
+        "@cove/drivers": "workspace:*",
+        "@cove/hub-core": "workspace:*",
         "@cove/logger": "workspace:*",
-        "@cove/protocols": "workspace:*",
-        "@cove/types": "workspace:*",
         "@t3-oss/env-core": "catalog:",
         "@trpc/server": "catalog:",
-        "bonjour-service": "1.3.0",
-        "drizzle-orm": "catalog:",
-        "esphome-client": "^1.1.2",
         "superjson": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
         "@cove/tsconfig": "workspace:*",
         "@types/bun": "catalog:",
-        "drizzle-kit": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -242,8 +213,10 @@
       "dependencies": {
         "@clerk/nextjs": "catalog:",
         "@cove/db": "workspace:*",
+        "@cove/hub-core": "workspace:*",
         "@cove/id": "workspace:*",
         "@cove/logger": "workspace:*",
+        "@cove/types": "workspace:*",
         "@happy-dom/global-registrator": "20.0.10",
         "@t3-oss/env-core": "catalog:",
         "@t3-oss/env-nextjs": "catalog:",
@@ -308,17 +281,18 @@
         "zx": "8.8.5",
       },
     },
-    "packages/discovery": {
-      "name": "@cove/discovery",
+    "packages/drivers": {
+      "name": "@cove/drivers",
       "version": "0.1.0",
       "dependencies": {
+        "@2colors/esphome-native-api": "^1.3.4",
+        "@cove/id": "workspace:*",
         "@cove/logger": "workspace:*",
-        "@cove/types": "workspace:*",
         "bonjour-service": "1.3.0",
+        "esphome-client": "^1.1.2",
       },
       "devDependencies": {
         "@cove/tsconfig": "workspace:*",
-        "@types/bun": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -339,6 +313,24 @@
         "@cove/tsconfig": "workspace:*",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/hub-core": {
+      "name": "@cove/hub-core",
+      "version": "0.1.0",
+      "dependencies": {
+        "@cove/db": "workspace:*",
+        "@cove/drivers": "workspace:*",
+        "@cove/id": "workspace:*",
+        "@cove/logger": "workspace:*",
+        "@cove/types": "workspace:*",
+        "drizzle-orm": "catalog:",
+        "superjson": "catalog:",
+      },
+      "devDependencies": {
+        "@cove/tsconfig": "workspace:*",
+        "@types/bun": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -368,22 +360,6 @@
         "@types/bun": "catalog:",
         "@types/debug": "4.1.12",
         "@types/vscode": "1.105.0",
-        "typescript": "catalog:",
-      },
-    },
-    "packages/protocols": {
-      "name": "@cove/protocols",
-      "version": "0.1.0",
-      "dependencies": {
-        "@bufbuild/protobuf": "2.10.0",
-        "@connectrpc/connect": "2.1.0",
-        "@cove/logger": "workspace:*",
-        "@cove/types": "workspace:*",
-      },
-      "devDependencies": {
-        "@bufbuild/protoc-gen-es": "2.10.0",
-        "@connectrpc/protoc-gen-connect-es": "1.7.0",
-        "@cove/tsconfig": "workspace:*",
         "typescript": "catalog:",
       },
     },
@@ -910,12 +886,6 @@
 
     "@boundaryml/baml-win32-x64-msvc": ["@boundaryml/baml-win32-x64-msvc@0.212.0", "", { "os": "win32", "cpu": "x64" }, "sha512-o10PQn+7KUhKY2BO0J84dXy1HBfR6h/4t0+gzK8aEUnqyjoS3AN4blwgi91NLKr0VF6VM+6Xi2AF7JvhaNyx4w=="],
 
-    "@bufbuild/protobuf": ["@bufbuild/protobuf@2.10.0", "", {}, "sha512-fdRs9PSrBF7QUntpZpq6BTw58fhgGJojgg39m9oFOJGZT+nip9b0so5cYY1oWl5pvemDLr0cPPsH46vwThEbpQ=="],
-
-    "@bufbuild/protoc-gen-es": ["@bufbuild/protoc-gen-es@2.10.0", "", { "dependencies": { "@bufbuild/protobuf": "2.10.0", "@bufbuild/protoplugin": "2.10.0" }, "bin": { "protoc-gen-es": "bin/protoc-gen-es" } }, "sha512-g3xtuxeMkbacn8/qWQ8NbHBA8unLAvGD7sjcXV1/lfO4iCfd6hYL1Z+rn2yLQZE/JEkG+GPZoIs7m5KI5VYaMw=="],
-
-    "@bufbuild/protoplugin": ["@bufbuild/protoplugin@2.10.0", "", { "dependencies": { "@bufbuild/protobuf": "2.10.0", "@typescript/vfs": "^1.5.2", "typescript": "5.4.5" } }, "sha512-GPJOZ1Gp9/Ci3MXP3yI7+q4G7IhB5cSpbLjsfnBILxtNx69I9+ix3r9P7JfewHvqMjtPe6L+YWX1LPBGNfZMGw=="],
-
     "@changesets/apply-release-plan": ["@changesets/apply-release-plan@7.0.13", "", { "dependencies": { "@changesets/config": "^3.1.1", "@changesets/get-version-range-type": "^0.4.0", "@changesets/git": "^3.0.4", "@changesets/should-skip-package": "^0.1.2", "@changesets/types": "^6.1.0", "@manypkg/get-packages": "^1.1.3", "detect-indent": "^6.0.0", "fs-extra": "^7.0.1", "lodash.startcase": "^4.4.0", "outdent": "^0.5.0", "prettier": "^2.7.1", "resolve-from": "^5.0.0", "semver": "^7.5.3" } }, "sha512-BIW7bofD2yAWoE8H4V40FikC+1nNFEKBisMECccS16W1rt6qqhNTBDmIw5HaqmMgtLNz9e7oiALiEUuKrQ4oHg=="],
 
     "@changesets/assemble-release-plan": ["@changesets/assemble-release-plan@6.0.9", "", { "dependencies": { "@changesets/errors": "^0.2.0", "@changesets/get-dependents-graph": "^2.1.3", "@changesets/should-skip-package": "^0.1.2", "@changesets/types": "^6.1.0", "@manypkg/get-packages": "^1.1.3", "semver": "^7.5.3" } }, "sha512-tPgeeqCHIwNo8sypKlS3gOPmsS3wP0zHt67JDuL20P4QcXiw/O4Hl7oXiuLnP9yg+rXLQ2sScdV1Kkzde61iSQ=="],
@@ -1012,10 +982,6 @@
 
     "@commitlint/types": ["@commitlint/types@20.0.0", "", { "dependencies": { "@types/conventional-commits-parser": "^5.0.0", "chalk": "^5.3.0" } }, "sha512-bVUNBqG6aznYcYjTjnc3+Cat/iBgbgpflxbIBTnsHTX0YVpnmINPEkSRWymT2Q8aSH3Y7aKnEbunilkYe8TybA=="],
 
-    "@connectrpc/connect": ["@connectrpc/connect@2.1.0", "", { "peerDependencies": { "@bufbuild/protobuf": "^2.7.0" } }, "sha512-xhiwnYlJNHzmFsRw+iSPIwXR/xweTvTw8x5HiwWp10sbVtd4OpOXbRgE7V58xs1EC17fzusF1f5uOAy24OkBuA=="],
-
-    "@connectrpc/protoc-gen-connect-es": ["@connectrpc/protoc-gen-connect-es@1.7.0", "", { "dependencies": { "@bufbuild/protobuf": "^1.10.0", "@bufbuild/protoplugin": "^1.10.0" }, "peerDependencies": { "@bufbuild/protoc-gen-es": "^1.10.0", "@connectrpc/connect": "1.7.0" }, "optionalPeers": ["@bufbuild/protoc-gen-es", "@connectrpc/connect"], "bin": { "protoc-gen-connect-es": "bin/protoc-gen-connect-es" } }, "sha512-g2rE799dxGgXtwSTBOJoSlzCy3HN0IX/Es8uKsCgXRmco8o277/bb5nz1X8TmvBooCBGNdtEdUDG50olcvS9jQ=="],
-
     "@corex/deepmerge": ["@corex/deepmerge@4.0.43", "", {}, "sha512-N8uEMrMPL0cu/bdboEWpQYb/0i2K5Qn8eCsxzOmxSggJbbQte7ljMRoXm917AbntqTGOzdTu+vP3KOOzoC70HQ=="],
 
     "@cove/ai": ["@cove/ai@workspace:packages/ai"],
@@ -1028,7 +994,7 @@
 
     "@cove/db": ["@cove/db@workspace:packages/db"],
 
-    "@cove/discovery": ["@cove/discovery@workspace:packages/discovery"],
+    "@cove/drivers": ["@cove/drivers@workspace:packages/drivers"],
 
     "@cove/email": ["@cove/email@workspace:packages/email"],
 
@@ -1036,7 +1002,7 @@
 
     "@cove/github": ["@cove/github@workspace:tooling/github"],
 
-    "@cove/hub": ["@cove/hub@workspace:apps/hub"],
+    "@cove/hub-core": ["@cove/hub-core@workspace:packages/hub-core"],
 
     "@cove/hub-v2": ["@cove/hub-v2@workspace:apps/hub-v2"],
 
@@ -1049,8 +1015,6 @@
     "@cove/next-config": ["@cove/next-config@workspace:tooling/next"],
 
     "@cove/npm": ["@cove/npm@workspace:tooling/npm"],
-
-    "@cove/protocols": ["@cove/protocols@workspace:packages/protocols"],
 
     "@cove/tooling-testing": ["@cove/tooling-testing@workspace:tooling/testing"],
 
@@ -2215,8 +2179,6 @@
     "@typescript-eslint/typescript-estree": ["@typescript-eslint/typescript-estree@8.46.2", "", { "dependencies": { "@typescript-eslint/project-service": "8.46.2", "@typescript-eslint/tsconfig-utils": "8.46.2", "@typescript-eslint/types": "8.46.2", "@typescript-eslint/visitor-keys": "8.46.2", "debug": "^4.3.4", "fast-glob": "^3.3.2", "is-glob": "^4.0.3", "minimatch": "^9.0.4", "semver": "^7.6.0", "ts-api-utils": "^2.1.0" }, "peerDependencies": { "typescript": ">=4.8.4 <6.0.0" } }, "sha512-f7rW7LJ2b7Uh2EiQ+7sza6RDZnajbNbemn54Ob6fRwQbgcIn+GWfyuHDHRYgRoZu1P4AayVScrRW+YfbTvPQoQ=="],
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.46.2", "", { "dependencies": { "@typescript-eslint/types": "8.46.2", "eslint-visitor-keys": "^4.2.1" } }, "sha512-tUFMXI4gxzzMXt4xpGJEsBsTox0XbNQ1y94EwlD/CuZwFcQP79xfQqMhau9HsRc/J0cAPA/HZt1dZPtGn9V/7w=="],
-
-    "@typescript/vfs": ["@typescript/vfs@1.6.2", "", { "dependencies": { "debug": "^4.1.1" }, "peerDependencies": { "typescript": "*" } }, "sha512-hoBwJwcbKHmvd2QVebiytN1aELvpk9B74B4L1mFm/XT1Q/VOYAWl2vQ9AWRFtQq8zmz6enTpfTV8WRc4ATjW/g=="],
 
     "@ungap/structured-clone": ["@ungap/structured-clone@1.3.0", "", {}, "sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g=="],
 
@@ -4608,8 +4570,6 @@
 
     "@base-org/account/zustand": ["zustand@5.0.3", "", { "peerDependencies": { "@types/react": ">=18.0.0", "immer": ">=9.0.6", "react": ">=18.0.0", "use-sync-external-store": ">=1.2.0" }, "optionalPeers": ["@types/react", "immer", "react", "use-sync-external-store"] }, "sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg=="],
 
-    "@bufbuild/protoplugin/typescript": ["typescript@5.4.5", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ=="],
-
     "@changesets/apply-release-plan/prettier": ["prettier@2.8.8", "", { "bin": { "prettier": "bin-prettier.js" } }, "sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q=="],
 
     "@changesets/get-github-info/node-fetch": ["node-fetch@2.7.0", "", { "dependencies": { "whatwg-url": "^5.0.0" }, "peerDependencies": { "encoding": "^0.1.0" }, "optionalPeers": ["encoding"] }, "sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A=="],
@@ -4639,10 +4599,6 @@
     "@commitlint/top-level/find-up": ["find-up@7.0.0", "", { "dependencies": { "locate-path": "^7.2.0", "path-exists": "^5.0.0", "unicorn-magic": "^0.1.0" } }, "sha512-YyZM99iHrqLKjmt4LJDj58KI+fYyufRLBSYcqycxf//KpBk9FoewoGX0450m9nB44qrZnovzC2oeP5hUibxc/g=="],
 
     "@commitlint/types/chalk": ["chalk@5.6.2", "", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
-
-    "@connectrpc/protoc-gen-connect-es/@bufbuild/protobuf": ["@bufbuild/protobuf@1.10.1", "", {}, "sha512-wJ8ReQbHxsAfXhrf9ixl0aYbZorRuOWpBNzm8pL8ftmSxQx/wnJD5Eg861NwJU/czy2VXFIebCeZnZrI9rktIQ=="],
-
-    "@connectrpc/protoc-gen-connect-es/@bufbuild/protoplugin": ["@bufbuild/protoplugin@1.10.1", "", { "dependencies": { "@bufbuild/protobuf": "1.10.1", "@typescript/vfs": "^1.4.0", "typescript": "4.5.2" } }, "sha512-LaSbfwabAFIvbVnbn8jWwElRoffCIxhVraO8arliVwWupWezHLXgqPHEYLXZY/SsAR+/YsFBQJa8tAGtNPJyaQ=="],
 
     "@cspotcode/source-map-support/@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.9", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.0.3", "@jridgewell/sourcemap-codec": "^1.4.10" } }, "sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ=="],
 
@@ -5583,8 +5539,6 @@
     "@commitlint/top-level/find-up/path-exists": ["path-exists@5.0.0", "", {}, "sha512-RjhtfwJOxzcFmNOi6ltcbcu4Iu+FL3zEj83dk4kAS+fVpTxXLO1b38RvJgT/0QwvV/L3aY9TAnyv0EOqW4GoMQ=="],
 
     "@commitlint/top-level/find-up/unicorn-magic": ["unicorn-magic@0.1.0", "", {}, "sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ=="],
-
-    "@connectrpc/protoc-gen-connect-es/@bufbuild/protoplugin/typescript": ["typescript@4.5.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw=="],
 
     "@esbuild-kit/core-utils/esbuild/@esbuild/android-arm": ["@esbuild/android-arm@0.18.20", "", { "os": "android", "cpu": "arm" }, "sha512-fyi7TDI/ijKKNZTUJAQqiG5T7YjJXgnzkURqmGj13C6dCqckZBLdl4h7bkhHt/t0WP+zO9/zwroDvANaOqO5Sw=="],
 

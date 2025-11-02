@@ -1,5 +1,6 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import {
   getAlertSeverityColor,
   getAlertSeverityLabel,
@@ -28,7 +29,6 @@ import { cn } from '@cove/ui/utils';
 import { format } from 'date-fns';
 import { AlertCircle, AlertTriangle, Bell, Check } from 'lucide-react';
 import * as React from 'react';
-import { hubApi } from '~/lib/hub-trpc/client';
 
 interface AlertHistoryPanelProps {
   entityId: string;

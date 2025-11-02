@@ -1,12 +1,12 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import { Badge } from '@cove/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
 import { Icons } from '@cove/ui/custom/icons';
 import { Text } from '@cove/ui/custom/typography';
 import { Lightbulb } from 'lucide-react';
 import Link from 'next/link';
-import { hubApi } from '~/lib/hub-trpc';
 
 export function DeviceList() {
   const { data: home } = hubApi.home.get.useQuery();

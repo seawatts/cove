@@ -1,5 +1,6 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import { getAlertSeverityColorValue } from '@cove/types';
 import type { WidgetProps } from '@cove/types/widget';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
@@ -25,7 +26,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { hubApi } from '~/lib/hub-trpc/client';
+import { timeRangeParser } from '../../_lib/query-parsers';
 import { useEntityData } from '../hooks/use-entity-data';
 
 function calculateStats(
@@ -65,10 +66,7 @@ interface ChartDataPoint {
 }
 
 export function ChartWidget({ sensor }: WidgetProps) {
-  const [timeRange] = useQueryState('timeRange', {
-    defaultValue: '24h',
-    parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
-  });
+  const [timeRange] = useQueryState('timeRange', timeRangeParser);
 
   // Use the unified data hook with polling only
   // Memoize the callback to prevent infinite loops
@@ -80,7 +78,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
     useEntityData({
       entityId: sensor.entityId,
       onStateChange: onStateChangeCallback,
-      timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
+      timeRange,
     });
 
   // Fetch alert configurations for this entity
@@ -144,9 +142,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
     });
 
     // Fill gaps to show missing data periods
-    const timeRangeMs = getTimeRangeMs(
-      (timeRange as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
-    );
+    const timeRangeMs = getTimeRangeMs(timeRange);
     const fillIntervalMs = getDefaultFillInterval(timeRangeMs);
 
     // Calculate timestamps - Date.now() is fine here since useMemo only runs when dependencies change

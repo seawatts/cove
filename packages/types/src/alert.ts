@@ -84,7 +84,7 @@ export function getAlertSeverityColor(severity: AlertSeverity): string {
 export function getAlertSeverityColorValue(severity: AlertSeverity): string {
   // Only resolve in browser environment
   if (typeof window === 'undefined' || typeof document === 'undefined') {
-    // Fallback colors for SSR
+    // Fallback colors for SSR/Node
     switch (severity) {
       case 'info':
         return 'rgb(59, 130, 246)'; // Blue

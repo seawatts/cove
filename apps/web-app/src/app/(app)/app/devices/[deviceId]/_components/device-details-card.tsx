@@ -1,5 +1,10 @@
 'use client';
 
+import type {
+  Device,
+  EntityWithStateAndCapabilities,
+  Room,
+} from '@cove/db/hub';
 import { Badge } from '@cove/ui/badge';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
@@ -14,50 +19,16 @@ import { getEntityDisplayName } from '@cove/utils';
 import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 
-interface Entity {
-  entityId: string;
-  kind: string;
-  key: string;
-  deviceClass?: string | null;
-  displayName?: string | null;
-  name?: string | null;
-  currentState?: {
-    state: string;
-    attrs?: Record<string, unknown>;
-    updatedAt: Date;
-  } | null;
-}
-
 interface DeviceDetailsCardProps {
-  device: {
-    name: string;
-    online: boolean;
-    available: boolean;
-    protocol: string;
-    type?: string;
-    manufacturer?: string;
-    model?: string;
-    ipAddress?: string;
-    macAddress?: string;
-    hwVersion?: string;
-    swVersion?: string;
-    configUrl?: string;
-    hostname?: string;
-    port?: number;
-    categories?: string[];
-    lastSeen?: Date;
-    matterNodeId?: number;
-    room?: {
-      name: string;
-      roomId: string;
-    };
-  };
+  device: Device;
+  room?: Room | null;
   entityCount: number;
-  buttonEntities?: Entity[];
+  buttonEntities?: EntityWithStateAndCapabilities[];
 }
 
 export function DeviceDetailsCard({
   device,
+  room,
   entityCount,
   buttonEntities = [],
 }: DeviceDetailsCardProps) {
@@ -68,11 +39,10 @@ export function DeviceDetailsCard({
     console.log('Button clicked:', entityId);
   };
 
+  const isOnline = !!device.lastSeen;
+
   const getStatusBadge = () => {
-    if (!device.available) {
-      return <Badge variant="destructive">Unavailable</Badge>;
-    }
-    if (device.online) {
+    if (isOnline) {
       return <Badge variant="default">Online</Badge>;
     }
     return <Badge variant="secondary">Offline</Badge>;
@@ -93,16 +63,18 @@ export function DeviceDetailsCard({
   };
 
   const technicalDetails = [
-    { label: 'IP Address', value: device.ipAddress },
-    { label: 'MAC Address', value: device.macAddress },
-    { label: 'Manufacturer', value: device.manufacturer },
+    { label: 'IP Address', value: device.ip },
+    { label: 'Fingerprint', value: device.fingerprint },
+    { label: 'Vendor', value: device.vendor },
     { label: 'Model', value: device.model },
-    { label: 'Hardware Version', value: device.hwVersion },
-    { label: 'Software Version', value: device.swVersion },
-    { label: 'Hostname', value: device.hostname },
-    { label: 'Port', value: device.port?.toString() },
-    { label: 'Matter Node ID', value: device.matterNodeId?.toString() },
-    { label: 'Last Seen', value: formatLastSeen(device.lastSeen) },
+    { label: 'Bridge ID', value: device.bridgeId },
+    { label: 'Last Seen', value: formatLastSeen(device.lastSeen ?? undefined) },
+    {
+      label: 'Paired At',
+      value: device.pairedAt
+        ? new Date(device.pairedAt).toLocaleString()
+        : null,
+    },
   ].filter((detail) => detail.value);
 
   return (
@@ -129,9 +101,8 @@ export function DeviceDetailsCard({
 
         <div className="space-y-1">
           <Text variant="muted">
-            {device.type && `${device.type} • `}
             {device.protocol}
-            {device.room && ` • ${device.room.name}`}
+            {room && ` • ${room.name}`}
           </Text>
           <Text className="text-sm" variant="muted">
             {entityCount} entity{entityCount !== 1 ? 'ies' : ''} discovered
@@ -145,15 +116,15 @@ export function DeviceDetailsCard({
             <div className="flex flex-wrap gap-2">
               {buttonEntities.map((entity) => (
                 <Button
-                  key={entity.entityId}
-                  onClick={() => handleButtonClick(entity.entityId)}
+                  key={entity.id}
+                  onClick={() => handleButtonClick(entity.id)}
                   variant="outline"
                 >
                   {getEntityDisplayName({
                     deviceClass: entity.deviceClass,
                     displayName: entity.displayName,
-                    key: entity.key,
-                    name: entity.name,
+                    key: entity.key || '',
+                    name: entity.name || '',
                   })}
                 </Button>
               ))}
@@ -166,23 +137,6 @@ export function DeviceDetailsCard({
         <CollapsibleContent>
           <CardContent className="pt-0">
             <div className="space-y-4">
-              {device.categories && device.categories.length > 0 && (
-                <div>
-                  <Text className="text-sm font-medium mb-2">Categories</Text>
-                  <div className="flex flex-wrap gap-1">
-                    {device.categories.map((category) => (
-                      <Badge
-                        className="text-xs"
-                        key={category}
-                        variant="outline"
-                      >
-                        {category}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               <div>
                 <Text className="text-sm font-medium mb-2">
                   Technical Details
@@ -198,23 +152,6 @@ export function DeviceDetailsCard({
                   ))}
                 </div>
               </div>
-
-              {/* Device Actions */}
-              {device.configUrl && (
-                <div className="space-y-2">
-                  <Text className="text-sm font-medium">Device Actions</Text>
-                  <Button asChild size="sm" variant="outline">
-                    <a
-                      href={device.configUrl}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      <Icons.ExternalLink className="mr-2" size="sm" />
-                      Open Config Interface
-                    </a>
-                  </Button>
-                </div>
-              )}
             </div>
           </CardContent>
         </CollapsibleContent>

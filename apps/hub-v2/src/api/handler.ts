@@ -3,10 +3,9 @@
  * Handles tRPC requests at /trpc/* endpoint
  */
 
+import { createHubContext, hubAppRouter } from '@cove/api/hub';
+import type { HubDaemon } from '@cove/hub-core';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import type { HubDaemon } from '../daemon';
-import { createTRPCContext } from './context';
-import { appRouter } from './root';
 
 // CORS headers for web app access
 const corsHeaders = {
@@ -29,10 +28,10 @@ export function createTRPCHandler(daemon: HubDaemon) {
     }
 
     const response = await fetchRequestHandler({
-      createContext: () => createTRPCContext({ daemon }),
+      createContext: () => createHubContext({ daemon }),
       endpoint: '/trpc',
       req,
-      router: appRouter,
+      router: hubAppRouter,
     });
 
     // Add CORS headers to all responses

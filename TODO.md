@@ -2,3 +2,10 @@ Cove TODO:
 - [ ] Add ASCII text for starting hub
 - [ ] Add Next.js style text for starting hub
 - [ ] view telemetry config for timing
+- [ ] Add entity to device favorites
+- [ ] add device favorites
+- [ ] add dashboards
+- [ ] add custom sql queries
+- [ ] add overlay graphs
+- [ ] i think we can get rid of the graph-queries or somthing
+- [ ]

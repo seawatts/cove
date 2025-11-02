@@ -1,16 +1,15 @@
 #!/usr/bin/env bun
+
 /**
  * Cove Hub V2 - Main Entry Point
  * Self-hosted home automation hub daemon
  */
 
+import { HubDaemon } from '@cove/hub-core';
 import { debug, defaultLogger, error, info } from '@cove/logger';
 import { ConsoleDestination } from '@cove/logger/destinations/console';
 import { RollingFileDestination } from '@cove/logger/destinations/rolling-file';
 import { createTRPCHandler } from './api/handler';
-import { createRoutes } from './api/routes';
-import { createWebSocketHandler } from './api/websocket';
-import { HubDaemon } from './daemon';
 import { env } from './env';
 
 try {
@@ -42,9 +41,6 @@ try {
     hubId: env.HUB_ID,
   });
 
-  // Create WebSocket handler
-  const wsHandler = createWebSocketHandler(daemon);
-
   // Create tRPC handler
   const trpcHandler = createTRPCHandler(daemon);
 
@@ -53,9 +49,6 @@ try {
     logInfo(`Received ${signal} signal, shutting down gracefully...`);
 
     try {
-      // Close WebSocket connections
-      wsHandler.closeAllConnections();
-
       // Stop daemon
       await daemon.stop();
 
@@ -77,35 +70,29 @@ try {
       await daemon.initialize();
       await daemon.start();
 
-      // Start the HTTP server with WebSocket support
+      // Start the HTTP server
       Bun.serve({
+        fetch: async (req: Request) => {
+          const url = new URL(req.url);
+
+          // Handle tRPC requests
+          if (url.pathname.startsWith('/trpc')) {
+            return await trpcHandler(req);
+          }
+
+          // Health check endpoint
+          if (url.pathname === '/health') {
+            return Response.json({
+              status: 'ok',
+              ...daemon.getStatus(),
+            });
+          }
+
+          // Default 404
+          return new Response('Not Found', { status: 404 });
+        },
         hostname: '0.0.0.0',
         port: env.PORT,
-
-        // Define routes - Bun handles the routing automatically
-        routes: {
-          ...createRoutes(daemon),
-          // tRPC endpoint
-          '/trpc/*': async (req: Request) => {
-            return await trpcHandler(req);
-          },
-        },
-
-        // WebSocket configuration
-        websocket: {
-          close: (ws, code, reason) => {
-            logDebug(`WebSocket connection closed: ${code} ${reason}`);
-            wsHandler.handleWebSocketClose(ws, code, reason);
-          },
-          message: (_ws, message) => {
-            logDebug(`WebSocket message received: ${message}`);
-            // Handle WebSocket messages here
-          },
-          open: (ws) => {
-            logDebug('WebSocket connection opened');
-            wsHandler.handleWebSocketOpen(ws);
-          },
-        },
       });
 
       logInfo(`Cove Hub started on http://0.0.0.0:${env.PORT}`);

@@ -1,5 +1,7 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
 import {
   type SensorMetadata,
   type WidgetProps,
@@ -18,7 +20,7 @@ import { formatSensorValue } from '@cove/utils/format-sensor-value';
 import { useQueryState } from 'nuqs';
 // Lazy load widget components to reduce bundle size
 import { lazy, Suspense, useState } from 'react';
-import { hubApi } from '~/lib/hub-trpc';
+import { timeRangeParser } from '../_lib/query-parsers';
 import { EntitySettingsDialog } from './entity-settings-dialog';
 import { LazyChartWrapper } from './lazy-chart-wrapper';
 
@@ -40,26 +42,11 @@ const TableWidget = lazy(() =>
   import('./widgets/table-widget').then((m) => ({ default: m.TableWidget })),
 );
 
-interface Entity {
-  entityId: string;
-  key: string;
-  kind: string;
-  deviceClass?: string | null;
-  displayName?: string | null;
-  name?: string | null;
-  capabilities: Array<Record<string, unknown>>;
-  currentState?: {
-    state: string;
-    attrs?: Record<string, unknown>;
-    updatedAt: Date;
-  } | null;
-}
-
 interface SensorWidgetProps {
   deviceId: string;
   sensor: SensorMetadata;
   mode?: 'full' | 'embedded';
-  entity?: Entity;
+  entity?: EntityWithStateAndCapabilities;
 }
 
 function WidgetTypeSelector({
@@ -116,17 +103,14 @@ export function SensorWidget({
   mode = 'full',
   entity,
 }: SensorWidgetProps) {
-  const [timeRange] = useQueryState('timeRange', {
-    defaultValue: '24h',
-    parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
-  });
+  const [timeRange] = useQueryState('timeRange', timeRangeParser);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const { data: aggregatedData = [] } = hubApi.telemetry.getAggregated.useQuery(
     {
       entityId: sensor.entityId, // Use entityId instead of key
-      timeRange: (timeRange as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
+      timeRange,
     },
   );
 

@@ -2,8 +2,10 @@
   "dependencies": {
     "@clerk/nextjs": "catalog:",
     "@cove/db": "workspace:*",
+    "@cove/hub-core": "workspace:*",
     "@cove/id": "workspace:*",
     "@cove/logger": "workspace:*",
+    "@cove/types": "workspace:*",
     "@happy-dom/global-registrator": "20.0.10",
     "@t3-oss/env-core": "catalog:",
     "@t3-oss/env-nextjs": "catalog:",
@@ -28,6 +30,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
+    "./hub": "./src/hub/index.ts",
+    "./hub/react": "./src/hub/react/index.ts",
     "./react": "./src/react/client-exports.ts",
     "./server": "./src/react/server-exports.ts",
     "./services": "./src/services/index.ts"

@@ -1,1 +1,0 @@
-ALTER TABLE `alertConfigs` ADD `showInGraph` integer DEFAULT true NOT NULL;

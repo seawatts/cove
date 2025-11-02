@@ -7,6 +7,7 @@ import { formatSensorValue } from '@cove/utils/format-sensor-value';
 import { format } from 'date-fns';
 import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { useQueryState } from 'nuqs';
+import { timeRangeParser } from '../../_lib/query-parsers';
 import { useEntityData } from '../hooks/use-entity-data';
 
 interface TrendData {
@@ -139,10 +140,7 @@ function calculateTrend(
 }
 
 export function ValueCardWidget({ sensor, config }: WidgetProps) {
-  const [timeRange] = useQueryState('timeRange', {
-    defaultValue: '24h',
-    parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
-  });
+  const [timeRange] = useQueryState('timeRange', timeRangeParser);
 
   // Use the unified data hook with polling only
   const { aggregatedData, latestState, latestTelemetryValue, status } =
@@ -151,7 +149,7 @@ export function ValueCardWidget({ sensor, config }: WidgetProps) {
       onStateChange: (newState) => {
         console.log('New state received for value card:', newState);
       },
-      timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
+      timeRange,
     });
 
   // Extract unit from sensor metadata

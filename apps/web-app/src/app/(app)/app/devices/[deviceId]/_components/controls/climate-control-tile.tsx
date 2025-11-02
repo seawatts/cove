@@ -1,5 +1,6 @@
 'use client';
 
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import {
@@ -19,20 +20,7 @@ import { EntitySettingsDialog } from '../entity-settings-dialog';
 
 interface ClimateControlTileProps {
   deviceId: string;
-  entity: {
-    entityId: string;
-    kind: string;
-    key: string;
-    deviceClass?: string | null;
-    displayName?: string | null;
-    name?: string | null;
-    capabilities: Array<Record<string, unknown>>;
-    currentState?: {
-      state: string;
-      attrs?: Record<string, unknown>;
-      updatedAt: Date;
-    } | null;
-  };
+  entity: EntityWithStateAndCapabilities;
   showChart?: boolean;
 }
 
@@ -86,9 +74,9 @@ export function ClimateControlTile({
     );
   };
 
-  const supportsFan = entity.capabilities.some((c) => c.type === 'fan_mode');
-
-  const supportsMode = entity.capabilities.some((c) => c.type === 'hvac_mode');
+  // Climate control specific capabilities would need to be added to the base capability types
+  const supportsFan = false; // TODO: Add fan_mode capability type
+  const supportsMode = false; // TODO: Add hvac_mode capability type
 
   return (
     <>
@@ -101,8 +89,8 @@ export function ClimateControlTile({
                 {getEntityDisplayName({
                   deviceClass: entity.deviceClass,
                   displayName: entity.displayName,
-                  key: entity.key,
-                  name: entity.name,
+                  key: entity.key || '',
+                  name: entity.name || '',
                 })}
               </Text>
             </div>

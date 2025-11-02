@@ -34,4 +34,6 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 export { createCaller };
 export type { RouterInputs, RouterOutputs };
 
+// Export hub API module (separate namespace for local hub API)
+export * as hubApi from './hub';
 export { type AppRouter, appRouter } from './root';

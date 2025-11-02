@@ -1,12 +1,12 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import { Badge } from '@cove/ui/badge';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@cove/ui/card';
 import { Icons } from '@cove/ui/custom/icons';
 import { Text } from '@cove/ui/custom/typography';
 import { RefreshCw } from 'lucide-react';
-import { hubApi } from '~/lib/hub-trpc';
 
 export function HubDetails() {
   const {

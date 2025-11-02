@@ -55,6 +55,7 @@ const nextConfig = {
     '@cove/id',
     '@cove/ui',
     '@cove/logger',
+    '@cove/hub-core',
   ],
   turbopack: {
     // Set the workspace root to silence the lockfile warning

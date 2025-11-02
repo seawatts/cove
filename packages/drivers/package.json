@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "@2colors/esphome-native-api": "^1.3.4",
+    "@cove/id": "workspace:*",
+    "@cove/logger": "workspace:*",
+    "bonjour-service": "1.3.0",
+    "esphome-client": "^1.1.2"
+  },
+  "description": "Protocol drivers for Cove home automation platform",
+  "devDependencies": {
+    "@cove/tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "name": "@cove/drivers",
+  "private": true,
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

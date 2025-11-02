@@ -1,0 +1,33 @@
+{
+  "dependencies": {
+    "@cove/db": "workspace:*",
+    "@cove/drivers": "workspace:*",
+    "@cove/id": "workspace:*",
+    "@cove/logger": "workspace:*",
+    "@cove/types": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "superjson": "catalog:"
+  },
+  "description": "Core hub engine for Cove home automation platform",
+  "devDependencies": {
+    "@cove/tsconfig": "workspace:*",
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "name": "@cove/hub-core",
+  "private": true,
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules dist",
+    "test": "bun test src/__tests__",
+    "test:coverage": "bun test --coverage src/__tests__",
+    "test:watch": "bun test --watch src/__tests__",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

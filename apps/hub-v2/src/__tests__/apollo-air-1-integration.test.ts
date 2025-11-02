@@ -12,12 +12,12 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
-import type { HubDaemon } from '../daemon';
+import type { HubDaemon } from '@cove/hub-core';
 import {
   createTestDaemon,
   stopTestDaemon,
   waitForHubReady,
-} from './daemon-helpers';
+} from '@cove/hub-core/__tests__/daemon-helpers';
 import {
   cleanupTestEnv,
   createTempTestDatabase,

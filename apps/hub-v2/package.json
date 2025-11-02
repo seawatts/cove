@@ -3,17 +3,13 @@
     "cove-hub-v2": "./cove-hub-v2"
   },
   "dependencies": {
-    "@2colors/esphome-native-api": "^1.3.4",
+    "@cove/api": "workspace:*",
     "@cove/db": "workspace:*",
-    "@cove/id": "workspace:*",
+    "@cove/drivers": "workspace:*",
+    "@cove/hub-core": "workspace:*",
     "@cove/logger": "workspace:*",
-    "@cove/protocols": "workspace:*",
-    "@cove/types": "workspace:*",
     "@t3-oss/env-core": "catalog:",
     "@trpc/server": "catalog:",
-    "bonjour-service": "1.3.0",
-    "drizzle-orm": "catalog:",
-    "esphome-client": "^1.1.2",
     "superjson": "catalog:",
     "zod": "catalog:"
   },
@@ -21,12 +17,7 @@
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
-    "drizzle-kit": "catalog:",
     "typescript": "catalog:"
-  },
-  "exports": {
-    ".": "./src/api/index.ts",
-    "./types": "./src/api/index.ts"
   },
   "license": "MIT",
   "main": "./src/index.ts",
@@ -34,10 +25,6 @@
   "private": false,
   "scripts": {
     "build": "bun build ./src/index.ts --compile --outfile cove-hub-v2",
-    "db:generate": "bunx drizzle-kit generate",
-    "db:migrate": "bunx drizzle-kit migrate",
-    "db:push": "bunx drizzle-kit push",
-    "db:studio": "bunx drizzle-kit studio",
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
     "test": "bun test src/__tests__",

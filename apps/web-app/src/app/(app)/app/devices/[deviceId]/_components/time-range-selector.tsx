@@ -11,8 +11,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from '@cove/ui/toggle-group';
 import { useQueryState } from 'nuqs';
 import * as React from 'react';
-
-type TimeRange = '1h' | '24h' | '7d' | '30d' | '90d';
+import { type TimeRange, timeRangeParser } from '../_lib/query-parsers';
 
 const timeRangeOptions: { value: TimeRange; label: string }[] = [
   { label: '1 hour', value: '1h' },
@@ -24,11 +23,7 @@ const timeRangeOptions: { value: TimeRange; label: string }[] = [
 
 export function TimeRangeSelector() {
   const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = useQueryState('timeRange', {
-    defaultValue: '24h',
-    parse: (value) => (value as TimeRange) || '24h',
-    serialize: (value) => value,
-  });
+  const [timeRange, setTimeRange] = useQueryState('timeRange', timeRangeParser);
 
   React.useEffect(() => {
     if (isMobile && timeRange === '90d') {

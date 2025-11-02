@@ -1,6 +1,8 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import { api } from '@cove/api/react';
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
 import type { AlertConfig, AlertSeverity, AlertType } from '@cove/types/alert';
 import {
   getAlertSeverityColor,
@@ -34,24 +36,10 @@ import { getEntityDisplayName } from '@cove/utils';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { hubApi } from '~/lib/hub-trpc/client';
 import { AlertConfigForm } from './alert-config-form';
 
 interface EntitySettingsDialogProps {
-  entity: {
-    entityId: string;
-    key: string;
-    kind: string;
-    deviceClass?: string | null;
-    name?: string | null;
-    displayName?: string | null;
-    capabilities: Array<Record<string, unknown>>;
-    currentState?: {
-      state: string;
-      attrs?: Record<string, unknown>;
-      updatedAt: Date;
-    } | null;
-  };
+  entity: EntityWithStateAndCapabilities;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -74,7 +62,7 @@ export function EntitySettingsDialog({
   // Fetch actual telemetry fields from database
   const { data: telemetryFields = [], isLoading: isLoadingFields } =
     hubApi.telemetry.getFields.useQuery(
-      { entityId: entity.entityId },
+      { entityId: entity.id },
       { enabled: open },
     );
 
@@ -93,7 +81,7 @@ export function EntitySettingsDialog({
     setIsSaving(true);
     updateEntity.mutate({
       displayName: displayName.trim() || undefined,
-      entityId: entity.entityId,
+      entityId: entity.id,
     });
   };
 
@@ -111,10 +99,7 @@ export function EntitySettingsDialog({
 
   // Fetch alert configs
   const { data: alertConfigs = [], isLoading: isLoadingAlerts } =
-    hubApi.alerts.list.useQuery(
-      { entityId: entity.entityId },
-      { enabled: open },
-    );
+    hubApi.alerts.list.useQuery({ entityId: entity.id }, { enabled: open });
 
   // Alert mutations
   const createAlertMutation = hubApi.alerts.create.useMutation({
@@ -125,7 +110,7 @@ export function EntitySettingsDialog({
     },
     onSuccess: () => {
       toast.success('Alert created successfully');
-      utils.alerts.list.invalidate({ entityId: entity.entityId });
+      utils.alerts.list.invalidate({ entityId: entity.id });
       setShowAlertForm(false);
       setEditingAlert(null);
     },
@@ -139,7 +124,7 @@ export function EntitySettingsDialog({
     },
     onSuccess: () => {
       toast.success('Alert updated successfully');
-      utils.alerts.list.invalidate({ entityId: entity.entityId });
+      utils.alerts.list.invalidate({ entityId: entity.id });
       setShowAlertForm(false);
       setEditingAlert(null);
     },
@@ -153,7 +138,7 @@ export function EntitySettingsDialog({
     },
     onSuccess: () => {
       toast.success('Alert deleted successfully');
-      utils.alerts.list.invalidate({ entityId: entity.entityId });
+      utils.alerts.list.invalidate({ entityId: entity.id });
     },
   });
 
@@ -170,7 +155,7 @@ export function EntitySettingsDialog({
       });
     } else {
       await createAlertMutation.mutateAsync({
-        entityId: entity.entityId,
+        entityId: entity.id,
         homeId: home.id,
         ...data,
       } as AlertConfig);
@@ -200,6 +185,7 @@ export function EntitySettingsDialog({
       );
     } catch (error) {
       // Error already handled by mutation's onError
+      console.error(error);
     }
   };
 
@@ -252,8 +238,8 @@ export function EntitySettingsDialog({
                 placeholder={getEntityDisplayName({
                   deviceClass: entity.deviceClass,
                   displayName: entity.displayName,
-                  key: entity.key,
-                  name: entity.name,
+                  key: entity.key || '',
+                  name: entity.name || '',
                 })}
                 value={displayName}
               />
@@ -285,7 +271,7 @@ export function EntitySettingsDialog({
                   <TableRow>
                     <TableCell className="font-medium">Entity ID</TableCell>
                     <TableCell className="font-mono text-xs">
-                      {entity.entityId}
+                      {entity.id}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -383,7 +369,7 @@ export function EntitySettingsDialog({
                 </div>
                 <AlertConfigForm
                   availableFields={availableFields}
-                  entityId={entity.entityId}
+                  entityId={entity.id}
                   homeId={home?.id || ''}
                   initialData={editingAlert || undefined}
                   onCancel={handleCancelAlert}

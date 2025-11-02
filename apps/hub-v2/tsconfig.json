@@ -1,16 +1,9 @@
 {
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "noEmit": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ES2022"
+    "outDir": "dist",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
-  "exclude": ["node_modules", "dist", "**/*.test.ts"],
-  "extends": "@cove/tsconfig/base.json",
-  "include": ["src/**/*"]
+  "exclude": ["node_modules", "src/__tests__"],
+  "extends": "@cove/tsconfig/react-library.json",
+  "include": ["*.ts", "src"]
 }

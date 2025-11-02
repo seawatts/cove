@@ -1,7 +1,9 @@
+import { getHubApi } from '@cove/api/hub/react';
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
+import { parseCapabilities } from '@cove/db/hub';
 import { Card, CardContent } from '@cove/ui/card';
 import { Text } from '@cove/ui/custom/typography';
 import { Suspense } from 'react';
-import { getHubApi } from '~/lib/hub-trpc/server';
 import { DeviceDetailsCard } from './_components/device-details-card';
 import { DeviceDetailsClient } from './_components/device-details-client';
 
@@ -39,37 +41,17 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
     );
   }
 
-  // Debug: Log what we received
-  console.log('[DeviceDetails] Device:', device.id, device.name);
-  console.log('[DeviceDetails] Entities count:', entities.length);
-  console.log('[DeviceDetails] First entity:', entities[0]);
-
-  // Helper to transform hub entity to component format
-  const transformEntity = (entity: (typeof entities)[0]) => {
-    // Convert capability object to array if needed
-    let capabilities: Array<Record<string, unknown>> = [];
-    if (entity.capability) {
-      if (Array.isArray(entity.capability)) {
-        capabilities = entity.capability as Array<Record<string, unknown>>;
-      } else if (typeof entity.capability === 'object') {
-        capabilities = [entity.capability as Record<string, unknown>];
-      }
-    }
-
-    return {
-      capabilities,
+  // Transform entities from hub format to web app format with parsed capabilities
+  const transformedEntities: EntityWithStateAndCapabilities[] = entities.map(
+    (entity) => ({
+      ...entity,
+      capabilities: parseCapabilities(entity.capability),
       currentState: entity.currentState,
-      deviceClass: entity.deviceClass ?? null,
-      displayName: entity.displayName ?? null,
-      entityId: entity.id,
-      key: entity.key ?? '',
-      kind: entity.kind,
-      name: entity.name ?? null,
-    };
-  };
+    }),
+  );
 
   // Filter button entities for device details card
-  const buttonEntities = entities.filter(
+  const buttonEntities = transformedEntities.filter(
     (entity) =>
       entity.kind === 'button' ||
       entity.key?.toLowerCase().includes('calibrate'),
@@ -79,40 +61,17 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
     <>
       {/* Device Details Card */}
       <DeviceDetailsCard
-        buttonEntities={buttonEntities.map(transformEntity)}
-        device={{
-          available: true,
-          categories: [],
-          configUrl: undefined,
-          hostname: undefined,
-          hwVersion: undefined,
-          ipAddress: device.ip ?? undefined,
-          lastSeen: device.lastSeen ?? undefined,
-          macAddress: undefined,
-          manufacturer: device.vendor ?? undefined,
-          matterNodeId: undefined,
-          model: device.model ?? undefined,
-          name: device.name || 'Unknown Device',
-          online: !!device.lastSeen,
-          port: undefined,
-          protocol: device.protocol || 'unknown',
-          room: device.room
-            ? {
-                name: device.room.name,
-                roomId: device.room.id,
-              }
-            : undefined,
-          swVersion: undefined,
-          type: undefined,
-        }}
+        buttonEntities={buttonEntities}
+        device={device}
         entityCount={entities.length}
+        room={device.room}
       />
 
       {/* Client component handles filtering and rendering */}
-      {entities.length > 0 ? (
+      {transformedEntities.length > 0 ? (
         <DeviceDetailsClient
           deviceId={deviceId}
-          entities={entities.map(transformEntity)}
+          entities={transformedEntities}
         />
       ) : (
         <Card>

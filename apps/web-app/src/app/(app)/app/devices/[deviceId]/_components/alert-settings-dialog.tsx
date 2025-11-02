@@ -1,5 +1,6 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import type { AlertConfig } from '@cove/types/alert';
 import {
   getAlertSeverityColor,
@@ -22,7 +23,6 @@ import { toast } from '@cove/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
 import { Bell, Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
-import { hubApi } from '~/lib/hub-trpc/client';
 import { AlertConfigForm } from './alert-config-form';
 
 interface AlertSettingsDialogProps {
@@ -94,23 +94,17 @@ export function AlertSettingsDialog({
   });
 
   const handleSubmit = async (data: Partial<AlertConfig>) => {
-    try {
-      if (editingAlert) {
-        await updateMutation.mutateAsync({
-          id: editingAlert.id,
-          ...data,
-        });
-      } else {
-        await createMutation.mutateAsync({
-          entityId,
-          homeId,
-          ...data,
-        } as AlertConfig);
-      }
-    } catch (error) {
-      // Error is already handled by mutation's onError callback
-      // Re-throw to propagate to form
-      throw error;
+    if (editingAlert) {
+      await updateMutation.mutateAsync({
+        id: editingAlert.id,
+        ...data,
+      });
+    } else {
+      await createMutation.mutateAsync({
+        entityId,
+        homeId,
+        ...data,
+      } as AlertConfig);
     }
   };
 
@@ -150,7 +144,7 @@ export function AlertSettingsDialog({
           ? 'Alert hidden from graph'
           : 'Alert visible on graph',
       );
-    } catch (error) {
+    } catch {
       // Error already handled by mutation's onError
     }
   };

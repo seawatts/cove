@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "dist",
-    "types": ["@types/bun"]
-  },
-  "exclude": ["node_modules", "dist"],
-  "extends": "@cove/tsconfig/base.json",
-  "include": ["src/**/*", "src/tests/**/*"]
-}

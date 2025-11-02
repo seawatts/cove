@@ -3,8 +3,9 @@
  * Polls every minute for updated data
  */
 
+import { hubApi } from '@cove/api/hub/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { hubApi } from '~/lib/hub-trpc';
+import type { TimeRange } from '../../_lib/query-parsers';
 
 interface EntityState {
   state: string | number | boolean | Record<string, unknown>;
@@ -14,7 +15,7 @@ interface EntityState {
 
 interface UseEntityDataProps {
   entityId: string;
-  timeRange?: '1h' | '24h' | '7d' | '30d' | '90d';
+  timeRange?: TimeRange;
   onStateChange?: (newState: EntityState) => void;
 }
 

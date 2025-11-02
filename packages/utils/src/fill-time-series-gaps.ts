@@ -153,6 +153,9 @@ export function getDefaultFillInterval(timeRangeMs: number): number {
 
 /**
  * Get time range in milliseconds from string
+ *
+ * NOTE: Uses TimeRange type from '@cove/db/graph-queries'
+ * When updating this package, import: import type { TimeRange } from '@cove/db/graph-queries'
  */
 export function getTimeRangeMs(
   timeRange: '1h' | '24h' | '7d' | '30d' | '90d',

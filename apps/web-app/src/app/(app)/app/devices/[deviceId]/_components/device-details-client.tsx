@@ -1,32 +1,17 @@
 'use client';
 
-import type { SensorMetadata } from '@cove/types/widget';
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
+import { entityToSensorMetadata, isUserFacingSensor } from '@cove/db/hub';
 import { Card, CardContent } from '@cove/ui/card';
 import { Text } from '@cove/ui/custom/typography';
-import { getEntityDisplayName } from '@cove/utils';
 import { useQueryState } from 'nuqs';
 import { ControlGrid } from './control-grid';
 import { EntityFilterTabs } from './entity-filter-tabs';
 import { SensorWidget } from './sensor-widget';
 import { TimeRangeSelector } from './time-range-selector';
 
-interface Entity {
-  entityId: string;
-  kind: string;
-  key: string;
-  deviceClass?: string | null;
-  displayName?: string | null;
-  name?: string | null;
-  capabilities: Array<Record<string, unknown>>;
-  currentState?: {
-    state: string;
-    attrs?: Record<string, unknown>;
-    updatedAt: Date;
-  } | null;
-}
-
 interface DeviceDetailsClientProps {
-  entities: Entity[];
+  entities: EntityWithStateAndCapabilities[];
   deviceId: string;
 }
 
@@ -49,56 +34,11 @@ export function DeviceDetailsClient({
 
   // Convert entities to sensor metadata for widgets
   const sensors = entities
-    .filter((entity) => {
-      // Only include actual sensor entities, not controllable entities
-      if (entity.kind !== 'sensor' && entity.kind !== 'binary_sensor') {
-        return false;
-      }
-
-      // Filter out system/status sensors
-      const systemDeviceClasses = [
-        'connectivity',
-        'duration',
-        'memory',
-        'signal_strength',
-      ];
-      if (
-        entity.deviceClass &&
-        systemDeviceClasses.includes(entity.deviceClass)
-      ) {
-        return false;
-      }
-
-      return true;
-    })
-    .map((entity) => {
-      const currentValue = entity.currentState?.state;
-      const isBoolean = typeof currentValue === 'boolean';
-
-      // Extract unit from numeric capability
-      const numericCapability = entity.capabilities.find(
-        (cap) => cap.type === 'numeric',
-      ) as { unit?: string } | undefined;
-      const unit = numericCapability?.unit;
-
-      return {
-        entity,
-        sensorMetadata: {
-          currentValue,
-          entityId: entity.entityId,
-          key: entity.key,
-          lastChanged: entity.currentState?.updatedAt || new Date(),
-          name: getEntityDisplayName({
-            deviceClass: entity.deviceClass,
-            displayName: entity.displayName,
-            key: entity.key,
-            name: entity.name,
-          }),
-          type: isBoolean ? 'binary' : 'continuous', // Default to continuous for all non-binary sensors
-          unit,
-        } as SensorMetadata,
-      };
-    });
+    .filter((entity) => isUserFacingSensor(entity))
+    .map((entity) => ({
+      entity,
+      sensorMetadata: entityToSensorMetadata(entity),
+    }));
 
   // Filter sensors based on entity filter
   const filteredSensors = sensors.filter((item) => {

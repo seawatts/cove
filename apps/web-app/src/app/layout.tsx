@@ -11,10 +11,10 @@ import '@cove/ui/globals.css';
 
 import { ClerkProvider } from '@clerk/nextjs';
 import { AnalyticsProviders } from '@cove/analytics/providers';
+import { HubTRPCProvider } from '@cove/api/hub/react';
 import { TRPCReactProvider } from '@cove/api/react';
 import { Suspense } from 'react';
 import { env } from '~/env.server';
-import { HubTRPCProvider } from '~/lib/hub-trpc';
 
 export const metadata: Metadata = {
   description: 'Seawatts is a tool for developers to manage their webhooks',

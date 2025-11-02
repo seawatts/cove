@@ -1,5 +1,7 @@
 'use client';
 
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
+import { entityToSensorMetadata } from '@cove/db/hub';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import { Text } from '@cove/ui/custom/typography';
 import { getEntityDisplayName } from '@cove/utils';
@@ -8,24 +10,9 @@ import { LightControlTile } from './controls/light-control-tile';
 import { SwitchControlTile } from './controls/switch-control-tile';
 import { SensorWidget } from './sensor-widget';
 
-interface Entity {
-  entityId: string;
-  kind: string;
-  key: string;
-  deviceClass?: string | null;
-  displayName?: string | null;
-  name?: string | null;
-  capabilities: Array<Record<string, unknown>>;
-  currentState?: {
-    state: string;
-    attrs?: Record<string, unknown>;
-    updatedAt: Date;
-  } | null;
-}
-
 interface ControlGridProps {
   deviceId: string;
-  entities: Entity[];
+  entities: EntityWithStateAndCapabilities[];
   showCharts?: boolean;
 }
 
@@ -44,33 +31,6 @@ export function ControlGrid({
     );
   }
 
-  // Helper to convert entity to SensorMetadata format
-  const entityToSensorMetadata = (entity: Entity) => {
-    const currentValue = entity.currentState?.state;
-    const isBoolean = typeof currentValue === 'boolean';
-
-    // Extract unit from numeric capability
-    const numericCapability = entity.capabilities.find(
-      (cap) => cap.type === 'numeric',
-    ) as { unit?: string } | undefined;
-    const unit = numericCapability?.unit;
-
-    return {
-      currentValue,
-      entityId: entity.entityId,
-      key: entity.key,
-      lastChanged: entity.currentState?.updatedAt || new Date(),
-      name: getEntityDisplayName({
-        deviceClass: entity.deviceClass,
-        displayName: entity.displayName,
-        key: entity.key,
-        name: entity.name,
-      }),
-      type: (isBoolean ? 'binary' : 'continuous') as 'binary' | 'continuous',
-      unit,
-    };
-  };
-
   // Group entities by type for better organization
   const entityGroups = {
     climate: entities.filter((e) => e.kind === 'climate'),
@@ -86,7 +46,7 @@ export function ControlGrid({
           'sensor',
           'binary_sensor',
           'button',
-        ].includes(e.kind) && !e.key.toLowerCase().includes('calibrate'),
+        ].includes(e.kind) && !e.key?.toLowerCase().includes('calibrate'),
     ),
     sensors: entities.filter(
       (e) => e.kind === 'sensor' || e.kind === 'binary_sensor',
@@ -111,7 +71,7 @@ export function ControlGrid({
               <LightControlTile
                 deviceId={deviceId}
                 entity={entity}
-                key={entity.entityId}
+                key={entity.id}
                 showChart={showCharts}
               />
             ))}
@@ -134,7 +94,7 @@ export function ControlGrid({
               <SwitchControlTile
                 deviceId={deviceId}
                 entity={entity}
-                key={entity.entityId}
+                key={entity.id}
                 showChart={showCharts}
               />
             ))}
@@ -157,7 +117,7 @@ export function ControlGrid({
               <ClimateControlTile
                 deviceId={deviceId}
                 entity={entity}
-                key={entity.entityId}
+                key={entity.id}
                 showChart={showCharts}
               />
             ))}
@@ -180,7 +140,7 @@ export function ControlGrid({
               <SensorWidget
                 deviceId={deviceId}
                 entity={entity}
-                key={entity.entityId}
+                key={entity.id}
                 mode="full"
                 sensor={entityToSensorMetadata(entity)}
               />
@@ -203,7 +163,7 @@ export function ControlGrid({
             {entityGroups.covers.map((entity) => (
               <Card
                 className="min-h-[140px] transition-shadow hover:shadow-md"
-                key={entity.entityId}
+                key={entity.id}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -213,8 +173,8 @@ export function ControlGrid({
                         {getEntityDisplayName({
                           deviceClass: entity.deviceClass,
                           displayName: entity.displayName,
-                          key: entity.key,
-                          name: entity.name,
+                          key: entity.key || '',
+                          name: entity.name || '',
                         })}
                       </Text>
                     </div>
@@ -253,7 +213,7 @@ export function ControlGrid({
             {entityGroups.other.map((entity) => (
               <Card
                 className="min-h-[140px] transition-shadow hover:shadow-md"
-                key={entity.entityId}
+                key={entity.id}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -263,8 +223,8 @@ export function ControlGrid({
                         {getEntityDisplayName({
                           deviceClass: entity.deviceClass,
                           displayName: entity.displayName,
-                          key: entity.key,
-                          name: entity.name,
+                          key: entity.key || '',
+                          name: entity.name || '',
                         })}
                       </Text>
                     </div>

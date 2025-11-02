@@ -1,5 +1,6 @@
 'use client';
 
+import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import { Icons } from '@cove/ui/custom/icons';
@@ -10,20 +11,7 @@ import { EntitySettingsDialog } from '../entity-settings-dialog';
 
 interface SwitchControlTileProps {
   deviceId: string;
-  entity: {
-    entityId: string;
-    kind: string;
-    key: string;
-    deviceClass?: string | null;
-    displayName?: string | null;
-    name?: string | null;
-    capabilities: Array<Record<string, unknown>>;
-    currentState?: {
-      state: string;
-      attrs?: Record<string, unknown>;
-      updatedAt: Date;
-    } | null;
-  };
+  entity: EntityWithStateAndCapabilities;
   showChart?: boolean;
 }
 
@@ -52,8 +40,8 @@ export function SwitchControlTile({
                 {getEntityDisplayName({
                   deviceClass: entity.deviceClass,
                   displayName: entity.displayName,
-                  key: entity.key,
-                  name: entity.name,
+                  key: entity.key || '',
+                  name: entity.name || '',
                 })}
               </Text>
             </div>
