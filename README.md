@@ -90,7 +90,7 @@ bun dev:next
 apps/
   web-app/          # Next.js 15 PWA control panel
   hub/              # Core hub daemon (Bun runtime)
-  hub-v2/           # Hub V2 daemon - simplified architecture
+  hub/           # Hub V2 daemon - simplified architecture
   expo/             # React Native mobile app (future)
   ios/              # Native iOS app with widgets
 
@@ -160,7 +160,7 @@ bun test:integ           # Run integration tests
 
 ### Hub V2 Testing
 ```bash
-cd apps/hub-v2
+cd apps/hub
 bun test                 # Run Hub V2 integration tests
 bun test:watch           # Watch mode for tests
 bun test:coverage        # Run with coverage report

@@ -1,6 +1,6 @@
 /**
  * Hub SQLite Database Schema
- * Local database for home automation hub (moved from apps/hub-v2)
+ * Local database for home automation hub (moved from apps/hub)
  *
  * This is separate from the main Supabase schema and uses SQLite for local storage
  * on the hub device.

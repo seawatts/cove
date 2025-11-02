@@ -20,10 +20,10 @@ import { EventBus } from './core/event-bus';
 import { Registry } from './core/registry';
 import { StateStore } from './core/state-store';
 
-const logDebug = debug('cove:hub-v2:daemon');
-const logInfo = info('cove:hub-v2:daemon');
-const logWarn = warn('cove:hub-v2:daemon');
-const logError = error('cove:hub-v2:daemon');
+const logDebug = debug('cove:hub:daemon');
+const logInfo = info('cove:hub:daemon');
+const logWarn = warn('cove:hub:daemon');
+const logError = error('cove:hub:daemon');
 
 export interface HubDaemonOptions {
   dbPath?: string;
@@ -55,7 +55,7 @@ export class HubDaemon {
   private activeSubscriptions = new Map<string, () => void>();
 
   constructor(options: HubDaemonOptions = {}) {
-    this.dbPath = options.dbPath || './data/hub-v2.db';
+    this.dbPath = options.dbPath || './data/hub.db';
     this.hubId = options.hubId || createId({ prefix: 'hub' });
   }
 

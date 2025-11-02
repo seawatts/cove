@@ -11,9 +11,9 @@ import type { AlertService } from './alert-service';
 import type { EventBus } from './event-bus';
 import type { Registry } from './registry';
 
-const logDebug = debug('cove:hub-v2:state-store');
-const logInfo = info('cove:hub-v2:state-store');
-const logError = error('cove:hub-v2:state-store');
+const logDebug = debug('cove:hub:state-store');
+const logInfo = info('cove:hub:state-store');
+const logError = error('cove:hub:state-store');
 
 export interface StateStoreOptions {
   db: DatabaseClient;

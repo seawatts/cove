@@ -1,5 +1,5 @@
 /**
- * Custom hook for fetching entity data using hub-v2 tRPC API
+ * Custom hook for fetching entity data using hub tRPC API
  * Polls every minute for updated data
  */
 
@@ -55,7 +55,7 @@ export function useEntityData({
     onStateChangeRef.current = onStateChange;
   }, [onStateChange]);
 
-  // Get current entity state from hub-v2
+  // Get current entity state from hub
   const {
     data: entity,
     isLoading: isLoadingEntity,
@@ -68,7 +68,7 @@ export function useEntityData({
     },
   );
 
-  // Get aggregated telemetry data from hub-v2
+  // Get aggregated telemetry data from hub
   const {
     data: aggregatedData = [],
     isLoading: isLoadingAggregated,

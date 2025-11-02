@@ -85,7 +85,7 @@ export function createTestDatabase(dbPath?: string): TestDatabase {
  */
 export function createTempTestDatabase(): TestDatabase {
   const randomId = Math.random().toString(36).substring(7);
-  const dbPath = `/tmp/hub-v2-test-${randomId}.db`;
+  const dbPath = `/tmp/hub-test-${randomId}.db`;
   return createTestDatabase(dbPath);
 }
 

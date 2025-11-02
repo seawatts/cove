@@ -5,7 +5,7 @@
  *
  * To run these tests:
  * 1. Ensure Apollo Air 1 device is on the network and discoverable via mDNS
- * 2. Run: bun test apps/hub-v2/src/__tests__/apollo-air-1-integration.test.ts
+ * 2. Run: bun test apps/hub/src/__tests__/apollo-air-1-integration.test.ts
  *
  * WARNING: These tests will control your actual light!
  * Make sure you're okay with the light being toggled during tests.

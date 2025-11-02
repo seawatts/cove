@@ -6,7 +6,7 @@
 import { debug } from '@cove/logger';
 import Bonjour, { type Bonjour as BonjourInstance } from 'bonjour-service';
 
-const log = debug('cove:hub-v2:discovery-service');
+const log = debug('cove:hub:discovery-service');
 
 let bonjourInstance: BonjourInstance | null = null;
 

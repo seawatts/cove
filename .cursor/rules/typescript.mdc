@@ -99,8 +99,8 @@ Key Conventions
   <Icons.Spinner size="sm" variant="primary" />;
   ```
 
-- When creating Dialogs / Modals with forms and actions, use apps/web-app-v2/src/components/prompt-feedback-buttons/dialog.tsx as a starting point. Make sure to use the @seawatts/ui/dialog for desktop and @seawatts/ui/drawer for mobile using the @seawatts/ui/hooks/use-media-query isDesktop hook.
-- When creating forms with actions, use apps/web-app-v2/src/components/prompt-feedback-buttons/form.tsx as a starting point.
+- When creating Dialogs / Modals with forms and actions, use apps/web-app/src/components/prompt-feedback-buttons/dialog.tsx as a starting point. Make sure to use the @seawatts/ui/dialog for desktop and @seawatts/ui/drawer for mobile using the @seawatts/ui/hooks/use-media-query isDesktop hook.
+- When creating forms with actions, use apps/web-app/src/components/prompt-feedback-buttons/form.tsx as a starting point.
 - Optimize Web Vitals (LCP, CLS, FID).
 - Limit 'use client':
   - Favor server components and Next.js SSR.

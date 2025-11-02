@@ -1,6 +1,6 @@
 {
   "bin": {
-    "cove-hub-v2": "./cove-hub-v2"
+    "cove-hub": "./cove-hub"
   },
   "dependencies": {
     "@cove/api": "workspace:*",
@@ -13,7 +13,7 @@
     "superjson": "catalog:",
     "zod": "catalog:"
   },
-  "description": "Cove Hub V2 - Core daemon for home automation",
+  "description": "Cove Hub - Core daemon for home automation",
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
@@ -21,10 +21,10 @@
   },
   "license": "MIT",
   "main": "./src/index.ts",
-  "name": "@cove/hub-v2",
+  "name": "@cove/hub",
   "private": false,
   "scripts": {
-    "build": "bun build ./src/index.ts --compile --outfile cove-hub-v2",
+    "build": "bun build ./src/index.ts --compile --outfile cove-hub",
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
     "test": "bun test src/__tests__",

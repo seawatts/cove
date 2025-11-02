@@ -10,10 +10,10 @@ import { debug, error, info, warn } from '@cove/logger';
 import type { EventBus } from './event-bus';
 import type { Registry } from './registry';
 
-const logDebug = debug('cove:hub-v2:command-router');
-const logInfo = info('cove:hub-v2:command-router');
-const logWarn = warn('cove:hub-v2:command-router');
-const logError = error('cove:hub-v2:command-router');
+const logDebug = debug('cove:hub:command-router');
+const logInfo = info('cove:hub:command-router');
+const logWarn = warn('cove:hub:command-router');
+const logError = error('cove:hub:command-router');
 
 export interface CommandRouterOptions {
   registry: Registry;

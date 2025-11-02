@@ -10,9 +10,9 @@ import { debug, info, error as logError } from '@cove/logger';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { AlertEvent, EventBus } from './event-bus';
 
-const logDebug = debug('cove:hub-v2:alert-service');
-const logInfo = info('cove:hub-v2:alert-service');
-const logErr = logError('cove:hub-v2:alert-service');
+const logDebug = debug('cove:hub:alert-service');
+const logInfo = info('cove:hub:alert-service');
+const logErr = logError('cove:hub:alert-service');
 
 export interface AlertServiceOptions {
   db: DatabaseClient;

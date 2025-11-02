@@ -68,16 +68,16 @@ LOG_LEVEL=error
 
 ```bash
 # Show only warnings and errors from all namespaces
-LOG_LEVEL=warn DEBUG='*' bun run apps/hub-v2/src/index.ts
+LOG_LEVEL=warn DEBUG='*' bun run apps/hub/src/index.ts
 
 # Show debug logs only from ESPHome driver
-LOG_LEVEL=debug DEBUG='cove:hub:esphome:*' bun run apps/hub-v2/src/index.ts
+LOG_LEVEL=debug DEBUG='cove:hub:esphome:*' bun run apps/hub/src/index.ts
 
 # Show info+ from all cove namespaces
-LOG_LEVEL=info DEBUG='cove:*' bun run apps/hub-v2/src/index.ts
+LOG_LEVEL=info DEBUG='cove:*' bun run apps/hub/src/index.ts
 
 # Development mode: show all debug logs
-LOG_LEVEL=debug DEBUG='cove:*' bun run apps/hub-v2/src/index.ts
+LOG_LEVEL=debug DEBUG='cove:*' bun run apps/hub/src/index.ts
 ```
 
 ## Programmatic API
@@ -213,7 +213,7 @@ defaultLogger.addDestination(new MyCustomDestination());
 
 ### Hub V2
 
-The logger is automatically configured in `apps/hub-v2/src/index.ts` with:
+The logger is automatically configured in `apps/hub/src/index.ts` with:
 
 - Console destination
 - Rolling file destination (`./logs/hub.log`)

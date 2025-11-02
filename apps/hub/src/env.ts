@@ -13,7 +13,7 @@ export const env = createEnv({
     PORT: process.env.PORT,
   },
   server: {
-    DB_PATH: z.string().default('./data/hub-v2.db'),
+    DB_PATH: z.string().default('./data/hub.db'),
     DEBUG: z.string().default('cove:*'),
     HUB_ID: z.string().optional(),
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),

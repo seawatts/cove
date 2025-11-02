@@ -15,10 +15,10 @@ import type { DeviceDescriptor, EntityDescriptor } from '@cove/drivers';
 import { debug, error, info, warn } from '@cove/logger';
 import { and, eq, isNull } from 'drizzle-orm';
 
-const logDebug = debug('cove:hub-v2:registry');
-const logInfo = info('cove:hub-v2:registry');
-const logWarn = warn('cove:hub-v2:registry');
-const logError = error('cove:hub-v2:registry');
+const logDebug = debug('cove:hub:registry');
+const logInfo = info('cove:hub:registry');
+const logWarn = warn('cove:hub:registry');
+const logError = error('cove:hub:registry');
 
 export interface RegistryOptions {
   db: DatabaseClient;

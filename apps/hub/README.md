@@ -56,7 +56,7 @@ bun run build
 
 Environment variables:
 
-- `DB_PATH`: Database file path (default: `./data/hub-v2.db`)
+- `DB_PATH`: Database file path (default: `./data/hub.db`)
 - `HUB_ID`: Unique hub identifier (auto-generated if not set)
 - `PORT`: HTTP server port (default: 3200)
 - `NODE_ENV`: Environment (development/production/test)
