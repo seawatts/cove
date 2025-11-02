@@ -17,6 +17,7 @@ next-env.d.ts
 .nitro/
 .output/
 
+.tmp/
 # expo
 .expo/
 expo-env.d.ts
