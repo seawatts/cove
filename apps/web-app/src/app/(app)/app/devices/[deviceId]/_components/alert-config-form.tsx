@@ -315,7 +315,11 @@ export function AlertConfigForm({
                       placeholder="1000"
                       type="number"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const value = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(value) ? undefined : value);
+                      }}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -338,7 +342,11 @@ export function AlertConfigForm({
                       placeholder="400"
                       type="number"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const value = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(value) ? undefined : value);
+                      }}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormDescription>Alert when below this value</FormDescription>
@@ -358,7 +366,11 @@ export function AlertConfigForm({
                       placeholder="1000"
                       type="number"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const value = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(value) ? undefined : value);
+                      }}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormDescription>Alert when above this value</FormDescription>
@@ -382,7 +394,11 @@ export function AlertConfigForm({
                       placeholder="10"
                       type="number"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const value = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(value) ? undefined : value);
+                      }}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormDescription>Change per second</FormDescription>
@@ -402,7 +418,11 @@ export function AlertConfigForm({
                       placeholder="60000"
                       type="number"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const value = e.target.valueAsNumber;
+                        field.onChange(Number.isNaN(value) ? undefined : value);
+                      }}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormDescription>Time period to measure rate</FormDescription>

@@ -1,7 +1,7 @@
 'use client';
 
 import { api } from '@cove/api/react';
-import type { AlertConfig } from '@cove/types/alert';
+import type { AlertConfig, AlertSeverity, AlertType } from '@cove/types/alert';
 import {
   getAlertSeverityColor,
   getAlertSeverityLabel,
@@ -111,7 +111,10 @@ export function EntitySettingsDialog({
 
   // Fetch alert configs
   const { data: alertConfigs = [], isLoading: isLoadingAlerts } =
-    hubApi.alerts.list.useQuery({ entityId: entity.entityId }, { enabled: open });
+    hubApi.alerts.list.useQuery(
+      { entityId: entity.entityId },
+      { enabled: open },
+    );
 
   // Alert mutations
   const createAlertMutation = hubApi.alerts.create.useMutation({
@@ -405,34 +408,42 @@ export function EntitySettingsDialog({
                     <div className="space-y-3">
                       {alertConfigs.map((alert) => (
                         <div
-                          key={alert.id}
                           className="border rounded-lg p-4 space-y-2"
+                          key={alert.id}
                         >
                           <div className="flex items-start justify-between">
                             <div className="space-y-1 flex-1">
                               <div className="flex items-center gap-2">
-                                <Text className="font-medium">{alert.name}</Text>
+                                <Text className="font-medium">
+                                  {alert.name}
+                                </Text>
                                 <Badge
                                   style={{
                                     backgroundColor: getAlertSeverityColor(
-                                      alert.severity,
+                                      alert.severity as AlertSeverity,
                                     ),
                                   }}
                                 >
-                                  {getAlertSeverityLabel(alert.severity)}
+                                  {getAlertSeverityLabel(
+                                    alert.severity as AlertSeverity,
+                                  )}
                                 </Badge>
                                 {!alert.enabled && (
                                   <Badge variant="outline">Disabled</Badge>
                                 )}
                               </div>
                               <Text className="text-sm text-muted-foreground">
-                                {getAlertTypeLabel(alert.alertType)} • Field:{' '}
-                                {alert.field}
+                                {getAlertTypeLabel(
+                                  alert.alertType as AlertType,
+                                )}{' '}
+                                • Field: {alert.field}
                               </Text>
                             </div>
                             <div className="flex gap-1">
                               <Button
-                                onClick={() => handleEditAlert(alert)}
+                                onClick={() =>
+                                  handleEditAlert(alert as AlertConfig)
+                                }
                                 size="sm"
                                 variant="ghost"
                               >
@@ -474,7 +485,8 @@ export function EntitySettingsDialog({
                               <Text className="text-muted-foreground">
                                 Trigger when {alert.field} changes by &gt;{' '}
                                 {alert.rateThreshold} per{' '}
-                                {alert.rateWindow ? alert.rateWindow / 1000 : 0}s
+                                {alert.rateWindow ? alert.rateWindow / 1000 : 0}
+                                s
                               </Text>
                             )}
                           </div>

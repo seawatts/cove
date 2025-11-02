@@ -76,6 +76,10 @@ export const telemetryRouter = createTRPCRouter({
 
       const db = ctx.daemon.getDb();
 
+      if (!db) {
+        throw new Error('Database not available');
+      }
+
       // Get distinct fields for this entity from telemetry table
       const result = await db
         .selectDistinct({ field: telemetry.field })
