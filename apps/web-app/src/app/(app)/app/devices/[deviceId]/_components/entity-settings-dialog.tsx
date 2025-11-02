@@ -1,6 +1,13 @@
 'use client';
 
 import { api } from '@cove/api/react';
+import type { AlertConfig } from '@cove/types/alert';
+import {
+  getAlertSeverityColor,
+  getAlertSeverityLabel,
+  getAlertTypeLabel,
+} from '@cove/types/alert';
+import { Badge } from '@cove/ui/badge';
 import { Button } from '@cove/ui/button';
 import { Text } from '@cove/ui/custom/typography';
 import {
@@ -12,6 +19,8 @@ import {
 } from '@cove/ui/dialog';
 import { Input } from '@cove/ui/input';
 import { Label } from '@cove/ui/label';
+import { ScrollArea } from '@cove/ui/scroll-area';
+import { Separator } from '@cove/ui/separator';
 import {
   Table,
   TableBody,
@@ -22,8 +31,11 @@ import {
 } from '@cove/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
 import { getEntityDisplayName } from '@cove/utils';
+import { Edit, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { hubApi } from '~/lib/hub-trpc/client';
+import { AlertConfigForm } from './alert-config-form';
 
 interface EntitySettingsDialogProps {
   entity: {
@@ -51,6 +63,13 @@ export function EntitySettingsDialog({
 }: EntitySettingsDialogProps) {
   const [displayName, setDisplayName] = useState(entity.displayName || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [editingAlert, setEditingAlert] = useState<AlertConfig | null>(null);
+  const [showAlertForm, setShowAlertForm] = useState(false);
+
+  const utils = hubApi.useUtils();
+
+  // Get home ID from hub
+  const { data: home } = hubApi.home.get.useQuery();
 
   const updateEntity = api.entity.update.useMutation({
     onError: (error) => {
@@ -71,9 +90,104 @@ export function EntitySettingsDialog({
     });
   };
 
+  // Get available telemetry fields from entity capabilities
+  const availableFields = Array.from(
+    new Set(
+      entity.capabilities
+        .flatMap((cap) => Object.keys(cap))
+        .filter((key) => !['type', 'action', 'command'].includes(key)),
+    ),
+  );
+
+  // Fetch alert configs
+  const { data: alertConfigs = [], isLoading: isLoadingAlerts } =
+    hubApi.alerts.list.useQuery({ entityId: entity.entityId }, { enabled: open });
+
+  // Alert mutations
+  const createAlertMutation = hubApi.alerts.create.useMutation({
+    onError: (error) => {
+      toast.error('Failed to create alert', {
+        description: error.message,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Alert created successfully');
+      utils.alerts.list.invalidate({ entityId: entity.entityId });
+      setShowAlertForm(false);
+      setEditingAlert(null);
+    },
+  });
+
+  const updateAlertMutation = hubApi.alerts.update.useMutation({
+    onError: (error) => {
+      toast.error('Failed to update alert', {
+        description: error.message,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Alert updated successfully');
+      utils.alerts.list.invalidate({ entityId: entity.entityId });
+      setShowAlertForm(false);
+      setEditingAlert(null);
+    },
+  });
+
+  const deleteAlertMutation = hubApi.alerts.delete.useMutation({
+    onError: (error) => {
+      toast.error('Failed to delete alert', {
+        description: error.message,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Alert deleted successfully');
+      utils.alerts.list.invalidate({ entityId: entity.entityId });
+    },
+  });
+
+  const handleAlertSubmit = async (data: Partial<AlertConfig>) => {
+    if (!home?.id) {
+      toast.error('Home ID not available. Please try again.');
+      return;
+    }
+
+    if (editingAlert) {
+      await updateAlertMutation.mutateAsync({
+        id: editingAlert.id,
+        ...data,
+      });
+    } else {
+      await createAlertMutation.mutateAsync({
+        entityId: entity.entityId,
+        homeId: home.id,
+        ...data,
+      } as AlertConfig);
+    }
+  };
+
+  const handleDeleteAlert = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this alert?')) {
+      await deleteAlertMutation.mutateAsync({ id });
+    }
+  };
+
+  const handleEditAlert = (alert: AlertConfig) => {
+    setEditingAlert(alert);
+    setShowAlertForm(true);
+  };
+
+  const handleNewAlert = () => {
+    setEditingAlert(null);
+    setShowAlertForm(true);
+  };
+
+  const handleCancelAlert = () => {
+    setShowAlertForm(false);
+    setEditingAlert(null);
+  };
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Entity Settings</DialogTitle>
           <DialogDescription>
@@ -82,9 +196,17 @@ export function EntitySettingsDialog({
         </DialogHeader>
 
         <Tabs className="w-full" defaultValue="display">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="display">Display</TabsTrigger>
             <TabsTrigger value="config">Configuration</TabsTrigger>
+            <TabsTrigger value="alerts">
+              Alerts
+              {alertConfigs.length > 0 && (
+                <Badge className="ml-2" variant="secondary">
+                  {alertConfigs.length}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="view">View Type</TabsTrigger>
           </TabsList>
 
@@ -197,6 +319,141 @@ export function EntitySettingsDialog({
                 </TableBody>
               </Table>
             </div>
+          </TabsContent>
+
+          <TabsContent className="space-y-4" value="alerts">
+            {showAlertForm ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Text className="font-medium">
+                    {editingAlert ? 'Edit Alert' : 'New Alert'}
+                  </Text>
+                  <Button onClick={handleCancelAlert} size="sm" variant="ghost">
+                    Cancel
+                  </Button>
+                </div>
+                <AlertConfigForm
+                  availableFields={availableFields}
+                  entityId={entity.entityId}
+                  homeId={home?.id || ''}
+                  initialData={editingAlert || undefined}
+                  onCancel={handleCancelAlert}
+                  onSubmit={handleAlertSubmit}
+                />
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm text-muted-foreground">
+                    Configure alerts to get notified when values cross
+                    thresholds
+                  </Text>
+                  <Button onClick={handleNewAlert} size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Alert
+                  </Button>
+                </div>
+
+                <ScrollArea className="h-[400px] pr-4">
+                  {isLoadingAlerts ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Text className="text-muted-foreground">
+                        Loading alerts...
+                      </Text>
+                    </div>
+                  ) : alertConfigs.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                      <Text className="text-muted-foreground">
+                        No alerts configured yet
+                      </Text>
+                      <Text className="text-xs text-muted-foreground mt-2">
+                        Create an alert to monitor sensor values
+                      </Text>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {alertConfigs.map((alert) => (
+                        <div
+                          key={alert.id}
+                          className="border rounded-lg p-4 space-y-2"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1 flex-1">
+                              <div className="flex items-center gap-2">
+                                <Text className="font-medium">{alert.name}</Text>
+                                <Badge
+                                  style={{
+                                    backgroundColor: getAlertSeverityColor(
+                                      alert.severity,
+                                    ),
+                                  }}
+                                >
+                                  {getAlertSeverityLabel(alert.severity)}
+                                </Badge>
+                                {!alert.enabled && (
+                                  <Badge variant="outline">Disabled</Badge>
+                                )}
+                              </div>
+                              <Text className="text-sm text-muted-foreground">
+                                {getAlertTypeLabel(alert.alertType)} • Field:{' '}
+                                {alert.field}
+                              </Text>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button
+                                onClick={() => handleEditAlert(alert)}
+                                size="sm"
+                                variant="ghost"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                onClick={() => handleDeleteAlert(alert.id)}
+                                size="sm"
+                                variant="ghost"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Show alert configuration details */}
+                          <Separator />
+                          <div className="text-sm">
+                            {alert.alertType === 'threshold' && (
+                              <Text className="text-muted-foreground">
+                                Trigger when {alert.field}{' '}
+                                {alert.thresholdOperator === 'gt'
+                                  ? '>'
+                                  : alert.thresholdOperator === 'lt'
+                                    ? '<'
+                                    : alert.thresholdOperator === 'gte'
+                                      ? '≥'
+                                      : '≤'}{' '}
+                                {alert.thresholdValue}
+                              </Text>
+                            )}
+                            {alert.alertType === 'range' && (
+                              <Text className="text-muted-foreground">
+                                Trigger when {alert.field} outside{' '}
+                                {alert.rangeMin} - {alert.rangeMax}
+                              </Text>
+                            )}
+                            {alert.alertType === 'rate_of_change' && (
+                              <Text className="text-muted-foreground">
+                                Trigger when {alert.field} changes by &gt;{' '}
+                                {alert.rateThreshold} per{' '}
+                                {alert.rateWindow ? alert.rateWindow / 1000 : 0}s
+                              </Text>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="view">
