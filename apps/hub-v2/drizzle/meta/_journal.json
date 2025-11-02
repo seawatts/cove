@@ -28,6 +28,13 @@
       "tag": "0003_brief_runaways",
       "version": "6",
       "when": 1762065897710
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1762073083738,
+      "tag": "0004_many_chameleon",
+      "breakpoints": true
     }
   ],
   "version": "7"

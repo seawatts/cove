@@ -5,6 +5,7 @@
 
 import { createId } from '@cove/id';
 import { debug, error, info, warn } from '@cove/logger';
+import { AlertService } from './core/alert-service';
 import { CommandRouter } from './core/command-router';
 import {
   type Driver,
@@ -40,6 +41,7 @@ export class HubDaemon {
   private db: DatabaseClient | null = null;
   private eventBus: EventBus | null = null;
   private registry: Registry | null = null;
+  private alertService: AlertService | null = null;
   private stateStore: StateStore | null = null;
   private commandRouter: CommandRouter | null = null;
   private driverRegistry: DriverRegistry | null = null;
@@ -75,7 +77,16 @@ export class HubDaemon {
       // Initialize core components
       this.eventBus = new EventBus();
       this.registry = new Registry({ db: this.db });
+
+      // Initialize alert service
+      this.alertService = new AlertService({
+        db: this.db,
+        eventBus: this.eventBus,
+      });
+      await this.alertService.initialize();
+
       this.stateStore = new StateStore({
+        alertService: this.alertService,
         db: this.db,
         eventBus: this.eventBus,
         registry: this.registry,
@@ -618,6 +629,7 @@ export class HubDaemon {
   getStatus() {
     return {
       components: {
+        alertService: !!this.alertService,
         commandRouter: !!this.commandRouter,
         database: !!this.db,
         driverRegistry: !!this.driverRegistry,
@@ -743,5 +755,52 @@ export class HubDaemon {
 
   getStateStore() {
     return this.stateStore;
+  }
+
+  getAlertService() {
+    return this.alertService;
+  }
+
+  // Alert management methods
+  async getAlertConfigs(entityId: string, field?: string) {
+    if (!this.alertService) {
+      throw new Error('Alert service not initialized');
+    }
+    return await this.alertService.getAlertConfigs(entityId, field);
+  }
+
+  async getAlertHistory(
+    entityId: string,
+    options: {
+      limit?: number;
+      unacknowledged?: boolean;
+      unresolved?: boolean;
+    } = {},
+  ) {
+    if (!this.alertService) {
+      throw new Error('Alert service not initialized');
+    }
+    return await this.alertService.getAlertHistory(entityId, options);
+  }
+
+  async getActiveAlerts(homeId?: string) {
+    if (!this.alertService) {
+      throw new Error('Alert service not initialized');
+    }
+    return await this.alertService.getActiveAlerts(homeId);
+  }
+
+  async acknowledgeAlert(alertId: string) {
+    if (!this.alertService) {
+      throw new Error('Alert service not initialized');
+    }
+    return await this.alertService.acknowledgeAlert(alertId);
+  }
+
+  async refreshAlertConfigs() {
+    if (!this.alertService) {
+      throw new Error('Alert service not initialized');
+    }
+    return await this.alertService.refreshConfigs();
   }
 }

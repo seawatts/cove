@@ -18,3 +18,6 @@ export * from './events';
 
 // Widget types (UI-specific, not in database)
 export * from './widget';
+
+// Alert types
+export * from './alert';
