@@ -60,7 +60,7 @@ export interface AlertNotification {
 }
 
 /**
- * Helper to get severity color for UI
+ * Helper to get severity color for UI (CSS variable format)
  */
 export function getAlertSeverityColor(severity: AlertSeverity): string {
   switch (severity) {
@@ -72,6 +72,80 @@ export function getAlertSeverityColor(severity: AlertSeverity): string {
       return 'hsl(var(--destructive))'; // Red
     default:
       return 'hsl(var(--muted))';
+  }
+}
+
+/**
+ * Helper to get resolved severity color value for chart libraries
+ * This resolves CSS variables to actual color values that libraries like Recharts can render
+ * by creating a temporary element and reading its computed color
+ */
+export function getAlertSeverityColorValue(severity: AlertSeverity): string {
+  // Only resolve in browser environment
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    // Fallback colors for SSR
+    switch (severity) {
+      case 'info':
+        return 'rgb(59, 130, 246)'; // Blue
+      case 'warning':
+        return 'rgb(245, 158, 11)'; // Orange
+      case 'critical':
+        return 'rgb(239, 68, 68)'; // Red
+      default:
+        return 'rgb(107, 114, 128)'; // Gray
+    }
+  }
+
+  // Create a temporary element to force color computation
+  const tempEl = document.createElement('div');
+  tempEl.style.position = 'absolute';
+  tempEl.style.visibility = 'hidden';
+  tempEl.style.pointerEvents = 'none';
+
+  // Map severity to CSS variable
+  let colorVar: string;
+  switch (severity) {
+    case 'info':
+      colorVar = 'var(--chart-3)';
+      break;
+    case 'warning':
+      colorVar = 'var(--chart-5)';
+      break;
+    case 'critical':
+      colorVar = 'var(--destructive)';
+      break;
+    default:
+      colorVar = 'var(--muted)';
+  }
+
+  tempEl.style.color = colorVar;
+  document.body.appendChild(tempEl);
+
+  // Get the computed color (browser converts to rgb/rgba)
+  const computedColor = getComputedStyle(tempEl).color;
+
+  // Clean up
+  document.body.removeChild(tempEl);
+
+  // Return computed color or fallback
+  if (
+    computedColor &&
+    computedColor !== 'rgba(0, 0, 0, 0)' &&
+    computedColor !== 'transparent'
+  ) {
+    return computedColor;
+  }
+
+  // Fallback colors
+  switch (severity) {
+    case 'info':
+      return 'rgb(59, 130, 246)';
+    case 'warning':
+      return 'rgb(245, 158, 11)';
+    case 'critical':
+      return 'rgb(239, 68, 68)';
+    default:
+      return 'rgb(107, 114, 128)';
   }
 }
 

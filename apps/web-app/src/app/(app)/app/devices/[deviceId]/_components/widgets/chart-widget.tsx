@@ -1,6 +1,6 @@
 'use client';
 
-import { getAlertSeverityColor } from '@cove/types';
+import { getAlertSeverityColorValue } from '@cove/types';
 import type { WidgetProps } from '@cove/types/widget';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@cove/ui/chart';
@@ -525,7 +525,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
             {/* Alert threshold lines and shaded regions */}
             {alertConfigs.map((config) => {
               if (config.alertType === 'threshold' && config.thresholdValue) {
-                const color = getAlertSeverityColor(
+                const color = getAlertSeverityColorValue(
                   config.severity as 'info' | 'warning' | 'critical',
                 );
                 return (
@@ -550,7 +550,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
                 config.rangeMin !== null &&
                 config.rangeMax !== null
               ) {
-                const color = getAlertSeverityColor(
+                const color = getAlertSeverityColorValue(
                   config.severity as 'info' | 'warning' | 'critical',
                 );
                 return (
@@ -621,7 +621,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
                 });
 
                 if (alertEvent) {
-                  const color = getAlertSeverityColor(
+                  const color = getAlertSeverityColorValue(
                     alertEvent.severity as 'info' | 'warning' | 'critical',
                   );
                   return (
