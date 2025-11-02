@@ -13,15 +13,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@cove/ui/dropdown-menu';
-import {
-  detectWidgetType,
-  getAvailableWidgetTypes,
-} from '@cove/utils/detect-widget-type';
+import { getAvailableWidgetTypes } from '@cove/utils/detect-widget-type';
 import { formatSensorValue } from '@cove/utils/format-sensor-value';
 import { useQueryState } from 'nuqs';
 // Lazy load widget components to reduce bundle size
 import { lazy, Suspense, useState } from 'react';
 import { hubApi } from '~/lib/hub-trpc';
+import { EntitySettingsDialog } from './entity-settings-dialog';
 
 const ChartWidget = lazy(() =>
   import('./widgets/chart-widget').then((m) => ({ default: m.ChartWidget })),
@@ -41,20 +39,38 @@ const TableWidget = lazy(() =>
   import('./widgets/table-widget').then((m) => ({ default: m.TableWidget })),
 );
 
+interface Entity {
+  entityId: string;
+  key: string;
+  kind: string;
+  deviceClass?: string | null;
+  displayName?: string | null;
+  name?: string | null;
+  capabilities: Array<Record<string, unknown>>;
+  currentState?: {
+    state: string;
+    attrs?: Record<string, unknown>;
+    updatedAt: Date;
+  } | null;
+}
+
 interface SensorWidgetProps {
   deviceId: string;
   sensor: SensorMetadata;
   mode?: 'full' | 'embedded';
+  entity?: Entity;
 }
 
 function WidgetTypeSelector({
   currentType,
   availableTypes,
   onChange,
+  onEntitySettingsClick,
 }: {
   currentType: WidgetType;
   availableTypes: WidgetType[];
   onChange: (type: WidgetType) => void;
+  onEntitySettingsClick?: () => void;
 }) {
   const typeLabels: Record<WidgetType, string> = {
     [WidgetType.Chart]: 'Chart',
@@ -65,28 +81,31 @@ function WidgetTypeSelector({
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className="absolute top-2 right-2 z-10"
-          size="sm"
-          variant="ghost"
-        >
+    <div className="absolute top-2 right-2 z-10 flex gap-1">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="sm" variant="ghost">
+            <Icons.LayoutGrid size="sm" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {availableTypes.map((type) => (
+            <DropdownMenuItem
+              className={type === currentType ? 'bg-accent' : ''}
+              key={type}
+              onClick={() => onChange(type)}
+            >
+              {typeLabels[type]}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {onEntitySettingsClick && (
+        <Button onClick={onEntitySettingsClick} size="sm" variant="ghost">
           <Icons.Settings size="sm" />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {availableTypes.map((type) => (
-          <DropdownMenuItem
-            className={type === currentType ? 'bg-accent' : ''}
-            key={type}
-            onClick={() => onChange(type)}
-          >
-            {typeLabels[type]}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+    </div>
   );
 }
 
@@ -94,11 +113,14 @@ export function SensorWidget({
   deviceId,
   sensor,
   mode = 'full',
+  entity,
 }: SensorWidgetProps) {
   const [timeRange] = useQueryState('timeRange', {
     defaultValue: '24h',
     parse: (value) => (value as '1h' | '24h' | '7d' | '30d' | '90d') || '24h',
   });
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const { data: aggregatedData = [] } = hubApi.telemetry.getAggregated.useQuery(
     {
@@ -108,9 +130,7 @@ export function SensorWidget({
   );
 
   // Use local state for widget preferences instead of backend storage
-  const [widgetType, setWidgetType] = useState<WidgetType>(
-    detectWidgetType(sensor.type),
-  );
+  const [widgetType, setWidgetType] = useState<WidgetType>(WidgetType.Chart);
 
   // Get available widget types for this sensor
   const availableTypes = getAvailableWidgetTypes(sensor.key, sensor.type);
@@ -157,26 +177,41 @@ export function SensorWidget({
   }
 
   return (
-    <div className="relative">
-      <WidgetTypeSelector
-        availableTypes={availableTypes}
-        currentType={widgetType}
-        onChange={handleWidgetTypeChange}
-      />
+    <>
+      <div className="relative">
+        <WidgetTypeSelector
+          availableTypes={availableTypes}
+          currentType={widgetType}
+          onChange={handleWidgetTypeChange}
+          onEntitySettingsClick={
+            entity ? () => setIsSettingsOpen(true) : undefined
+          }
+        />
 
-      <Suspense
-        fallback={
-          <div className="h-[250px] animate-pulse bg-muted rounded-lg" />
-        }
-      >
-        {widgetType === WidgetType.Chart && <ChartWidget {...widgetProps} />}
-        {widgetType === WidgetType.ValueCard && (
-          <ValueCardWidget {...widgetProps} />
-        )}
-        {widgetType === WidgetType.Gauge && <GaugeWidget {...widgetProps} />}
-        {widgetType === WidgetType.Radial && <RadialWidget {...widgetProps} />}
-        {widgetType === WidgetType.Table && <TableWidget {...widgetProps} />}
-      </Suspense>
-    </div>
+        <Suspense
+          fallback={
+            <div className="h-[250px] animate-pulse bg-muted rounded-lg" />
+          }
+        >
+          {widgetType === WidgetType.Chart && <ChartWidget {...widgetProps} />}
+          {widgetType === WidgetType.ValueCard && (
+            <ValueCardWidget {...widgetProps} />
+          )}
+          {widgetType === WidgetType.Gauge && <GaugeWidget {...widgetProps} />}
+          {widgetType === WidgetType.Radial && (
+            <RadialWidget {...widgetProps} />
+          )}
+          {widgetType === WidgetType.Table && <TableWidget {...widgetProps} />}
+        </Suspense>
+      </div>
+
+      {entity && (
+        <EntitySettingsDialog
+          entity={entity}
+          onOpenChange={setIsSettingsOpen}
+          open={isSettingsOpen}
+        />
+      )}
+    </>
   );
 }

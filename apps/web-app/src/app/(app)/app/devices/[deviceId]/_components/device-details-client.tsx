@@ -48,7 +48,7 @@ export function DeviceDetailsClient({
   });
 
   // Convert entities to sensor metadata for widgets
-  const sensors: SensorMetadata[] = entities
+  const sensors = entities
     .filter((entity) => {
       // Only include actual sensor entities, not controllable entities
       if (entity.kind !== 'sensor' && entity.kind !== 'binary_sensor') {
@@ -82,26 +82,30 @@ export function DeviceDetailsClient({
       const unit = numericCapability?.unit;
 
       return {
-        currentValue,
-        entityId: entity.entityId,
-        key: entity.key,
-        lastChanged: entity.currentState?.updatedAt || new Date(),
-        name: getEntityDisplayName({
-          deviceClass: entity.deviceClass,
-          displayName: entity.displayName,
+        entity,
+        sensorMetadata: {
+          currentValue,
+          entityId: entity.entityId,
           key: entity.key,
-          name: entity.name,
-        }),
-        type: isBoolean ? 'binary' : 'continuous', // Default to continuous for all non-binary sensors
-        unit,
+          lastChanged: entity.currentState?.updatedAt || new Date(),
+          name: getEntityDisplayName({
+            deviceClass: entity.deviceClass,
+            displayName: entity.displayName,
+            key: entity.key,
+            name: entity.name,
+          }),
+          type: isBoolean ? 'binary' : 'continuous', // Default to continuous for all non-binary sensors
+          unit,
+        } as SensorMetadata,
       };
     });
 
   // Filter sensors based on entity filter
-  const filteredSensors = sensors.filter((sensor) => {
+  const filteredSensors = sensors.filter((item) => {
     if (entityFilter === 'all') return true;
     if (entityFilter === 'sensor') return true;
-    if (entityFilter === 'binary_sensor') return sensor.type === 'binary';
+    if (entityFilter === 'binary_sensor')
+      return item.sensorMetadata.type === 'binary';
     return false;
   });
 
@@ -137,8 +141,8 @@ export function DeviceDetailsClient({
         />
       )}
 
-      {/* Sensor widgets - show in both 'all' and 'sensors' views */}
-      {isSensorEntity && filteredSensors.length > 0 && (
+      {/* Sensor widgets - only show when NOT in control entities view (to avoid duplicates) */}
+      {!isControlEntity && isSensorEntity && filteredSensors.length > 0 && (
         <div>
           <div className="mb-4">
             <Text className="text-lg font-semibold">Sensor Data</Text>
@@ -148,12 +152,13 @@ export function DeviceDetailsClient({
             </Text>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredSensors.map((sensor) => (
+            {filteredSensors.map((item) => (
               <SensorWidget
                 deviceId={deviceId}
-                key={sensor.key}
+                entity={item.entity}
+                key={item.sensorMetadata.key}
                 mode="full"
-                sensor={sensor}
+                sensor={item.sensorMetadata}
               />
             ))}
           </div>

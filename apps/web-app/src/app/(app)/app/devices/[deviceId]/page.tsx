@@ -63,6 +63,7 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
       displayName: entity.displayName ?? null,
       entityId: entity.id,
       key: entity.key ?? '',
+      kind: entity.kind,
       name: entity.name ?? null,
     };
   };
@@ -85,7 +86,7 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
           configUrl: undefined,
           hostname: undefined,
           hwVersion: undefined,
-          ipAddress: device.ip,
+          ipAddress: device.ip ?? undefined,
           lastSeen: device.lastSeen ?? undefined,
           macAddress: undefined,
           manufacturer: device.vendor ?? undefined,
@@ -95,7 +96,12 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
           online: !!device.lastSeen,
           port: undefined,
           protocol: device.protocol || 'unknown',
-          room: device.room ?? undefined,
+          room: device.room
+            ? {
+                name: device.room.name,
+                roomId: device.room.id,
+              }
+            : undefined,
           swVersion: undefined,
           type: undefined,
         }}

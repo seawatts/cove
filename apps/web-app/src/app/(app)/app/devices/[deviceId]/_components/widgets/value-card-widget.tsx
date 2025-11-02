@@ -233,15 +233,17 @@ export function ValueCardWidget({ sensor, config }: WidgetProps) {
       </CardHeader>
       <CardContent className="pt-0 pb-6">
         {/* Last Updated - Very Subtle */}
-        {(latestState?.updatedAt || sensor.lastChanged) && (
-          <div className="text-xs text-muted-foreground/50 text-center">
-            Last updated:{' '}
-            {format(
-              latestState?.updatedAt || new Date(sensor.lastChanged),
-              'MMM dd, HH:mm',
-            )}
-          </div>
-        )}
+        {(() => {
+          const updateTime =
+            latestState?.updatedAt ||
+            (sensor.lastChanged ? new Date(sensor.lastChanged) : undefined);
+          if (!updateTime) return null;
+          return (
+            <div className="text-xs text-muted-foreground/50 text-center">
+              Last updated: {format(updateTime, 'MMM dd, HH:mm')}
+            </div>
+          );
+        })()}
 
         {/* Trend Indicator */}
         {config.showTrend && trend && (

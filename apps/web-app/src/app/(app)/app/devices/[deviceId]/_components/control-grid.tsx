@@ -179,6 +179,7 @@ export function ControlGrid({
             {entityGroups.sensors.map((entity) => (
               <SensorWidget
                 deviceId={deviceId}
+                entity={entity}
                 key={entity.entityId}
                 mode="full"
                 sensor={entityToSensorMetadata(entity)}

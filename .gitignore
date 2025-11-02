@@ -61,4 +61,4 @@ apps/cli/certificates
 *.db
 
 # log files
-*.log
+*.logapps/hub-v2/logs/*.log
