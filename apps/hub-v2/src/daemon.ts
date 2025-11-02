@@ -4,7 +4,7 @@
  */
 
 import { createId } from '@cove/id';
-import { debug } from '@cove/logger';
+import { debug, error, info, warn } from '@cove/logger';
 import { CommandRouter } from './core/command-router';
 import {
   type Driver,
@@ -19,7 +19,10 @@ import { type DatabaseClient, DatabaseWrapper } from './db';
 import { getDriverState as getESPHomeDriverState } from './drivers/esphome/state';
 import { env } from './env';
 
-const log = debug('cove:hub-v2:daemon');
+const logDebug = debug('cove:hub-v2:daemon');
+const logInfo = info('cove:hub-v2:daemon');
+const logWarn = warn('cove:hub-v2:daemon');
+const logError = error('cove:hub-v2:daemon');
 
 export interface HubDaemonOptions {
   dbPath?: string;
@@ -58,16 +61,16 @@ export class HubDaemon {
    * Initialize all components
    */
   async initialize() {
-    log('Initializing Hub V2 daemon');
-    log(`Hub ID: ${this.hubId}`);
-    log(`Database: ${this.dbPath}`);
+    logInfo('Initializing Hub V2 daemon');
+    logDebug(`Hub ID: ${this.hubId}`);
+    logDebug(`Database: ${this.dbPath}`);
 
     try {
       // Initialize database
       const dbWrapper = new DatabaseWrapper(this.dbPath);
       await dbWrapper.initialize();
       this.db = dbWrapper.getClient();
-      log('Database initialized');
+      logInfo('Database initialized');
 
       // Initialize core components
       this.eventBus = new EventBus();
@@ -75,6 +78,7 @@ export class HubDaemon {
       this.stateStore = new StateStore({
         db: this.db,
         eventBus: this.eventBus,
+        registry: this.registry,
       });
 
       // Initialize driver registry
@@ -82,7 +86,7 @@ export class HubDaemon {
 
       // Auto-load all drivers
       await DriverLoader.loadDrivers(this.driverRegistry);
-      log('All drivers loaded and initialized');
+      logInfo('All drivers loaded and initialized');
 
       // Initialize command router
       const driverMap = new Map<string, Driver>();
@@ -102,10 +106,10 @@ export class HubDaemon {
       // Set up event handlers
       this.setupEventHandlers();
 
-      log('Hub V2 daemon initialized');
-    } catch (error) {
-      log('Failed to initialize daemon:', error);
-      throw error;
+      logInfo('Hub V2 daemon initialized');
+    } catch (err) {
+      logError('Failed to initialize daemon:', err);
+      throw err;
     }
   }
 
@@ -129,8 +133,8 @@ export class HubDaemon {
             stateEvent.entityId,
             stateEvent.state as Record<string, unknown>,
           )
-          .catch((error) => {
-            log('Failed to write entity state:', error);
+          .catch((err) => {
+            logError('Failed to write entity state:', err);
           });
       }
     });
@@ -156,28 +160,32 @@ export class HubDaemon {
           ?.getEntity(telemetryEvent.entityId)
           .then((entity) => {
             if (entity) {
-              this.stateStore?.appendTelemetry(
-                telemetryEvent.entityId,
-                entity.homeId,
-                telemetryEvent.field,
-                telemetryEvent.value as string | number | boolean,
-                telemetryEvent.unit,
-              );
+              this.stateStore
+                ?.appendTelemetry(
+                  telemetryEvent.entityId,
+                  entity.homeId,
+                  telemetryEvent.field,
+                  telemetryEvent.value as string | number | boolean,
+                  telemetryEvent.unit,
+                )
+                .catch((err: unknown) => {
+                  logError('Failed to append telemetry:', err);
+                });
             } else {
-              log(
+              logWarn(
                 `Cannot append telemetry: entity ${telemetryEvent.entityId} not found`,
               );
             }
           })
-          .catch((error: unknown) => {
-            log('Failed to append telemetry:', error);
+          .catch((err: unknown) => {
+            logError('Failed to append telemetry:', err);
           });
       } else {
-        log('Received invalid telemetry event:', event);
+        logWarn('Received invalid telemetry event:', event);
       }
     });
 
-    log('Event handlers set up');
+    logDebug('Event handlers set up');
   }
 
   /**
@@ -185,11 +193,11 @@ export class HubDaemon {
    */
   async start() {
     if (this.running) {
-      log('Daemon already running');
+      logDebug('Daemon already running');
       return;
     }
 
-    log('Starting Hub V2 daemon');
+    logInfo('Starting Hub V2 daemon');
 
     try {
       // Initialize if not already done
@@ -212,10 +220,10 @@ export class HubDaemon {
       this.startStateWriterLoop();
 
       this.running = true;
-      log('Hub V2 daemon started');
-    } catch (error) {
-      log('Failed to start daemon:', error);
-      throw error;
+      logInfo('Hub V2 daemon started');
+    } catch (err) {
+      logError('Failed to start daemon:', err);
+      throw err;
     }
   }
 
@@ -224,11 +232,11 @@ export class HubDaemon {
    */
   async stop() {
     if (!this.running) {
-      log('Daemon not running');
+      logDebug('Daemon not running');
       return;
     }
 
-    log('Stopping Hub V2 daemon');
+    logInfo('Stopping Hub V2 daemon');
 
     try {
       // Stop worker loops
@@ -249,8 +257,8 @@ export class HubDaemon {
       for (const [entityId, unsubscribe] of this.activeSubscriptions) {
         try {
           unsubscribe();
-        } catch (error) {
-          log(`Error unsubscribing from ${entityId}:`, error);
+        } catch (err) {
+          logWarn(`Error unsubscribing from ${entityId}:`, err);
         }
       }
       this.activeSubscriptions.clear();
@@ -258,14 +266,14 @@ export class HubDaemon {
       // Shutdown all drivers
       if (this.driverRegistry?.shutdownAll) {
         await this.driverRegistry.shutdownAll();
-        log('All drivers shut down');
+        logInfo('All drivers shut down');
       }
 
       this.running = false;
-      log('Hub V2 daemon stopped');
-    } catch (error) {
-      log('Error stopping daemon:', error);
-      throw error;
+      logInfo('Hub V2 daemon stopped');
+    } catch (err) {
+      logError('Error stopping daemon:', err);
+      throw err;
     }
   }
 
@@ -275,7 +283,7 @@ export class HubDaemon {
   private startDiscoveryLoop() {
     if (this.discoveryInterval) return;
 
-    log('Starting discovery loop');
+    logInfo('Starting discovery loop');
 
     // Run discovery immediately, then set up interval for subsequent runs
     this.runDiscovery();
@@ -298,7 +306,7 @@ export class HubDaemon {
         const protocol =
           protocols.find((p) => this.driverRegistry?.get(p) === driver) ||
           'unknown';
-        log(`Running discovery for ${protocol} driver`);
+        logDebug(`Running discovery for ${protocol} driver`);
 
         const home = await this.registry.getOrCreateHome('Default Home');
 
@@ -313,7 +321,7 @@ export class HubDaemon {
             // Auto-connect to discovered devices (ESPHome doesn't require pairing)
             if (deviceDesc.address) {
               try {
-                log(
+                logDebug(
                   `Auto-connecting to ${deviceDesc.id} at ${deviceDesc.address}`,
                 );
                 await driver.connect(deviceDesc.id, deviceDesc.address);
@@ -359,7 +367,7 @@ export class HubDaemon {
                   );
                 }
 
-                log(
+                logDebug(
                   `Discovered ${entities.length} entities for device ${dbDevice.id} (driver: ${deviceDesc.id})`,
                 );
 
@@ -370,7 +378,7 @@ export class HubDaemon {
                   event: 'paired',
                 });
               } catch (connectError) {
-                log(`Failed to connect to ${deviceDesc.id}:`, connectError);
+                logWarn(`Failed to connect to ${deviceDesc.id}:`, connectError);
               }
             }
 
@@ -380,12 +388,15 @@ export class HubDaemon {
               deviceId: deviceDesc.id,
               event: 'discovered',
             });
-          } catch (error) {
-            log(`Error processing discovered device ${deviceDesc.id}:`, error);
+          } catch (err) {
+            logWarn(
+              `Error processing discovered device ${deviceDesc.id}:`,
+              err,
+            );
           }
         }
-      } catch (error) {
-        log('Discovery error for driver:', error);
+      } catch (err) {
+        logWarn('Discovery error for driver:', err);
       }
     }
   }
@@ -397,7 +408,7 @@ export class HubDaemon {
     if (this.discoveryInterval) {
       clearInterval(this.discoveryInterval);
       this.discoveryInterval = null;
-      log('Stopped discovery loop');
+      logInfo('Stopped discovery loop');
     }
   }
 
@@ -407,7 +418,7 @@ export class HubDaemon {
   private startSubscriptionLoop() {
     if (this.subscriptionInterval) return;
 
-    log('Starting subscription loop');
+    logInfo('Starting subscription loop');
 
     this.subscriptionInterval = setInterval(async () => {
       if (!this.registry || !this.driverRegistry || !this.eventBus) return;
@@ -443,7 +454,7 @@ export class HubDaemon {
                 credentials as { driverDeviceId?: string }
               )?.driverDeviceId;
               if (!driverDeviceId) {
-                log(
+                logDebug(
                   `Cannot construct entity ID for ${entity.id}: missing driverDeviceId in credentials`,
                 );
                 continue;
@@ -461,13 +472,26 @@ export class HubDaemon {
                 const connection = driverState.connections.get(driverDeviceId);
 
                 if (connection) {
-                  // Find entity in connection by key
+                  // Find entity in connection by key or objectId
+                  // Note: entity.key might be stored as either ESPHome key (small number)
+                  // or objectId (large number like 2082512631)
                   for (const [
                     storedEntityId,
                     espEntity,
                   ] of connection.entities.entries()) {
-                    // Try matching by key number first (most reliable)
-                    if (entity.key && String(espEntity.key) === entity.key) {
+                    // Try matching by ESPHome key first (most reliable)
+                    const entityKeyMatch =
+                      entity.key &&
+                      (String(espEntity.key) === String(entity.key) ||
+                        Number(espEntity.key) === Number(entity.key));
+
+                    // Also try matching by objectId since entity.key might be stored as objectId
+                    const objectIdMatch =
+                      entity.key &&
+                      (espEntity.objectId === String(entity.key) ||
+                        espEntity.objectId === entity.key);
+
+                    if (entityKeyMatch || objectIdMatch) {
                       entityObjectId =
                         espEntity.objectId ||
                         storedEntityId.split(':').slice(1).join(':');
@@ -496,9 +520,10 @@ export class HubDaemon {
               }
 
               if (!entityObjectId) {
-                log(
-                  `Cannot construct entity ID for ${entity.id}: could not find objectId (key: ${entity.key})`,
-                );
+                // Only log as debug, not as error - subscription might not be critical for all entities
+                // log(
+                //   `Cannot construct entity ID for ${entity.id}: could not find objectId (key: ${entity.key})`,
+                // );
                 continue;
               }
 
@@ -557,13 +582,13 @@ export class HubDaemon {
 
             // Store unsubscribe function
             this.activeSubscriptions.set(entity.id, unsubscribe);
-            log(`Subscribed to entity state: ${entity.id}`);
-          } catch (error) {
-            log(`Failed to subscribe to entity ${entity.id}:`, error);
+            logDebug(`Subscribed to entity state: ${entity.id}`);
+          } catch (err) {
+            logWarn(`Failed to subscribe to entity ${entity.id}:`, err);
           }
         }
-      } catch (error) {
-        log('Subscription loop error:', error);
+      } catch (err) {
+        logWarn('Subscription loop error:', err);
       }
     }, 3000); // Every 3 seconds
   }
@@ -575,7 +600,7 @@ export class HubDaemon {
     if (this.subscriptionInterval) {
       clearInterval(this.subscriptionInterval);
       this.subscriptionInterval = null;
-      log('Stopped subscription loop');
+      logInfo('Stopped subscription loop');
     }
   }
 
@@ -584,7 +609,7 @@ export class HubDaemon {
    */
   private startStateWriterLoop() {
     // State writing is handled by the event handlers set up in setupEventHandlers()
-    log('State writer loop active via event handlers');
+    logDebug('State writer loop active via event handlers');
   }
 
   /**

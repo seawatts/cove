@@ -177,6 +177,7 @@ export const entities = pgTable(
     deviceId: text('deviceId')
       .notNull()
       .references(() => devices.id, { onDelete: 'cascade' }),
+    displayName: text('displayName'), // Custom user-defined display name
     id: text('id')
       .$defaultFn(() => createId({ prefix: 'entity' }))
       .notNull()

@@ -98,20 +98,26 @@ function parseKeyForDisplay(key: string): string {
  */
 export function getEntityDisplayName(entity: {
   name?: string | null;
+  displayName?: string | null;
   deviceClass?: string | null;
   key: string;
 }): string {
-  // 1. Use name if available (highest priority)
+  // 1. Use displayName if available (highest priority - custom user-defined name)
+  if (entity.displayName?.trim()) {
+    return entity.displayName.trim();
+  }
+
+  // 2. Use name if available (second priority)
   if (entity.name?.trim()) {
     return entity.name.trim();
   }
 
-  // 2. Try deviceClass with formatting (second priority)
+  // 3. Try deviceClass with formatting (third priority)
   if (entity.deviceClass?.trim()) {
     return formatDeviceClass(entity.deviceClass.trim());
   }
 
-  // 3. Parse key as fallback (last resort)
+  // 4. Parse key as fallback (last resort)
   return parseKeyForDisplay(entity.key);
 }
 
@@ -120,6 +126,7 @@ export function getEntityDisplayName(entity: {
  */
 export function getEntityShortDisplayName(entity: {
   name?: string | null;
+  displayName?: string | null;
   deviceClass?: string | null;
   key: string;
 }): string {

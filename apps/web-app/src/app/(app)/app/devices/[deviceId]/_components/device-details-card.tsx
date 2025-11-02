@@ -19,6 +19,7 @@ interface Entity {
   kind: string;
   key: string;
   deviceClass?: string | null;
+  displayName?: string | null;
   name?: string | null;
   currentState?: {
     state: string;
@@ -150,6 +151,7 @@ export function DeviceDetailsCard({
                 >
                   {getEntityDisplayName({
                     deviceClass: entity.deviceClass,
+                    displayName: entity.displayName,
                     key: entity.key,
                     name: entity.name,
                   })}

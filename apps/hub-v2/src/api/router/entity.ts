@@ -56,6 +56,30 @@ export const entityRouter = createTRPCRouter({
 
       return { ...entity, state };
     }),
+
+  /**
+   * Get telemetry configuration for an entity
+   */
+  getTelemetryConfig: publicProcedure
+    .input(
+      z.object({
+        entityId: z.string(),
+        field: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const registry = ctx.daemon.getRegistry();
+      if (!registry) {
+        throw new Error('Registry not available');
+      }
+
+      const config = await registry.getTelemetryConfig(
+        input.entityId,
+        input.field,
+      );
+
+      return config;
+    }),
   /**
    * List entities with optional filters
    */
@@ -80,6 +104,27 @@ export const entityRouter = createTRPCRouter({
     }),
 
   /**
+   * Remove telemetry configuration for an entity
+   */
+  removeTelemetryConfig: publicProcedure
+    .input(
+      z.object({
+        entityId: z.string(),
+        field: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const registry = ctx.daemon.getRegistry();
+      if (!registry) {
+        throw new Error('Registry not available');
+      }
+
+      await registry.removeTelemetryConfig(input.entityId, input.field);
+
+      return { success: true };
+    }),
+
+  /**
    * Send command to an entity (alias for command to match web app expectations)
    */
   sendCommand: publicProcedure
@@ -100,5 +145,31 @@ export const entityRouter = createTRPCRouter({
       });
 
       return result;
+    }),
+
+  /**
+   * Set telemetry configuration for an entity
+   */
+  setTelemetryConfig: publicProcedure
+    .input(
+      z.object({
+        changeThreshold: z.number().nullable().optional(), // Minimum change required to record (for numeric values)
+        entityId: z.string(),
+        field: z.string().nullable().optional(), // If null, applies to all fields
+        minimumInterval: z.number().nullable().optional(), // Minimum time between recordings (ms)
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const registry = ctx.daemon.getRegistry();
+      if (!registry) {
+        throw new Error('Registry not available');
+      }
+
+      await registry.setTelemetryConfig(input.entityId, input.field ?? null, {
+        changeThreshold: input.changeThreshold ?? null,
+        minimumInterval: input.minimumInterval ?? null,
+      });
+
+      return { success: true };
     }),
 });

@@ -3,17 +3,21 @@
  * Handles entity_state snapshots and telemetry batching
  */
 
-import { debug } from '@cove/logger';
+import { debug, error, info } from '@cove/logger';
 import { and, desc, eq, gte } from 'drizzle-orm';
 import type { DatabaseClient } from '../db';
 import { entityState, telemetry } from '../db';
 import type { EventBus } from './event-bus';
+import type { Registry } from './registry';
 
-const log = debug('cove:hub-v2:state-store');
+const logDebug = debug('cove:hub-v2:state-store');
+const logInfo = info('cove:hub-v2:state-store');
+const logError = error('cove:hub-v2:state-store');
 
 export interface StateStoreOptions {
   db: DatabaseClient;
   eventBus: EventBus;
+  registry?: Registry; // Optional registry for telemetry config
 }
 
 interface TelemetryBatchItem {
@@ -31,6 +35,7 @@ interface TelemetryBatchItem {
 export class StateStore {
   private db: DatabaseClient;
   private eventBus: EventBus;
+  private registry?: Registry;
   private telemetryQueue: TelemetryBatchItem[] = [];
   private telemetryTimer: ReturnType<typeof setInterval> | null = null;
   private readonly BATCH_SIZE = 500;
@@ -40,11 +45,22 @@ export class StateStore {
     string,
     { value: number | string | boolean; timestamp: Date }
   >();
-  private readonly TELEMETRY_DEDUP_WINDOW = 30000; // ms - ignore duplicate values within 30 seconds
+  private readonly DEFAULT_TELEMETRY_DEDUP_WINDOW = 30000; // ms - default: ignore duplicate values within 30 seconds
+  // Cache telemetry configs to avoid frequent DB lookups
+  private telemetryConfigCache = new Map<
+    string,
+    {
+      changeThreshold: number | null;
+      minimumInterval: number | null;
+      cachedAt: Date;
+    }
+  >();
+  private readonly CONFIG_CACHE_TTL = 60000; // Cache configs for 1 minute
 
   constructor(options: StateStoreOptions) {
     this.db = options.db;
     this.eventBus = options.eventBus;
+    this.registry = options.registry;
   }
 
   /**
@@ -60,7 +76,7 @@ export class StateStore {
       await this.flushTelemetryBatch(batch);
     }, this.BATCH_INTERVAL);
 
-    log('Started telemetry batching');
+    logInfo('Started telemetry batching');
   }
 
   /**
@@ -77,7 +93,7 @@ export class StateStore {
       this.flushTelemetryBatch(this.telemetryQueue.splice(0));
     }
 
-    log('Stopped telemetry batching');
+    logInfo('Stopped telemetry batching');
   }
 
   /**
@@ -105,11 +121,11 @@ export class StateStore {
 
       // Only log if batch is significant to reduce noise
       if (batch.length >= 10) {
-        log(`Flushed ${batch.length} telemetry records`);
+        logInfo(`Flushed ${batch.length} telemetry records`);
       }
-    } catch (error) {
-      log('Failed to flush telemetry batch:', error);
-      log('Batch items:', batch);
+    } catch (err) {
+      logError('Failed to flush telemetry batch:', err);
+      logDebug('Batch items:', batch);
     }
   }
 
@@ -133,17 +149,65 @@ export class StateStore {
           target: entityState.entityId,
         });
 
-      log(`Updated entity state: ${entityId}`);
-    } catch (error) {
-      log('Failed to write entity state:', error);
-      throw error;
+      logDebug(`Updated entity state: ${entityId}`);
+    } catch (err) {
+      logError('Failed to write entity state:', err);
+      throw err;
+    }
+  }
+
+  /**
+   * Get telemetry config for an entity (with caching)
+   */
+  private async getTelemetryConfigCached(
+    entityId: string,
+    field: string,
+  ): Promise<{
+    changeThreshold: number | null;
+    minimumInterval: number | null;
+  } | null> {
+    const cacheKey = `${entityId}:${field}`;
+    const cached = this.telemetryConfigCache.get(cacheKey);
+    const now = new Date();
+
+    // Return cached config if still valid
+    if (cached) {
+      const cacheAge = now.getTime() - cached.cachedAt.getTime();
+      if (cacheAge < this.CONFIG_CACHE_TTL) {
+        return {
+          changeThreshold: cached.changeThreshold,
+          minimumInterval: cached.minimumInterval,
+        };
+      }
+    }
+
+    // Fetch fresh config from registry
+    if (!this.registry) {
+      return null;
+    }
+
+    try {
+      const config = await this.registry.getTelemetryConfig(entityId, field);
+      if (config) {
+        // Update cache
+        this.telemetryConfigCache.set(cacheKey, {
+          cachedAt: now,
+          changeThreshold: config.changeThreshold,
+          minimumInterval: config.minimumInterval,
+        });
+      }
+      return config;
+    } catch (err) {
+      logDebug('Failed to get telemetry config:', err);
+      return null;
     }
   }
 
   /**
    * Append telemetry record (batched)
+   * Uses per-entity telemetry configuration for frequency and sensitivity
    */
-  appendTelemetry(
+  async appendTelemetry(
     entityId: string,
     homeId: string,
     field: string,
@@ -154,16 +218,58 @@ export class StateStore {
     const now = timestamp || new Date();
     const telemetryKey = `${entityId}:${field}`;
 
-    // Deduplication: Check if we've seen this exact value recently
+    // Get telemetry config for this entity/field
+    const config = await this.getTelemetryConfigCached(entityId, field);
+    const minimumInterval =
+      config?.minimumInterval ?? this.DEFAULT_TELEMETRY_DEDUP_WINDOW;
+    const changeThreshold = config?.changeThreshold ?? null;
+
+    // Check last recorded value
     const lastValue = this.lastTelemetryValue.get(telemetryKey);
     if (lastValue) {
       const timeSinceLastUpdate = now.getTime() - lastValue.timestamp.getTime();
-      if (
-        lastValue.value === value &&
-        timeSinceLastUpdate < this.TELEMETRY_DEDUP_WINDOW
-      ) {
-        // Skip duplicate value within dedup window
-        return;
+
+      // Check minimum interval (frequency control)
+      if (timeSinceLastUpdate < minimumInterval) {
+        // Too soon since last recording - check if value changed enough
+        if (typeof value === 'number' && typeof lastValue.value === 'number') {
+          // Apply change threshold (sensitivity control)
+          if (changeThreshold !== null) {
+            const change = Math.abs(value - lastValue.value);
+            if (change < changeThreshold) {
+              // Change is too small, skip recording
+              return;
+            }
+          } else {
+            // No change threshold set, skip if exact match
+            if (value === lastValue.value) {
+              return;
+            }
+          }
+        } else {
+          // Non-numeric or different type - skip if exact match
+          if (value === lastValue.value) {
+            return;
+          }
+        }
+      } else {
+        // Enough time has passed - check if value changed
+        if (typeof value === 'number' && typeof lastValue.value === 'number') {
+          // Apply change threshold if configured
+          if (changeThreshold !== null) {
+            const change = Math.abs(value - lastValue.value);
+            if (change < changeThreshold) {
+              // Change is too small, skip recording
+              return;
+            }
+          } else if (value === lastValue.value) {
+            // No change threshold, exact match means skip
+            return;
+          }
+        } else if (value === lastValue.value) {
+          // Non-numeric exact match, skip
+          return;
+        }
       }
     }
 
@@ -201,8 +307,8 @@ export class StateStore {
       return await this.db.query.entityState.findFirst({
         where: eq(entityState.entityId, entityId),
       });
-    } catch (error) {
-      log('Failed to get entity state:', error);
+    } catch (err) {
+      logError('Failed to get entity state:', err);
       return null;
     }
   }
@@ -236,8 +342,8 @@ export class StateStore {
         orderBy: [desc(telemetry.ts)],
         where,
       });
-    } catch (error) {
-      log('Failed to get entity telemetry:', error);
+    } catch (err) {
+      logError('Failed to get entity telemetry:', err);
       return [];
     }
   }
@@ -274,8 +380,8 @@ export class StateStore {
           entity: true,
         },
       });
-    } catch (error) {
-      log('Failed to get home telemetry:', error);
+    } catch (err) {
+      logError('Failed to get home telemetry:', err);
       return [];
     }
   }
@@ -379,8 +485,8 @@ export class StateStore {
           timestamp,
         }))
         .sort((a, b) => a.timestamp - b.timestamp);
-    } catch (error) {
-      log('Failed to get aggregated telemetry:', error);
+    } catch (err) {
+      logError('Failed to get aggregated telemetry:', err);
       return [];
     }
   }
@@ -400,10 +506,10 @@ export class StateStore {
       await this.db.delete(entityState);
       await this.db.delete(telemetry);
       this.telemetryQueue.length = 0;
-      log('Cleared all state and telemetry');
-    } catch (error) {
-      log('Failed to clear state and telemetry:', error);
-      throw error;
+      logInfo('Cleared all state and telemetry');
+    } catch (err) {
+      logError('Failed to clear state and telemetry:', err);
+      throw err;
     }
   }
 }

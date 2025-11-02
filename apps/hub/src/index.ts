@@ -12,8 +12,12 @@ import { HubDaemon } from './daemon';
 import { env } from './env';
 import { resetStartTime } from './health';
 
-defaultLogger.enableNamespace('*');
-defaultLogger.enableNamespace('cove:*');
+// Set up logging based on environment configuration
+// Note: The logger package reads LOG_LEVEL and DEBUG env vars automatically,
+// but we still configure namespaces here for explicit control
+for (const namespace of env.DEBUG.split(',')) {
+  defaultLogger.enableNamespace(namespace.trim());
+}
 defaultLogger.addDestination(new ConsoleDestination());
 
 // Add file-based logging

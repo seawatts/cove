@@ -1,14 +1,14 @@
 {
   "dependencies": {
-    "@bufbuild/protobuf": "2.9.0",
-    "@connectrpc/connect": "1.4.0",
+    "@bufbuild/protobuf": "2.10.0",
+    "@connectrpc/connect": "2.1.0",
     "@cove/logger": "workspace:*",
     "@cove/types": "workspace:*"
   },
   "description": "Protocol implementations for Cove home automation platform",
   "devDependencies": {
-    "@bufbuild/protoc-gen-es": "2.9.0",
-    "@connectrpc/protoc-gen-connect-es": "1.4.0",
+    "@bufbuild/protoc-gen-es": "2.10.0",
+    "@connectrpc/protoc-gen-connect-es": "1.7.0",
     "@cove/tsconfig": "workspace:*",
     "typescript": "catalog:"
   },

@@ -67,8 +67,10 @@ export interface ESPHomeEntity {
   config?: {
     name?: string;
     objectId?: string;
+    deviceClass?: string;
     [key: string]: unknown;
   };
+  deviceClass?: string;
 }
 
 export type {

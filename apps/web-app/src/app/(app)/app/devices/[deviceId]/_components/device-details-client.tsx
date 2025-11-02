@@ -15,6 +15,7 @@ interface Entity {
   kind: string;
   key: string;
   deviceClass?: string | null;
+  displayName?: string | null;
   name?: string | null;
   capabilities: Array<Record<string, unknown>>;
   currentState?: {
@@ -87,6 +88,7 @@ export function DeviceDetailsClient({
         lastChanged: entity.currentState?.updatedAt || new Date(),
         name: getEntityDisplayName({
           deviceClass: entity.deviceClass,
+          displayName: entity.displayName,
           key: entity.key,
           name: entity.name,
         }),

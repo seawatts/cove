@@ -4,7 +4,7 @@
  * Self-hosted home automation hub daemon
  */
 
-import { debug, defaultLogger } from '@cove/logger';
+import { debug, defaultLogger, error, info } from '@cove/logger';
 import { ConsoleDestination } from '@cove/logger/destinations/console';
 import { RollingFileDestination } from '@cove/logger/destinations/rolling-file';
 import { createTRPCHandler } from './api/handler';
@@ -13,9 +13,12 @@ import { createWebSocketHandler } from './api/websocket';
 import { HubDaemon } from './daemon';
 import { env } from './env';
 
-// Set up logging
-defaultLogger.enableNamespace('*');
-defaultLogger.enableNamespace('cove:*');
+// Set up logging based on environment configuration
+// Note: The logger package reads LOG_LEVEL and DEBUG env vars automatically,
+// but we still configure namespaces here for explicit control
+for (const namespace of env.DEBUG.split(',')) {
+  defaultLogger.enableNamespace(namespace.trim());
+}
 defaultLogger.addDestination(new ConsoleDestination());
 
 // Add file-based logging
@@ -28,7 +31,9 @@ defaultLogger.addDestination(
   }),
 );
 
-const log = debug('cove:hub');
+const logDebug = debug('cove:hub');
+const logInfo = info('cove:hub');
+const logError = error('cove:hub');
 
 // Initialize daemon
 const daemon = new HubDaemon({
@@ -44,7 +49,7 @@ const trpcHandler = createTRPCHandler(daemon);
 
 // Graceful shutdown handler
 const shutdown = async (signal: string) => {
-  log(`Received ${signal} signal, shutting down gracefully...`);
+  logInfo(`Received ${signal} signal, shutting down gracefully...`);
 
   try {
     // Close WebSocket connections
@@ -53,10 +58,10 @@ const shutdown = async (signal: string) => {
     // Stop daemon
     await daemon.stop();
 
-    log('Hub shutdown complete');
+    logInfo('Hub shutdown complete');
     process.exit(0);
-  } catch (error) {
-    log('Error during shutdown:', error);
+  } catch (err) {
+    logError('Error during shutdown:', err);
     process.exit(1);
   }
 };
@@ -88,27 +93,27 @@ async function start() {
       // WebSocket configuration
       websocket: {
         close: (ws, code, reason) => {
-          log(`WebSocket connection closed: ${code} ${reason}`);
+          logDebug(`WebSocket connection closed: ${code} ${reason}`);
           wsHandler.handleWebSocketClose(ws, code, reason);
         },
         message: (_ws, message) => {
-          log(`WebSocket message received: ${message}`);
+          logDebug(`WebSocket message received: ${message}`);
           // Handle WebSocket messages here
         },
         open: (ws) => {
-          log('WebSocket connection opened');
+          logDebug('WebSocket connection opened');
           wsHandler.handleWebSocketOpen(ws);
         },
       },
     });
 
-    log(`Cove Hub started on http://0.0.0.0:${env.PORT}`);
-    log(`Hub ID: ${daemon.getStatus().hubId}`);
-    log(`Database: ${env.DB_PATH}`);
-    log(`Environment: ${env.NODE_ENV}`);
-    log(`tRPC endpoint: http://0.0.0.0:${env.PORT}/trpc`);
-  } catch (error) {
-    log('Failed to start Hub:', error);
+    logInfo(`Cove Hub started on http://0.0.0.0:${env.PORT}`);
+    logInfo(`Hub ID: ${daemon.getStatus().hubId}`);
+    logDebug(`Database: ${env.DB_PATH}`);
+    logDebug(`Environment: ${env.NODE_ENV}`);
+    logInfo(`tRPC endpoint: http://0.0.0.0:${env.PORT}/trpc`);
+  } catch (err) {
+    logError('Failed to start Hub:', err);
     process.exit(1);
   }
 }

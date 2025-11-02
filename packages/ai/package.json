@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@boundaryml/baml": "0.211.2"
+    "@boundaryml/baml": "0.212.0"
   },
   "devDependencies": {
     "@cove/tsconfig": "workspace:*",

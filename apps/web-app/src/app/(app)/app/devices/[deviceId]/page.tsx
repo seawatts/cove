@@ -46,13 +46,6 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
 
   // Helper to transform hub entity to component format
   const transformEntity = (entity: (typeof entities)[0]) => {
-    const state = entity.state;
-    const stateValue = state
-      ? typeof state?.state === 'string'
-        ? state.state
-        : JSON.stringify(state.state)
-      : null;
-
     // Convert capability object to array if needed
     let capabilities: Array<Record<string, unknown>> = [];
     if (entity.capability) {
@@ -64,17 +57,11 @@ async function DeviceDetails({ deviceId }: { deviceId: string }) {
     }
 
     return {
-      ...entity,
       capabilities,
-      currentState: state
-        ? {
-            attrs: (state.state as Record<string, unknown>) || {},
-            state: stateValue || '',
-            updatedAt: state.updatedAt,
-          }
-        : null,
-      deviceClass: null,
-      entityId: entity.id, // Map id to entityId for component
+      currentState: entity.currentState,
+      deviceClass: entity.deviceClass ?? null,
+      displayName: entity.displayName ?? null,
+      entityId: entity.id,
       key: entity.key ?? '',
       name: entity.name ?? null,
     };

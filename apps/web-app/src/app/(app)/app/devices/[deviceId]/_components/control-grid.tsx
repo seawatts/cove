@@ -6,12 +6,14 @@ import { getEntityDisplayName } from '@cove/utils';
 import { ClimateControlTile } from './controls/climate-control-tile';
 import { LightControlTile } from './controls/light-control-tile';
 import { SwitchControlTile } from './controls/switch-control-tile';
+import { SensorWidget } from './sensor-widget';
 
 interface Entity {
   entityId: string;
   kind: string;
   key: string;
   deviceClass?: string | null;
+  displayName?: string | null;
   name?: string | null;
   capabilities: Array<Record<string, unknown>>;
   currentState?: {
@@ -42,6 +44,33 @@ export function ControlGrid({
     );
   }
 
+  // Helper to convert entity to SensorMetadata format
+  const entityToSensorMetadata = (entity: Entity) => {
+    const currentValue = entity.currentState?.state;
+    const isBoolean = typeof currentValue === 'boolean';
+
+    // Extract unit from numeric capability
+    const numericCapability = entity.capabilities.find(
+      (cap) => cap.type === 'numeric',
+    ) as { unit?: string } | undefined;
+    const unit = numericCapability?.unit;
+
+    return {
+      currentValue,
+      entityId: entity.entityId,
+      key: entity.key,
+      lastChanged: entity.currentState?.updatedAt || new Date(),
+      name: getEntityDisplayName({
+        deviceClass: entity.deviceClass,
+        displayName: entity.displayName,
+        key: entity.key,
+        name: entity.name,
+      }),
+      type: (isBoolean ? 'binary' : 'continuous') as 'binary' | 'continuous',
+      unit,
+    };
+  };
+
   // Group entities by type for better organization
   const entityGroups = {
     climate: entities.filter((e) => e.kind === 'climate'),
@@ -58,6 +87,9 @@ export function ControlGrid({
           'binary_sensor',
           'button',
         ].includes(e.kind) && !e.key.toLowerCase().includes('calibrate'),
+    ),
+    sensors: entities.filter(
+      (e) => e.kind === 'sensor' || e.kind === 'binary_sensor',
     ),
     switches: entities.filter((e) => e.kind === 'switch'),
   };
@@ -133,6 +165,29 @@ export function ControlGrid({
         </div>
       )}
 
+      {/* Sensors */}
+      {entityGroups.sensors.length > 0 && (
+        <div>
+          <div className="mb-4">
+            <Text className="text-lg font-semibold">Sensors</Text>
+            <Text className="text-sm text-muted-foreground">
+              {entityGroups.sensors.length} sensor
+              {entityGroups.sensors.length !== 1 ? 's' : ''}
+            </Text>
+          </div>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {entityGroups.sensors.map((entity) => (
+              <SensorWidget
+                deviceId={deviceId}
+                key={entity.entityId}
+                mode="full"
+                sensor={entityToSensorMetadata(entity)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Covers */}
       {entityGroups.covers.length > 0 && (
         <div>
@@ -156,6 +211,7 @@ export function ControlGrid({
                       <Text className="text-lg font-semibold">
                         {getEntityDisplayName({
                           deviceClass: entity.deviceClass,
+                          displayName: entity.displayName,
                           key: entity.key,
                           name: entity.name,
                         })}
@@ -205,6 +261,7 @@ export function ControlGrid({
                       <Text className="text-lg font-semibold">
                         {getEntityDisplayName({
                           deviceClass: entity.deviceClass,
+                          displayName: entity.displayName,
                           key: entity.key,
                           name: entity.name,
                         })}

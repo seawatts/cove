@@ -11,16 +11,21 @@ import { Icons } from '@cove/ui/custom/icons';
 import { Text } from '@cove/ui/custom/typography';
 import { Label } from '@cove/ui/label';
 import { Slider } from '@cove/ui/slider';
+import { getEntityDisplayName } from '@cove/utils';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { EntitySettingsDialog } from '../entity-settings-dialog';
 
 interface ClimateControlTileProps {
   deviceId: string;
   entity: {
     entityId: string;
+    kind: string;
     key: string;
     deviceClass?: string | null;
+    displayName?: string | null;
+    name?: string | null;
     capabilities: Array<Record<string, unknown>>;
     currentState?: {
       state: string;
@@ -43,6 +48,7 @@ export function ClimateControlTile({
   showChart = false,
 }: ClimateControlTileProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [climateState, setClimateState] = useState<ClimateState>({
     fanMode: 'auto',
     mode: 'heat',
@@ -50,16 +56,21 @@ export function ClimateControlTile({
     temperature: 20,
   });
 
-  // Initialize climate state from current values
-  useEffect(() => {
+  // Memoize the climate attributes to avoid infinite loops
+  const climateAttrs = useMemo(() => {
     const attrs = entity.currentState?.attrs || {};
-    setClimateState({
+    return {
       fanMode: (attrs.fan_mode as string) || 'auto',
       mode: (attrs.hvac_mode as string) || 'heat',
       targetTemperature: (attrs.temperature as number) || 22,
       temperature: (attrs.current_temperature as number) || 20,
-    });
-  }, [entity.currentState]);
+    };
+  }, [entity.currentState?.attrs]);
+
+  // Initialize climate state from current values
+  useEffect(() => {
+    setClimateState(climateAttrs);
+  }, [climateAttrs]);
 
   const handleTemperatureChange = async (temp: number) => {
     setClimateState((prev) => ({ ...prev, targetTemperature: temp }));
@@ -79,170 +90,173 @@ export function ClimateControlTile({
 
   const supportsMode = entity.capabilities.some((c) => c.type === 'hvac_mode');
 
-  const getModeIcon = (mode: string) => {
-    switch (mode) {
-      case 'heat':
-        return <Icons.Flame size="sm" />;
-      case 'cool':
-        return <Icons.SunMedium size="sm" />;
-      case 'auto':
-        return <Icons.ArrowUpDown size="sm" />;
-      case 'off':
-        return <Icons.X size="sm" />;
-      default:
-        return <Icons.Flame size="sm" />;
-    }
-  };
-
   return (
-    <Card className="min-h-[140px] transition-shadow hover:shadow-md">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="size-3 rounded-full bg-primary" />
-            <Text className="text-lg font-semibold">{entity.key}</Text>
+    <>
+      <Card className="min-h-[140px] transition-shadow hover:shadow-md">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="size-3 rounded-full bg-primary" />
+              <Text className="text-lg font-semibold">
+                {getEntityDisplayName({
+                  deviceClass: entity.deviceClass,
+                  displayName: entity.displayName,
+                  key: entity.key,
+                  name: entity.name,
+                })}
+              </Text>
+            </div>
+            <Button
+              onClick={() => setIsSettingsOpen(true)}
+              size="sm"
+              variant="ghost"
+            >
+              <Icons.Settings size="sm" />
+            </Button>
           </div>
-          <div className="flex items-center gap-2">
-            {getModeIcon(climateState.mode)}
-            <Text className="text-sm capitalize">{climateState.mode}</Text>
-          </div>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Current temperature display */}
-        <div className="text-center">
-          <Text className="text-3xl font-bold">
-            {Math.round(climateState.temperature)}°
-          </Text>
-          <Text className="text-sm text-muted-foreground">
-            Target: {Math.round(climateState.targetTemperature)}°
-          </Text>
-        </div>
-
-        {/* Last updated */}
-        {entity.currentState?.updatedAt && (
-          <Text className="text-xs text-muted-foreground text-center">
-            Updated{' '}
-            {new Date(entity.currentState.updatedAt).toLocaleTimeString()}
-          </Text>
-        )}
-
-        {/* Chart placeholder - will be replaced with actual mini-chart */}
-        {showChart && (
-          <div className="h-16 bg-muted/20 rounded-md flex items-center justify-center">
-            <Text className="text-xs text-muted-foreground">
-              Mini-chart coming soon
+        <CardContent className="space-y-4">
+          {/* Current temperature display */}
+          <div className="text-center">
+            <Text className="text-3xl font-bold">
+              {Math.round(climateState.temperature)}°
+            </Text>
+            <Text className="text-sm text-muted-foreground">
+              Target: {Math.round(climateState.targetTemperature)}°
             </Text>
           </div>
-        )}
 
-        {/* Expandable controls */}
-        <Collapsible onOpenChange={setIsExpanded} open={isExpanded}>
-          <CollapsibleTrigger asChild>
-            <Button className="w-full" size="sm" variant="ghost">
-              <Text className="text-sm">Temperature Control</Text>
-              <ChevronDown
-                className={`ml-2 size-4 transition-transform ${
-                  isExpanded ? 'rotate-180' : ''
-                }`}
-              />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4 pt-2">
-            {/* Temperature slider */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Target Temperature</Label>
-                <Text className="text-sm text-muted-foreground">
-                  {Math.round(climateState.targetTemperature)}°
-                </Text>
-              </div>
-              <Slider
-                disabled={true}
-                max={30}
-                min={16}
-                onValueChange={([temp]) =>
-                  temp !== undefined && handleTemperatureChange(temp)
-                }
-                step={0.5}
-                value={[climateState.targetTemperature]}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>16°</span>
-                <span>30°</span>
-              </div>
+          {/* Last updated */}
+          {entity.currentState?.updatedAt && (
+            <Text className="text-xs text-muted-foreground text-center">
+              Updated{' '}
+              {new Date(entity.currentState.updatedAt).toLocaleTimeString()}
+            </Text>
+          )}
+
+          {/* Chart placeholder - will be replaced with actual mini-chart */}
+          {showChart && (
+            <div className="h-16 bg-muted/20 rounded-md flex items-center justify-center">
+              <Text className="text-xs text-muted-foreground">
+                Mini-chart coming soon
+              </Text>
             </div>
+          )}
 
-            {/* Mode controls */}
-            {supportsMode && (
+          {/* Expandable controls */}
+          <Collapsible onOpenChange={setIsExpanded} open={isExpanded}>
+            <CollapsibleTrigger asChild>
+              <Button className="w-full" size="sm" variant="ghost">
+                <Text className="text-sm">Temperature Control</Text>
+                <ChevronDown
+                  className={`ml-2 size-4 transition-transform ${
+                    isExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-2">
+              {/* Temperature slider */}
               <div className="space-y-2">
-                <Label className="text-sm">Mode</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    disabled
-                    onClick={() => handleModeChange('heat')}
-                    size="sm"
-                    variant={
-                      climateState.mode === 'heat' ? 'default' : 'outline'
-                    }
-                  >
-                    Heat
-                  </Button>
-                  <Button
-                    disabled
-                    onClick={() => handleModeChange('cool')}
-                    size="sm"
-                    variant={
-                      climateState.mode === 'cool' ? 'default' : 'outline'
-                    }
-                  >
-                    Cool
-                  </Button>
-                  <Button
-                    disabled
-                    onClick={() => handleModeChange('auto')}
-                    size="sm"
-                    variant={
-                      climateState.mode === 'auto' ? 'default' : 'outline'
-                    }
-                  >
-                    Auto
-                  </Button>
-                  <Button
-                    disabled
-                    onClick={() => handleModeChange('off')}
-                    size="sm"
-                    variant={
-                      climateState.mode === 'off' ? 'default' : 'outline'
-                    }
-                  >
-                    Off
-                  </Button>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Target Temperature</Label>
+                  <Text className="text-sm text-muted-foreground">
+                    {Math.round(climateState.targetTemperature)}°
+                  </Text>
+                </div>
+                <Slider
+                  disabled={true}
+                  max={30}
+                  min={16}
+                  onValueChange={([temp]) =>
+                    temp !== undefined && handleTemperatureChange(temp)
+                  }
+                  step={0.5}
+                  value={[climateState.targetTemperature]}
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>16°</span>
+                  <span>30°</span>
                 </div>
               </div>
-            )}
 
-            {/* Fan controls */}
-            {supportsFan && (
-              <div className="space-y-2">
-                <Label className="text-sm">Fan</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  <Button disabled size="sm" variant="outline">
-                    Auto
-                  </Button>
-                  <Button disabled size="sm" variant="outline">
-                    Low
-                  </Button>
-                  <Button disabled size="sm" variant="outline">
-                    High
-                  </Button>
+              {/* Mode controls */}
+              {supportsMode && (
+                <div className="space-y-2">
+                  <Label className="text-sm">Mode</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      disabled
+                      onClick={() => handleModeChange('heat')}
+                      size="sm"
+                      variant={
+                        climateState.mode === 'heat' ? 'default' : 'outline'
+                      }
+                    >
+                      Heat
+                    </Button>
+                    <Button
+                      disabled
+                      onClick={() => handleModeChange('cool')}
+                      size="sm"
+                      variant={
+                        climateState.mode === 'cool' ? 'default' : 'outline'
+                      }
+                    >
+                      Cool
+                    </Button>
+                    <Button
+                      disabled
+                      onClick={() => handleModeChange('auto')}
+                      size="sm"
+                      variant={
+                        climateState.mode === 'auto' ? 'default' : 'outline'
+                      }
+                    >
+                      Auto
+                    </Button>
+                    <Button
+                      disabled
+                      onClick={() => handleModeChange('off')}
+                      size="sm"
+                      variant={
+                        climateState.mode === 'off' ? 'default' : 'outline'
+                      }
+                    >
+                      Off
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-    </Card>
+              )}
+
+              {/* Fan controls */}
+              {supportsFan && (
+                <div className="space-y-2">
+                  <Label className="text-sm">Fan</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button disabled size="sm" variant="outline">
+                      Auto
+                    </Button>
+                    <Button disabled size="sm" variant="outline">
+                      Low
+                    </Button>
+                    <Button disabled size="sm" variant="outline">
+                      High
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+        </CardContent>
+      </Card>
+
+      <EntitySettingsDialog
+        entity={entity}
+        onOpenChange={setIsSettingsOpen}
+        open={isSettingsOpen}
+      />
+    </>
   );
 }

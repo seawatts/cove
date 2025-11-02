@@ -107,9 +107,11 @@ export const entities = sqliteTable(
   'entities',
   {
     capability: blob('capability', { mode: 'json' }).notNull(), // schema of supported features
+    deviceClass: text('deviceClass'), // e.g., "temperature", "co2", "humidity", "signal_strength"
     deviceId: text('deviceId')
       .notNull()
       .references(() => devices.id, { onDelete: 'cascade' }),
+    displayName: text('displayName'), // Custom user-defined display name
     homeId: text('homeId')
       .notNull()
       .references(() => homes.id, { onDelete: 'cascade' }),
@@ -170,6 +172,25 @@ export const credentials = sqliteTable('credentials', {
   kind: text('kind').notNull(), // "hue_token", "nanoleaf_token", "hap_pairing", etc.
 });
 
+export const telemetryConfig = sqliteTable(
+  'telemetryConfig',
+  {
+    changeThreshold: integer('changeThreshold'), // Minimum change required to record (for numeric values). If null, exact match only.
+    entityId: text('entityId')
+      .notNull()
+      .references(() => entities.id, { onDelete: 'cascade' }),
+    field: text('field'), // If null, applies to all fields for this entity. Otherwise, field-specific config.
+    minimumInterval: integer('minimumInterval'), // Minimum time between recordings (ms). If null, uses default.
+    updatedAt: integer('updatedAt', { mode: 'timestamp' })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [
+    unique('telemetryConfig_entityId_field').on(t.entityId, t.field),
+    index('telemetryConfig_entityId_idx').on(t.entityId),
+  ],
+);
+
 // ===================================
 // Relations
 // ===================================
@@ -221,6 +242,7 @@ export const entityRelations = relations(entities, ({ one, many }) => ({
   }),
   state: one(entityState),
   telemetry: many(telemetry),
+  telemetryConfig: many(telemetryConfig),
 }));
 
 export const entityStateRelations = relations(entityState, ({ one }) => ({
@@ -247,3 +269,13 @@ export const credentialsRelations = relations(credentials, ({ one }) => ({
     references: [devices.id],
   }),
 }));
+
+export const telemetryConfigRelations = relations(
+  telemetryConfig,
+  ({ one }) => ({
+    entity: one(entities, {
+      fields: [telemetryConfig.entityId],
+      references: [entities.id],
+    }),
+  }),
+);

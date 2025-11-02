@@ -3,13 +3,16 @@
  * Handles device fingerprint deduplication and entity management
  */
 
-import { debug } from '@cove/logger';
-import { and, eq } from 'drizzle-orm';
+import { debug, error, info, warn } from '@cove/logger';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { DatabaseClient } from '../db';
-import { credentials, devices, entities, homes } from '../db';
+import { credentials, devices, entities, homes, telemetryConfig } from '../db';
 import type { DeviceDescriptor, EntityDescriptor } from './driver-kit';
 
-const log = debug('cove:hub-v2:registry');
+const logDebug = debug('cove:hub-v2:registry');
+const logInfo = info('cove:hub-v2:registry');
+const logWarn = warn('cove:hub-v2:registry');
+const logError = error('cove:hub-v2:registry');
 
 export interface RegistryOptions {
   db: DatabaseClient;
@@ -36,7 +39,7 @@ export class Registry {
       });
 
       if (existingHome) {
-        log(`Using existing home: ${existingHome.id} (${name})`);
+        logDebug(`Using existing home: ${existingHome.id} (${name})`);
         return existingHome;
       }
 
@@ -53,11 +56,11 @@ export class Registry {
         throw new Error('Failed to create home');
       }
 
-      log(`Created new home: ${newHome[0].id} (${name})`);
+      logInfo(`Created new home: ${newHome[0].id} (${name})`);
       return newHome[0];
-    } catch (error) {
-      log('Failed to get or create home:', error);
-      throw error;
+    } catch (err) {
+      logError('Failed to get or create home:', err);
+      throw err;
     }
   }
 
@@ -80,7 +83,7 @@ export class Registry {
         });
 
         if (existingByFingerprint) {
-          log(
+          logDebug(
             `Using existing device by fingerprint: ${existingByFingerprint.id} (${deviceDesc.name})`,
           );
 
@@ -110,7 +113,7 @@ export class Registry {
         });
 
         if (existingByAddress) {
-          log(
+          logDebug(
             `Using existing device by address: ${existingByAddress.id} (${deviceDesc.name})`,
           );
 
@@ -144,11 +147,11 @@ export class Registry {
         throw new Error('Failed to create device');
       }
 
-      log(`Created new device: ${newDevice[0].id} (${deviceDesc.name})`);
+      logInfo(`Created new device: ${newDevice[0].id} (${deviceDesc.name})`);
       return newDevice[0];
-    } catch (error) {
-      log('Failed to upsert device:', error);
-      throw error;
+    } catch (err) {
+      logError('Failed to upsert device:', err);
+      throw err;
     }
   }
 
@@ -173,7 +176,7 @@ export class Registry {
       });
 
       if (existingEntity) {
-        log(
+        logDebug(
           `Using existing entity: ${existingEntity.id} (${entityDesc.kind}: ${entityDesc.id})`,
         );
         return existingEntity;
@@ -184,6 +187,7 @@ export class Registry {
         .insert(entities)
         .values({
           capability: entityDesc.capability,
+          deviceClass: entityDesc.metadata?.deviceClass as string | undefined,
           deviceId,
           homeId,
           key: entityDesc.metadata?.key
@@ -198,13 +202,13 @@ export class Registry {
         throw new Error('Failed to create entity');
       }
 
-      log(
+      logInfo(
         `Created new entity: ${newEntity[0].id} (${entityDesc.kind}: ${entityDesc.id})`,
       );
       return newEntity[0];
-    } catch (error) {
-      log('Failed to upsert entity:', error);
-      throw error;
+    } catch (err) {
+      logError('Failed to upsert entity:', err);
+      throw err;
     }
   }
 
@@ -235,10 +239,10 @@ export class Registry {
           target: credentials.deviceId,
         });
 
-      log(`Stored credentials for device: ${deviceId} (${kind})`);
-    } catch (error) {
-      log('Failed to store credentials:', error);
-      throw error;
+      logDebug(`Stored credentials for device: ${deviceId} (${kind})`);
+    } catch (err) {
+      logError('Failed to store credentials:', err);
+      throw err;
     }
   }
 
@@ -260,8 +264,8 @@ export class Registry {
       // Decrypt credential data (simple base64 for now)
       const credentialData = JSON.parse((creds.blob as Buffer).toString());
       return credentialData;
-    } catch (error) {
-      log('Failed to get credentials:', error);
+    } catch (err) {
+      logWarn('Failed to get credentials:', err);
       return null;
     }
   }
@@ -295,8 +299,8 @@ export class Registry {
       );
 
       return devicesWithEntities;
-    } catch (error) {
-      log('Failed to get devices by home:', error);
+    } catch (err) {
+      logError('Failed to get devices by home:', err);
       return [];
     }
   }
@@ -339,8 +343,8 @@ export class Registry {
           // that can't be serialized to JSON.
         },
       });
-    } catch (error) {
-      log('Failed to get entities:', error);
+    } catch (err) {
+      logError('Failed to get entities:', err);
       return [];
     }
   }
@@ -364,8 +368,8 @@ export class Registry {
           // that can't be serialized to JSON.
         },
       });
-    } catch (error) {
-      log('Failed to get entity:', error);
+    } catch (err) {
+      logWarn('Failed to get entity:', err);
       return null;
     }
   }
@@ -397,8 +401,8 @@ export class Registry {
         ...device,
         entities: deviceEntities,
       };
-    } catch (error) {
-      log('Failed to get device:', error);
+    } catch (err) {
+      logWarn('Failed to get device:', err);
       return null;
     }
   }
@@ -408,6 +412,14 @@ export class Registry {
    */
   async markDevicePaired(deviceId: string) {
     try {
+      // Check if device is already paired
+      const device = await this.db.query.devices.findFirst({
+        columns: { pairedAt: true },
+        where: eq(devices.id, deviceId),
+      });
+
+      const isAlreadyPaired = device?.pairedAt !== null;
+
       await this.db
         .update(devices)
         .set({
@@ -416,10 +428,15 @@ export class Registry {
         })
         .where(eq(devices.id, deviceId));
 
-      log(`Marked device as paired: ${deviceId}`);
-    } catch (error) {
-      log('Failed to mark device as paired:', error);
-      throw error;
+      // Only log as info if this is a new pairing, otherwise debug
+      if (isAlreadyPaired) {
+        logDebug(`Device already paired, updating lastSeen: ${deviceId}`);
+      } else {
+        logInfo(`Marked device as paired: ${deviceId}`);
+      }
+    } catch (err) {
+      logError('Failed to mark device as paired:', err);
+      throw err;
     }
   }
 
@@ -432,8 +449,153 @@ export class Registry {
         .update(devices)
         .set({ lastSeen: new Date() })
         .where(eq(devices.id, deviceId));
-    } catch (error) {
-      log('Failed to update device last seen:', error);
+    } catch (err) {
+      logWarn('Failed to update device last seen:', err);
+    }
+  }
+
+  /**
+   * Set telemetry configuration for an entity
+   * @param entityId - Entity ID
+   * @param field - Optional field name. If null, config applies to all fields
+   * @param config - Telemetry configuration options
+   */
+  async setTelemetryConfig(
+    entityId: string,
+    field: string | null,
+    config: {
+      minimumInterval?: number | null; // Minimum time between recordings (ms)
+      changeThreshold?: number | null; // Minimum change required to record (for numeric values)
+    },
+  ) {
+    try {
+      // Verify entity exists
+      const entity = await this.db.query.entities.findFirst({
+        where: eq(entities.id, entityId),
+      });
+
+      if (!entity) {
+        throw new Error(`Entity not found: ${entityId}`);
+      }
+
+      // Check if config already exists
+      const existing = await this.db.query.telemetryConfig.findFirst({
+        where: and(
+          eq(telemetryConfig.entityId, entityId),
+          field === null
+            ? isNull(telemetryConfig.field)
+            : eq(telemetryConfig.field, field),
+        ),
+      });
+
+      if (existing) {
+        // Update existing config
+        await this.db
+          .update(telemetryConfig)
+          .set({
+            changeThreshold: config.changeThreshold ?? null,
+            minimumInterval: config.minimumInterval ?? null,
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(telemetryConfig.entityId, entityId),
+              field === null
+                ? isNull(telemetryConfig.field)
+                : eq(telemetryConfig.field, field),
+            ),
+          );
+      } else {
+        // Insert new config
+        await this.db.insert(telemetryConfig).values({
+          changeThreshold: config.changeThreshold ?? null,
+          entityId,
+          field: field ?? null,
+          minimumInterval: config.minimumInterval ?? null,
+          updatedAt: new Date(),
+        });
+      }
+
+      logInfo(
+        `Updated telemetry config for entity ${entityId}${field ? ` field ${field}` : ''}`,
+      );
+    } catch (err) {
+      logError('Failed to set telemetry config:', err);
+      throw err;
+    }
+  }
+
+  /**
+   * Get telemetry configuration for an entity
+   * Returns field-specific config if available, otherwise entity-level config
+   */
+  async getTelemetryConfig(
+    entityId: string,
+    field?: string,
+  ): Promise<{
+    changeThreshold: number | null;
+    minimumInterval: number | null;
+  } | null> {
+    try {
+      // First try to get field-specific config if field is provided
+      if (field) {
+        const fieldConfig = await this.db.query.telemetryConfig.findFirst({
+          where: and(
+            eq(telemetryConfig.entityId, entityId),
+            eq(telemetryConfig.field, field),
+          ),
+        });
+
+        if (fieldConfig) {
+          return {
+            changeThreshold: fieldConfig.changeThreshold ?? null,
+            minimumInterval: fieldConfig.minimumInterval ?? null,
+          };
+        }
+      }
+
+      // Fall back to entity-level config (field is null)
+      const entityConfig = await this.db.query.telemetryConfig.findFirst({
+        where: and(
+          eq(telemetryConfig.entityId, entityId),
+          isNull(telemetryConfig.field),
+        ),
+      });
+
+      if (entityConfig) {
+        return {
+          changeThreshold: entityConfig.changeThreshold ?? null,
+          minimumInterval: entityConfig.minimumInterval ?? null,
+        };
+      }
+
+      return null;
+    } catch (err) {
+      logWarn('Failed to get telemetry config:', err);
+      return null;
+    }
+  }
+
+  /**
+   * Remove telemetry configuration for an entity
+   */
+  async removeTelemetryConfig(entityId: string, field?: string) {
+    try {
+      const where = field
+        ? and(
+            eq(telemetryConfig.entityId, entityId),
+            eq(telemetryConfig.field, field),
+          )
+        : eq(telemetryConfig.entityId, entityId);
+
+      await this.db.delete(telemetryConfig).where(where);
+
+      logInfo(
+        `Removed telemetry config for entity ${entityId}${field ? ` field ${field}` : ''}`,
+      );
+    } catch (err) {
+      logError('Failed to remove telemetry config:', err);
+      throw err;
     }
   }
 }

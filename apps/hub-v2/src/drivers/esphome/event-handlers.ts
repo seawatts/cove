@@ -3,13 +3,15 @@
  * Handles ESPHome client events and entity state updates
  */
 
-import { debug } from '@cove/logger';
+import { debug, info, warn } from '@cove/logger';
 import type {
   ESPHomeConnection,
   ESPHomeConnectionWithCallbacks,
 } from './types';
 
-const log = debug('cove:driver:esphome');
+const logDebug = debug('cove:driver:esphome');
+const logInfo = info('cove:driver:esphome');
+const logWarn = warn('cove:driver:esphome');
 
 /**
  * Set up event handlers for an ESPHome connection
@@ -20,7 +22,7 @@ export function setupEventHandlers(connection: ESPHomeConnection): void {
   // Note: esphome-client uses 'connect' not 'connected'
 
   client.on('disconnected', () => {
-    log(`Disconnected from ${deviceId}`);
+    logInfo(`Disconnected from ${deviceId}`);
     connection.connected = false;
   });
 
@@ -35,7 +37,7 @@ export function setupEventHandlers(connection: ESPHomeConnection): void {
         type: string;
       }>,
     ) => {
-      log(
+      logDebug(
         `Entities discovered for ${deviceId} - processing ${entityList.length} entities`,
       );
       // Process entities from the event data
@@ -45,13 +47,13 @@ export function setupEventHandlers(connection: ESPHomeConnection): void {
 
   // Listen for device info
   client.on('deviceInfo', (info: unknown) => {
-    log(`Device info for ${deviceId}:`, info);
+    logDebug(`Device info for ${deviceId}:`, info);
     connection.deviceInfo = info as ESPHomeConnection['deviceInfo'];
   });
 
   // Listen for connect event from esphome-client
   client.on('connect', (data: { encrypted?: boolean }) => {
-    log(`Connected to ${deviceId} (encrypted: ${data.encrypted || false})`);
+    logInfo(`Connected to ${deviceId} (encrypted: ${data.encrypted || false})`);
     connection.connected = true;
   });
 
@@ -65,25 +67,45 @@ export function setupEventHandlers(connection: ESPHomeConnection): void {
       type: string;
       unitOfMeasurement?: string;
     }) => {
-      // Find the entity by key
+      // Find the entity by key first, then try objectId if key doesn't match
+      // Sometimes the 'key' in the event data is actually an objectId (large number)
+      let foundEntityId: string | null = null;
       for (const [entityId, entity] of connection.entities) {
         if (entity.key === data.key) {
-          // Check if we have callbacks registered for this entity
-          const connWithCallbacks =
-            connection as ESPHomeConnectionWithCallbacks;
-          if (connWithCallbacks.entityCallbacks) {
-            const callback = connWithCallbacks.entityCallbacks.get(entityId);
-            if (callback && data.state !== undefined) {
-              // For sensors, include unit when available so downstream can persist it
-              const payload = {
-                unit: data.unitOfMeasurement,
-                value: data.state,
-              } as Record<string, unknown>;
-              log(`State update for entity ${entityId}:`, payload);
-              callback(payload);
-            }
-          }
+          foundEntityId = entityId;
           break;
+        }
+        // Also try matching by objectId if key doesn't match
+        // The data.key might actually be an objectId in string/number format
+        if (
+          entity.objectId === String(data.key) ||
+          entity.objectId === data.key.toString()
+        ) {
+          foundEntityId = entityId;
+          break;
+        }
+      }
+
+      if (!foundEntityId) {
+        // Log warn when entity not found - this can happen when ESPHome sends events for entities we haven't subscribed to
+        logWarn(
+          `No entity found for sensor event (key: ${data.key}, entity: ${data.entity}, type: ${data.type})`,
+        );
+        return;
+      }
+
+      // Check if we have callbacks registered for this entity
+      const connWithCallbacks = connection as ESPHomeConnectionWithCallbacks;
+      if (connWithCallbacks.entityCallbacks) {
+        const callback = connWithCallbacks.entityCallbacks.get(foundEntityId);
+        if (callback && data.state !== undefined) {
+          // For sensors, include unit when available so downstream can persist it
+          const payload = {
+            unit: data.unitOfMeasurement,
+            value: data.state,
+          } as Record<string, unknown>;
+          logDebug(`State update for entity ${foundEntityId}:`, payload);
+          callback(payload);
         }
       }
     },
@@ -99,25 +121,45 @@ export function setupEventHandlers(connection: ESPHomeConnection): void {
       type: string;
       unitOfMeasurement?: string;
     }) => {
-      // Find the entity by key
+      // Find the entity by key first, then try objectId if key doesn't match
+      // Sometimes the 'key' in the event data is actually an objectId (large number)
+      let foundEntityId: string | null = null;
       for (const [entityId, entity] of connection.entities) {
         if (entity.key === data.key) {
-          // Check if we have callbacks registered for this entity
-          const connWithCallbacks =
-            connection as ESPHomeConnectionWithCallbacks;
-          if (connWithCallbacks.entityCallbacks) {
-            const callback = connWithCallbacks.entityCallbacks.get(entityId);
-            if (callback && data.state !== undefined) {
-              // Include unit when available so downstream can persist it
-              const payload = {
-                unit: data.unitOfMeasurement,
-                value: data.state,
-              } as Record<string, unknown>;
-              log(`Telemetry update for entity ${entityId}:`, payload);
-              callback(payload);
-            }
-          }
+          foundEntityId = entityId;
           break;
+        }
+        // Also try matching by objectId if key doesn't match
+        // The data.key might actually be an objectId in string/number format
+        if (
+          entity.objectId === String(data.key) ||
+          entity.objectId === data.key.toString()
+        ) {
+          foundEntityId = entityId;
+          break;
+        }
+      }
+
+      if (!foundEntityId) {
+        // Log warn when entity not found - this can happen when ESPHome sends events for entities we haven't subscribed to
+        logWarn(
+          `No entity found for telemetry event (key: ${data.key}, entity: ${data.entity}, type: ${data.type})`,
+        );
+        return;
+      }
+
+      // Check if we have callbacks registered for this entity
+      const connWithCallbacks = connection as ESPHomeConnectionWithCallbacks;
+      if (connWithCallbacks.entityCallbacks) {
+        const callback = connWithCallbacks.entityCallbacks.get(foundEntityId);
+        if (callback && data.state !== undefined) {
+          // Include unit when available so downstream can persist it
+          const payload = {
+            unit: data.unitOfMeasurement,
+            value: data.state,
+          } as Record<string, unknown>;
+          logDebug(`Telemetry update for entity ${foundEntityId}:`, payload);
+          callback(payload);
         }
       }
     },
@@ -137,7 +179,7 @@ function populateEntitiesFromClient(
   }>,
 ): void {
   try {
-    log(
+    logDebug(
       `Populating entities from list for ${connection.deviceId}, count: ${entityList.length}`,
     );
 
@@ -152,15 +194,15 @@ function populateEntitiesFromClient(
         type: entity.type,
       });
 
-      log(
+      logDebug(
         `Registered entity: ${entityId} (key: ${entity.key}, name: ${entity.name}, type: ${entity.type})`,
       );
     }
 
-    log(
+    logInfo(
       `Populated ${connection.entities.size} entities for ${connection.deviceId}`,
     );
-  } catch (error) {
-    log('Error populating entities from list:', error);
+  } catch (err) {
+    logWarn('Error populating entities from list:', err);
   }
 }

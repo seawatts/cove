@@ -109,6 +109,17 @@ export function mapEntityTypeToKind(type: string): EntityKinds {
 }
 
 /**
+ * Extract device class from ESPHome entity config
+ */
+export function extractDeviceClass(config?: {
+  deviceClass?: string;
+  [key: string]: unknown;
+}): string | undefined {
+  if (!config) return undefined;
+  return config.deviceClass;
+}
+
+/**
  * Create a capability descriptor based on entity type
  */
 export function createCapability(type: string): CapabilityDescriptor {

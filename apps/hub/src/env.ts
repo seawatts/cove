@@ -35,6 +35,12 @@ export const env = createEnv({
 
     // Telemetry
     TELEMETRY_INTERVAL: z.coerce.number().default(30), // 30 seconds
+
+    // Logging
+    DEBUG: z.string().default('cove:*'),
+    LOG_LEVEL: z
+      .enum(['debug', 'info', 'warn', 'error'])
+      .default('info'),
   },
   skipValidation:
     process.env.SKIP_ENV_VALIDATION === 'true' ||

@@ -40,6 +40,7 @@ export default async function getEntities(
       id: entityId,
       kind,
       metadata: {
+        deviceClass: espEntity.deviceClass,
         key: espEntity.key,
         objectId: espEntity.objectId,
         originalType: espEntity.type,
@@ -331,7 +332,15 @@ export function populateEntitiesFromMap(
   connection: ESPHomeConnection,
   entities: Map<
     number,
-    { config?: { name?: string; objectId?: string; entityClass?: string } }
+    {
+      config?: {
+        name?: string;
+        objectId?: string;
+        entityClass?: string;
+        deviceClass?: string;
+        [key: string]: unknown;
+      };
+    }
   >,
 ): void {
   const { deviceId } = connection;
@@ -346,6 +355,7 @@ export function populateEntitiesFromMap(
       const entityId = `${deviceId}:${config.objectId || key}`;
 
       connection.entities.set(entityId, {
+        deviceClass: config.deviceClass,
         entityId,
         key,
         name: config.name || 'Unknown',
@@ -354,7 +364,7 @@ export function populateEntitiesFromMap(
       });
 
       log(
-        `Registered entity: ${entityId} (key: ${key}, name: ${config.name}, type: ${config.entityClass})`,
+        `Registered entity: ${entityId} (key: ${key}, name: ${config.name}, type: ${config.entityClass}, deviceClass: ${config.deviceClass})`,
       );
     }
 

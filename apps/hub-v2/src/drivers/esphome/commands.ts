@@ -22,18 +22,18 @@ async function handleSwitchCommand(
 ): Promise<void> {
   if (command.capability === 'on_off') {
     const state = Boolean(command.value);
-    // ESPHome clients typically use switchCommand(key, state) with numeric key
+    // ESPHome client expects entity ID in format: "switch-objectId"
+    const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
     const client = connection.client as {
-      switchCommand?: (key: number, state: boolean) => Promise<void> | void;
-      sendSwitchCommand?: (key: number, state: boolean) => Promise<void> | void;
+      sendSwitchCommand?: (id: string, state: boolean) => Promise<void> | void;
     };
-    if (client.switchCommand) {
-      await client.switchCommand(entity.key, state);
-    } else if (client.sendSwitchCommand) {
-      await client.sendSwitchCommand(entity.key, state);
+
+    if (client.sendSwitchCommand) {
+      await client.sendSwitchCommand(clientEntityId, state);
     } else {
       log(
-        `No switchCommand method found on client for entity ${entity.entityId}`,
+        `No sendSwitchCommand method found on client for entity ${entity.entityId}`,
       );
     }
   }
@@ -60,23 +60,23 @@ async function handleLightCommand(
     options.state = true;
   }
 
-  // ESPHome clients typically use lightCommand(key, command) with numeric key
+  // ESPHome client expects entity ID in format: "light-objectId"
+  // Our entity.entityId is "deviceId:objectId", so we need to construct the client ID
+  const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
   const client = connection.client as {
-    lightCommand?: (
-      key: number,
-      command: Record<string, unknown>,
-    ) => Promise<void> | void;
     sendLightCommand?: (
-      key: number,
-      command: Record<string, unknown>,
+      id: string,
+      options: Record<string, unknown>,
     ) => Promise<void> | void;
   };
-  if (client.lightCommand) {
-    await client.lightCommand(entity.key, options);
-  } else if (client.sendLightCommand) {
-    await client.sendLightCommand(entity.key, options);
+
+  if (client.sendLightCommand) {
+    await client.sendLightCommand(clientEntityId, options);
   } else {
-    log(`No lightCommand method found on client for entity ${entity.entityId}`);
+    log(
+      `No sendLightCommand method found on client for entity ${entity.entityId}`,
+    );
   }
 }
 
@@ -85,17 +85,18 @@ async function handleButtonCommand(
   entity: ESPHomeEntity,
   _command: DriverCommand,
 ): Promise<void> {
+  // ESPHome client expects entity ID in format: "button-objectId"
+  const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
   const client = connection.client as {
-    buttonCommand?: (key: number) => Promise<void> | void;
-    sendButtonCommand?: (key: number) => Promise<void> | void;
+    sendButtonCommand?: (id: string) => Promise<void> | void;
   };
-  if (client.buttonCommand) {
-    await client.buttonCommand(entity.key);
-  } else if (client.sendButtonCommand) {
-    await client.sendButtonCommand(entity.key);
+
+  if (client.sendButtonCommand) {
+    await client.sendButtonCommand(clientEntityId);
   } else {
     log(
-      `No buttonCommand method found on client for entity ${entity.entityId}`,
+      `No sendButtonCommand method found on client for entity ${entity.entityId}`,
     );
   }
 }
@@ -106,17 +107,18 @@ async function handleNumberCommand(
   command: DriverCommand,
 ): Promise<void> {
   if (command.capability === 'numeric') {
+    // ESPHome client expects entity ID in format: "number-objectId"
+    const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
     const client = connection.client as {
-      numberCommand?: (key: number, value: number) => Promise<void> | void;
-      sendNumberCommand?: (key: number, value: number) => Promise<void> | void;
+      sendNumberCommand?: (id: string, value: number) => Promise<void> | void;
     };
-    if (client.numberCommand) {
-      await client.numberCommand(entity.key, Number(command.value));
-    } else if (client.sendNumberCommand) {
-      await client.sendNumberCommand(entity.key, Number(command.value));
+
+    if (client.sendNumberCommand) {
+      await client.sendNumberCommand(clientEntityId, Number(command.value));
     } else {
       log(
-        `No numberCommand method found on client for entity ${entity.entityId}`,
+        `No sendNumberCommand method found on client for entity ${entity.entityId}`,
       );
     }
   }
@@ -128,17 +130,18 @@ async function handleSelectCommand(
   command: DriverCommand,
 ): Promise<void> {
   if (command.capability === 'select') {
+    // ESPHome client expects entity ID in format: "select-objectId"
+    const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
     const client = connection.client as {
-      selectCommand?: (key: number, value: string) => Promise<void> | void;
-      sendSelectCommand?: (key: number, value: string) => Promise<void> | void;
+      sendSelectCommand?: (id: string, value: string) => Promise<void> | void;
     };
-    if (client.selectCommand) {
-      await client.selectCommand(entity.key, String(command.value));
-    } else if (client.sendSelectCommand) {
-      await client.sendSelectCommand(entity.key, String(command.value));
+
+    if (client.sendSelectCommand) {
+      await client.sendSelectCommand(clientEntityId, String(command.value));
     } else {
       log(
-        `No selectCommand method found on client for entity ${entity.entityId}`,
+        `No sendSelectCommand method found on client for entity ${entity.entityId}`,
       );
     }
   }
@@ -158,22 +161,22 @@ async function handleFanCommand(
     options.state = Boolean(command.value);
   }
 
+  // ESPHome client expects entity ID in format: "fan-objectId"
+  const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
   const client = connection.client as {
-    fanCommand?: (
-      key: number,
-      command: Record<string, unknown>,
-    ) => Promise<void> | void;
     sendFanCommand?: (
-      key: number,
-      command: Record<string, unknown>,
+      id: string,
+      options: Record<string, unknown>,
     ) => Promise<void> | void;
   };
-  if (client.fanCommand) {
-    await client.fanCommand(entity.key, options);
-  } else if (client.sendFanCommand) {
-    await client.sendFanCommand(entity.key, options);
+
+  if (client.sendFanCommand) {
+    await client.sendFanCommand(clientEntityId, options);
   } else {
-    log(`No fanCommand method found on client for entity ${entity.entityId}`);
+    log(
+      `No sendFanCommand method found on client for entity ${entity.entityId}`,
+    );
   }
 }
 
@@ -188,22 +191,22 @@ async function handleCoverCommand(
     options.position = Number(command.value) / 100; // Convert 0-100 to 0-1
   }
 
+  // ESPHome client expects entity ID in format: "cover-objectId"
+  const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
   const client = connection.client as {
-    coverCommand?: (
-      key: number,
-      command: Record<string, unknown>,
-    ) => Promise<void> | void;
     sendCoverCommand?: (
-      key: number,
-      command: Record<string, unknown>,
+      id: string,
+      options: Record<string, unknown>,
     ) => Promise<void> | void;
   };
-  if (client.coverCommand) {
-    await client.coverCommand(entity.key, options);
-  } else if (client.sendCoverCommand) {
-    await client.sendCoverCommand(entity.key, options);
+
+  if (client.sendCoverCommand) {
+    await client.sendCoverCommand(clientEntityId, options);
   } else {
-    log(`No coverCommand method found on client for entity ${entity.entityId}`);
+    log(
+      `No sendCoverCommand method found on client for entity ${entity.entityId}`,
+    );
   }
 }
 
@@ -218,23 +221,21 @@ async function handleClimateCommand(
     options.targetTemperature = Number(command.value);
   }
 
+  // ESPHome client expects entity ID in format: "climate-objectId"
+  const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
   const client = connection.client as {
-    climateCommand?: (
-      key: number,
-      command: Record<string, unknown>,
-    ) => Promise<void> | void;
     sendClimateCommand?: (
-      key: number,
-      command: Record<string, unknown>,
+      id: string,
+      options: Record<string, unknown>,
     ) => Promise<void> | void;
   };
-  if (client.climateCommand) {
-    await client.climateCommand(entity.key, options);
-  } else if (client.sendClimateCommand) {
-    await client.sendClimateCommand(entity.key, options);
+
+  if (client.sendClimateCommand) {
+    await client.sendClimateCommand(clientEntityId, options);
   } else {
     log(
-      `No climateCommand method found on client for entity ${entity.entityId}`,
+      `No sendClimateCommand method found on client for entity ${entity.entityId}`,
     );
   }
 }
@@ -245,29 +246,25 @@ async function handleLockCommand(
   command: DriverCommand,
 ): Promise<void> {
   const state = String(command.value).toLowerCase();
+  // ESPHome client expects entity ID in format: "lock-objectId"
+  const clientEntityId = `${entity.type}-${entity.objectId}`.toLowerCase();
+
   const client = connection.client as {
-    lockCommand?: (key: number, action: string) => Promise<void> | void;
-    sendLockCommand?: (key: number, action: string) => Promise<void> | void;
+    sendLockCommand?: (id: string, action: string) => Promise<void> | void;
   };
 
-  if (client.lockCommand) {
+  if (client.sendLockCommand) {
     if (state === 'lock') {
-      await client.lockCommand(entity.key, 'lock');
+      await client.sendLockCommand(clientEntityId, 'lock');
     } else if (state === 'unlock') {
-      await client.lockCommand(entity.key, 'unlock');
+      await client.sendLockCommand(clientEntityId, 'unlock');
     } else if (state === 'open') {
-      await client.lockCommand(entity.key, 'open');
-    }
-  } else if (client.sendLockCommand) {
-    if (state === 'lock') {
-      await client.sendLockCommand(entity.key, 'lock');
-    } else if (state === 'unlock') {
-      await client.sendLockCommand(entity.key, 'unlock');
-    } else if (state === 'open') {
-      await client.sendLockCommand(entity.key, 'open');
+      await client.sendLockCommand(clientEntityId, 'open');
     }
   } else {
-    log(`No lockCommand method found on client for entity ${entity.entityId}`);
+    log(
+      `No sendLockCommand method found on client for entity ${entity.entityId}`,
+    );
   }
 }
 

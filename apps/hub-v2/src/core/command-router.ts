@@ -3,13 +3,17 @@
  * Routes commands to appropriate drivers with retry, rate limiting, and coalescing
  */
 
-import { debug } from '@cove/logger';
+import { debug, error, info, warn } from '@cove/logger';
 import type { Device, Entity } from '../db/types';
+import { getDriverState as getESPHomeDriverState } from '../drivers/esphome/state';
 import type { Driver } from './driver-kit';
 import type { EventBus } from './event-bus';
 import type { Registry } from './registry';
 
-const log = debug('cove:hub-v2:command-router');
+const logDebug = debug('cove:hub-v2:command-router');
+const logInfo = info('cove:hub-v2:command-router');
+const logWarn = warn('cove:hub-v2:command-router');
+const logError = error('cove:hub-v2:command-router');
 
 export interface CommandRouterOptions {
   registry: Registry;
@@ -75,13 +79,13 @@ export class CommandRouter {
 
       // Process coalesced commands
       for (const command of commands) {
-        this.processCommandInternal(command).catch((error) => {
-          log('Error processing coalesced command:', error);
+        this.processCommandInternal(command).catch((err) => {
+          logError('Error processing coalesced command:', err);
         });
       }
     }, this.COALESCE_WINDOW);
 
-    log('Started command coalescing');
+    logInfo('Started command coalescing');
   }
 
   /**
@@ -99,13 +103,13 @@ export class CommandRouter {
       this.coalescingQueue.clear();
 
       for (const command of commands) {
-        this.processCommandInternal(command).catch((error) => {
-          log('Error processing remaining coalesced command:', error);
+        this.processCommandInternal(command).catch((err) => {
+          logError('Error processing remaining coalesced command:', err);
         });
       }
     }
 
-    log('Stopped command coalescing');
+    logInfo('Stopped command coalescing');
   }
 
   /**
@@ -196,16 +200,16 @@ export class CommandRouter {
       // Check for in-flight command (idempotency)
       const inFlight = this.inFlightCommands.get(commandKey);
       if (inFlight) {
-        log(`Command already in flight: ${commandKey}`);
+        logDebug(`Command already in flight: ${commandKey}`);
         return await inFlight.promise;
       }
 
       // Check rate limit
       if (!this.checkRateLimit(command.entityId)) {
-        const error = `Rate limit exceeded for entity: ${command.entityId}`;
-        log(error);
+        const errorMsg = `Rate limit exceeded for entity: ${command.entityId}`;
+        logWarn(errorMsg);
         return {
-          error,
+          error: errorMsg,
           latency: Date.now() - startTime,
           success: false,
         };
@@ -214,10 +218,10 @@ export class CommandRouter {
       // Get entity and device info
       const entity = await this.registry.getEntity(command.entityId);
       if (!entity) {
-        const error = `Entity not found: ${command.entityId}`;
-        log(error);
+        const errorMsg = `Entity not found: ${command.entityId}`;
+        logError(errorMsg);
         return {
-          error,
+          error: errorMsg,
           latency: Date.now() - startTime,
           success: false,
         };
@@ -225,10 +229,10 @@ export class CommandRouter {
 
       const device = await this.registry.getDevice(entity.deviceId);
       if (!device) {
-        const error = `Device not found for entity: ${command.entityId}`;
-        log(error);
+        const errorMsg = `Device not found for entity: ${command.entityId}`;
+        logError(errorMsg);
         return {
-          error,
+          error: errorMsg,
           latency: Date.now() - startTime,
           success: false,
         };
@@ -237,10 +241,10 @@ export class CommandRouter {
       // Get driver for device protocol
       const driver = this.drivers.get(device.protocol);
       if (!driver) {
-        const error = `No driver found for protocol: ${device.protocol}`;
-        log(error);
+        const errorMsg = `No driver found for protocol: ${device.protocol}`;
+        logError(errorMsg);
         return {
-          error,
+          error: errorMsg,
           latency: Date.now() - startTime,
           success: false,
         };
@@ -274,17 +278,20 @@ export class CommandRouter {
         success: result.success,
       });
 
-      log(
-        `Command processed: ${commandKey} (${result.success ? 'success' : 'failed'})`,
-      );
+      if (result.success) {
+        logInfo(`Command processed: ${commandKey}`);
+      } else {
+        logError(
+          `Command failed: ${commandKey} - ${result.error || 'Unknown error'}`,
+        );
+      }
       return result;
-    } catch (error) {
+    } catch (err) {
       // Clean up in-flight command on error
       this.inFlightCommands.delete(commandKey);
 
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      log(`Command failed: ${commandKey} - ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      logError(`Command failed: ${commandKey} - ${errorMessage}`);
 
       const result = {
         error: errorMessage,
@@ -322,10 +329,99 @@ export class CommandRouter {
         // Map normalized command to driver-specific format
         const driverCommand = this.mapCommandToDriver(command, entity, device);
 
+        // Construct driver-specific entity ID if needed (e.g., ESPHome uses driverDeviceId:objectId format)
+        let driverEntityId = command.entityId;
+        if (device.protocol === 'esphome') {
+          const credentials = await this.registry.getCredentials(device.id);
+          if (credentials) {
+            const driverDeviceId = (credentials as { driverDeviceId?: string })
+              ?.driverDeviceId;
+
+            if (!driverDeviceId) {
+              logError(
+                `Cannot construct ESPHome entity ID: missing driverDeviceId for device ${device.id}`,
+              );
+            } else {
+              // Look up objectId from ESPHome connection using entity key
+              // Same approach as used in daemon subscription loop
+              let entityObjectId: string | undefined;
+
+              if (entity.key) {
+                const driverState = getESPHomeDriverState();
+                const connection = driverState.connections.get(driverDeviceId);
+
+                if (connection) {
+                  // Find entity in connection by key or objectId
+                  // Note: entity.key might be stored as either ESPHome key (small number)
+                  // or objectId (large number like 2082512631)
+                  for (const [
+                    storedEntityId,
+                    espEntity,
+                  ] of connection.entities.entries()) {
+                    // Try matching by ESPHome key first (most reliable)
+                    const entityKeyMatch =
+                      entity.key &&
+                      (String(espEntity.key) === String(entity.key) ||
+                        Number(espEntity.key) === Number(entity.key));
+
+                    // Also try matching by objectId since entity.key might be stored as objectId
+                    const objectIdMatch =
+                      entity.key &&
+                      (espEntity.objectId === String(entity.key) ||
+                        espEntity.objectId === entity.key);
+
+                    if (entityKeyMatch || objectIdMatch) {
+                      entityObjectId =
+                        espEntity.objectId ||
+                        storedEntityId.split(':').slice(1).join(':');
+                      break;
+                    }
+                  }
+
+                  // If still not found, extract from stored entity ID
+                  if (!entityObjectId) {
+                    for (const [
+                      storedEntityId,
+                    ] of connection.entities.entries()) {
+                      if (storedEntityId.startsWith(`${driverDeviceId}:`)) {
+                        const extractedObjectId = storedEntityId
+                          .split(':')
+                          .slice(1)
+                          .join(':');
+                        if (extractedObjectId) {
+                          entityObjectId = extractedObjectId;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              if (driverDeviceId && entityObjectId) {
+                driverEntityId = `${driverDeviceId}:${entityObjectId}`;
+                // Only log successful construction in debug mode
+              } else {
+                // Fallback: try to use the entity ID directly if it's already in driver format
+                if (
+                  command.entityId.includes(':') &&
+                  command.entityId.split(':')[0] === driverDeviceId
+                ) {
+                  driverEntityId = command.entityId;
+                } else {
+                  logError(
+                    `Cannot construct ESPHome entity ID: driverDeviceId=${driverDeviceId}, entityObjectId=${entityObjectId}, entityKey=${entity.key}`,
+                  );
+                }
+              }
+            }
+          }
+        }
+
         // Execute command on driver
-        const result = await driver.invoke(command.entityId, {
+        const result = await driver.invoke(driverEntityId, {
           capability: command.capability,
-          entityId: command.entityId,
+          entityId: driverEntityId,
           metadata: driverCommand,
           value: command.value,
         });
@@ -342,7 +438,7 @@ export class CommandRouter {
 
         if (attempt < maxRetries) {
           const delay = Math.min(100 * 2 ** (attempt - 1), 1000); // Exponential backoff, max 1s
-          log(
+          logWarn(
             `Command attempt ${attempt} failed, retrying in ${delay}ms: ${lastError.message}`,
           );
           await new Promise((resolve) => setTimeout(resolve, delay));
@@ -392,6 +488,6 @@ export class CommandRouter {
     this.inFlightCommands.clear();
     this.coalescingQueue.clear();
     this.rateLimits.clear();
-    log('Cleared command router state');
+    logDebug('Cleared command router state');
   }
 }

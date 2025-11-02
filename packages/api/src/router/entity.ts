@@ -41,6 +41,7 @@ export const entitiesRouter = createTRPCRouter({
             model: devices.model,
             name: devices.name,
           },
+          displayName: entities.displayName,
           entityId: entities.id,
           key: entities.key,
           kind: entities.kind,
@@ -82,6 +83,7 @@ export const entitiesRouter = createTRPCRouter({
           },
           deviceClass: entities.deviceClass,
           deviceId: entities.deviceId,
+          displayName: entities.displayName,
           entityId: entities.id,
           key: entities.key,
           kind: entities.kind,
@@ -128,6 +130,7 @@ export const entitiesRouter = createTRPCRouter({
             model: devices.model,
             name: devices.name,
           },
+          displayName: entities.displayName,
           entityId: entities.id,
           key: entities.key,
           kind: entities.kind,
@@ -423,5 +426,31 @@ export const entitiesRouter = createTRPCRouter({
       });
 
       return { success: true };
+    }),
+
+  /**
+   * Update an entity
+   */
+  update: protectedProcedure
+    .input(
+      z.object({
+        displayName: z.string().optional(),
+        entityId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { entityId, displayName } = input;
+
+      const result = await ctx.db
+        .update(entities)
+        .set({ displayName })
+        .where(eq(entities.id, entityId))
+        .returning();
+
+      if (result.length === 0) {
+        throw new Error('Entity not found');
+      }
+
+      return result[0];
     }),
 });
