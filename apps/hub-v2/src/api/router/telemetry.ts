@@ -3,7 +3,9 @@
  * Entity telemetry queries
  */
 
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { telemetry } from '../../db/schema';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 
 export const telemetryRouter = createTRPCRouter({
@@ -22,13 +24,13 @@ export const telemetryRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { entityId, field, since, limit } = input;
 
-      const telemetry = await ctx.daemon.getEntityTelemetry(entityId, {
+      const telemetryData = await ctx.daemon.getEntityTelemetry(entityId, {
         field,
         limit,
         since,
       });
 
-      return telemetry;
+      return telemetryData;
     }),
 
   /**
@@ -58,5 +60,28 @@ export const telemetryRouter = createTRPCRouter({
       );
 
       return aggregated;
+    }),
+
+  /**
+   * Get distinct telemetry fields for an entity
+   */
+  getFields: publicProcedure
+    .input(
+      z.object({
+        entityId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { entityId } = input;
+
+      const db = ctx.daemon.getDb();
+
+      // Get distinct fields for this entity from telemetry table
+      const result = await db
+        .selectDistinct({ field: telemetry.field })
+        .from(telemetry)
+        .where(eq(telemetry.entityId, entityId));
+
+      return result.map((r) => r.field);
     }),
 });

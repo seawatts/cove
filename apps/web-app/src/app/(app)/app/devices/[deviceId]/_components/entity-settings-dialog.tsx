@@ -71,6 +71,13 @@ export function EntitySettingsDialog({
   // Get home ID from hub
   const { data: home } = hubApi.home.get.useQuery();
 
+  // Fetch actual telemetry fields from database
+  const { data: telemetryFields = [], isLoading: isLoadingFields } =
+    hubApi.telemetry.getFields.useQuery(
+      { entityId: entity.entityId },
+      { enabled: open },
+    );
+
   const updateEntity = api.entity.update.useMutation({
     onError: (error) => {
       toast.error(`Failed to update entity: ${error.message}`);
@@ -90,14 +97,17 @@ export function EntitySettingsDialog({
     });
   };
 
-  // Get available telemetry fields from entity capabilities
-  const availableFields = Array.from(
-    new Set(
-      entity.capabilities
-        .flatMap((cap) => Object.keys(cap))
-        .filter((key) => !['type', 'action', 'command'].includes(key)),
-    ),
-  );
+  // Use telemetry fields from database, fallback to capability keys if none exist
+  const availableFields =
+    telemetryFields.length > 0
+      ? telemetryFields
+      : Array.from(
+          new Set(
+            entity.capabilities
+              .flatMap((cap) => Object.keys(cap))
+              .filter((key) => !['type', 'action', 'command'].includes(key)),
+          ),
+        );
 
   // Fetch alert configs
   const { data: alertConfigs = [], isLoading: isLoadingAlerts } =
@@ -322,7 +332,23 @@ export function EntitySettingsDialog({
           </TabsContent>
 
           <TabsContent className="space-y-4" value="alerts">
-            {showAlertForm ? (
+            {isLoadingFields ? (
+              <div className="flex items-center justify-center py-8">
+                <Text className="text-muted-foreground">
+                  Loading available fields...
+                </Text>
+              </div>
+            ) : availableFields.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Text className="text-muted-foreground">
+                  No telemetry fields found
+                </Text>
+                <Text className="text-xs text-muted-foreground mt-2">
+                  This entity needs to report telemetry data before alerts can
+                  be configured
+                </Text>
+              </div>
+            ) : showAlertForm ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Text className="font-medium">
@@ -344,10 +370,15 @@ export function EntitySettingsDialog({
             ) : (
               <>
                 <div className="flex items-center justify-between">
-                  <Text className="text-sm text-muted-foreground">
-                    Configure alerts to get notified when values cross
-                    thresholds
-                  </Text>
+                  <div className="space-y-1">
+                    <Text className="text-sm text-muted-foreground">
+                      Configure alerts to get notified when values cross
+                      thresholds
+                    </Text>
+                    <Text className="text-xs text-muted-foreground">
+                      Available fields: {availableFields.join(', ')}
+                    </Text>
+                  </div>
                   <Button onClick={handleNewAlert} size="sm">
                     <Plus className="h-4 w-4 mr-2" />
                     New Alert
