@@ -86,7 +86,8 @@
     "./hooks/*": "./src/hooks/*.tsx",
     "./lib/*": "./src/lib/*.tsx",
     "./magicui/*": "./src/magicui/*.tsx",
-    "./postcss.config": "./postcss.config.mjs"
+    "./postcss.config": "./postcss.config.mjs",
+    "./utils": "./src/lib/utils.tsx"
   },
   "license": "MIT",
   "name": "@cove/ui",

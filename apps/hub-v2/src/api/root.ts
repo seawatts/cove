@@ -3,6 +3,7 @@
  * Combines all routers into a single app router
  */
 
+import { alertsRouter } from './router/alerts';
 import { deviceRouter } from './router/device';
 import { entityRouter } from './router/entity';
 import { healthRouter } from './router/health';
@@ -11,6 +12,7 @@ import { telemetryRouter } from './router/telemetry';
 import { createTRPCRouter } from './trpc';
 
 export const appRouter = createTRPCRouter({
+  alerts: alertsRouter,
   device: deviceRouter,
   entity: entityRouter,
   health: healthRouter,

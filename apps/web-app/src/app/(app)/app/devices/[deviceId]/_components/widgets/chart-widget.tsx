@@ -1,5 +1,6 @@
 'use client';
 
+import { getAlertSeverityColor } from '@cove/types';
 import type { WidgetProps } from '@cove/types/widget';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@cove/ui/chart';
@@ -17,10 +18,14 @@ import {
   Area,
   CartesianGrid,
   ComposedChart,
+  Dot,
   Line,
+  ReferenceArea,
+  ReferenceLine,
   XAxis,
   YAxis,
 } from 'recharts';
+import { hubApi } from '~/lib/hub-trpc/client';
 import { useEntityData } from '../hooks/use-entity-data';
 
 function calculateStats(
@@ -77,6 +82,18 @@ export function ChartWidget({ sensor }: WidgetProps) {
       onStateChange: onStateChangeCallback,
       timeRange: timeRange as '1h' | '24h' | '7d' | '30d' | '90d',
     });
+
+  // Fetch alert configurations for this entity
+  const { data: alertConfigs = [] } = hubApi.alerts.list.useQuery({
+    entityId: sensor.entityId,
+    field: sensor.key,
+  });
+
+  // Fetch alert history for marking on chart
+  const { data: alertHistory = [] } = hubApi.alerts.getHistory.useQuery({
+    entityId: sensor.entityId,
+    limit: 100,
+  });
 
   // Use latest telemetry value if available (most accurate), then latest state, then fall back to initial sensor value
   const currentValue =
@@ -479,6 +496,138 @@ export function ChartWidget({ sensor }: WidgetProps) {
               strokeDasharray="5 5"
               strokeWidth={2}
               type="monotone"
+            />
+
+            {/* Alert threshold lines and shaded regions */}
+            {alertConfigs.map((config) => {
+              if (config.alertType === 'threshold' && config.thresholdValue) {
+                return (
+                  <ReferenceLine
+                    key={config.id}
+                    label={{
+                      fill: getAlertSeverityColor(
+                        config.severity as 'info' | 'warning' | 'critical',
+                      ),
+                      fontSize: 12,
+                      position: 'insideTopRight',
+                      value: config.name,
+                    }}
+                    stroke={getAlertSeverityColor(
+                      config.severity as 'info' | 'warning' | 'critical',
+                    )}
+                    strokeDasharray="3 3"
+                    strokeWidth={2}
+                    y={config.thresholdValue}
+                  />
+                );
+              }
+
+              if (
+                config.alertType === 'range' &&
+                config.rangeMin !== null &&
+                config.rangeMax !== null
+              ) {
+                const color = getAlertSeverityColor(
+                  config.severity as 'info' | 'warning' | 'critical',
+                );
+                return (
+                  <React.Fragment key={config.id}>
+                    {/* Shaded area above max */}
+                    {config.rangeMax < yMax && (
+                      <ReferenceArea
+                        fill={color}
+                        fillOpacity={0.1}
+                        strokeOpacity={0.3}
+                        y1={config.rangeMax}
+                        y2={yMax}
+                      />
+                    )}
+                    {/* Shaded area below min */}
+                    {config.rangeMin > yMin && (
+                      <ReferenceArea
+                        fill={color}
+                        fillOpacity={0.1}
+                        strokeOpacity={0.3}
+                        y1={yMin}
+                        y2={config.rangeMin}
+                      />
+                    )}
+                    {/* Threshold lines */}
+                    <ReferenceLine
+                      stroke={color}
+                      strokeDasharray="3 3"
+                      strokeWidth={1.5}
+                      y={config.rangeMax}
+                    />
+                    <ReferenceLine
+                      label={{
+                        fill: color,
+                        fontSize: 12,
+                        position: 'insideTopRight',
+                        value: config.name,
+                      }}
+                      stroke={color}
+                      strokeDasharray="3 3"
+                      strokeWidth={1.5}
+                      y={config.rangeMin}
+                    />
+                  </React.Fragment>
+                );
+              }
+
+              return null;
+            })}
+
+            {/* Custom dots for alert events */}
+            <Line
+              dataKey="realValue"
+              dot={(props: unknown) => {
+                const dotProps = props as {
+                  cx: number;
+                  cy: number;
+                  payload: ChartDataPoint;
+                  index: number;
+                };
+
+                // Find if there's an alert event at this timestamp
+                const alertEvent = alertHistory.find((event) => {
+                  const eventTime = new Date(event.triggeredAt).getTime();
+                  const pointTime = dotProps.payload.timestamp;
+                  // Allow 5 minute tolerance
+                  return Math.abs(eventTime - pointTime) < 5 * 60 * 1000;
+                });
+
+                if (alertEvent) {
+                  const color = getAlertSeverityColor(
+                    alertEvent.severity as 'info' | 'warning' | 'critical',
+                  );
+                  return (
+                    <Dot
+                      cx={dotProps.cx}
+                      cy={dotProps.cy}
+                      fill={color}
+                      key={`alert-dot-${dotProps.payload.timestamp}-${dotProps.index}`}
+                      r={6}
+                      stroke="#fff"
+                      strokeWidth={2}
+                    />
+                  );
+                }
+
+                // Return transparent dot to satisfy type requirements
+                return (
+                  <Dot
+                    cx={dotProps.cx}
+                    cy={dotProps.cy}
+                    fill="transparent"
+                    key={`transparent-dot-${dotProps.payload.timestamp}-${dotProps.index}`}
+                    r={0}
+                  />
+                );
+              }}
+              isAnimationActive={false}
+              stroke="transparent"
+              strokeWidth={0}
             />
           </ComposedChart>
         </ChartContainer>

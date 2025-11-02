@@ -20,6 +20,8 @@ export interface WebSocketMessage {
     | 'telemetry'
     | 'device_lifecycle'
     | 'command'
+    | 'alert_triggered'
+    | 'alert_resolved'
     | 'error';
   data: unknown;
   timestamp: string;
@@ -175,6 +177,25 @@ export function createWebSocketHandler(daemon: HubDaemon) {
       });
     });
 
+    // Subscribe to alert triggered events
+    const alertTriggeredUnsub = eventBus.subscribe(
+      'alert/triggered',
+      (event) => {
+        sendToClient(ws, {
+          data: event,
+          type: 'alert_triggered',
+        });
+      },
+    );
+
+    // Subscribe to alert resolved events
+    const alertResolvedUnsub = eventBus.subscribe('alert/resolved', (event) => {
+      sendToClient(ws, {
+        data: event,
+        type: 'alert_resolved',
+      });
+    });
+
     // Store unsubscribe functions on WebSocket object
     ws.unsubscribeFunctions = [
       stateUnsub,
@@ -182,6 +203,8 @@ export function createWebSocketHandler(daemon: HubDaemon) {
       telemetryUnsub,
       commandUnsub,
       errorUnsub,
+      alertTriggeredUnsub,
+      alertResolvedUnsub,
     ];
   }
 

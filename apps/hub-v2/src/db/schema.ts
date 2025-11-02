@@ -192,10 +192,95 @@ export const telemetryConfig = sqliteTable(
 );
 
 // ===================================
+// Alert System
+// ===================================
+
+export const alertConfigs = sqliteTable(
+  'alertConfigs',
+  {
+    alertType: text('alertType').notNull(), // 'threshold', 'range', 'rate_of_change'
+    createdAt: integer('createdAt', { mode: 'timestamp' })
+      .notNull()
+      .$defaultFn(() => new Date()),
+    enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+    entityId: text('entityId')
+      .notNull()
+      .references(() => entities.id, { onDelete: 'cascade' }),
+    field: text('field').notNull(), // telemetry field to monitor (e.g., "co2", "temperature")
+    homeId: text('homeId')
+      .notNull()
+      .references(() => homes.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'alert_config' }))
+      .notNull()
+      .primaryKey(),
+    name: text('name').notNull(),
+    // Range config (for range alerts)
+    rangeMax: integer('rangeMax'), // maximum value for range
+    rangeMin: integer('rangeMin'), // minimum value for range
+    // Rate of change config (for rate_of_change alerts)
+    rateThreshold: integer('rateThreshold'), // rate of change threshold
+    rateWindow: integer('rateWindow'), // time window in ms
+    severity: text('severity').notNull(), // 'info', 'warning', 'critical'
+    // Threshold config (for threshold alerts)
+    thresholdOperator: text('thresholdOperator'), // 'gt', 'lt', 'gte', 'lte'
+    thresholdValue: integer('thresholdValue'), // numeric threshold
+    updatedAt: integer('updatedAt', { mode: 'timestamp' })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [
+    index('alertConfigs_entityId_idx').on(t.entityId),
+    index('alertConfigs_homeId_idx').on(t.homeId),
+    index('alertConfigs_enabled_idx').on(t.enabled),
+    index('alertConfigs_severity_idx').on(t.severity),
+  ],
+);
+
+export const alertHistory = sqliteTable(
+  'alertHistory',
+  {
+    acknowledged: integer('acknowledged', { mode: 'boolean' })
+      .notNull()
+      .default(false),
+    alertConfigId: text('alertConfigId')
+      .notNull()
+      .references(() => alertConfigs.id, { onDelete: 'cascade' }),
+    entityId: text('entityId')
+      .notNull()
+      .references(() => entities.id, { onDelete: 'cascade' }),
+    homeId: text('homeId')
+      .notNull()
+      .references(() => homes.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'alert_event' }))
+      .notNull()
+      .primaryKey(),
+    message: text('message').notNull(),
+    resolvedAt: integer('resolvedAt', { mode: 'timestamp' }),
+    severity: text('severity').notNull(),
+    threshold: integer('threshold'), // threshold that was crossed (if applicable)
+    triggeredAt: integer('triggeredAt', { mode: 'timestamp' }).notNull(),
+    value: integer('value').notNull(), // value that triggered the alert
+  },
+  (t) => [
+    index('alertHistory_alertConfigId_idx').on(t.alertConfigId),
+    index('alertHistory_entityId_idx').on(t.entityId),
+    index('alertHistory_homeId_idx').on(t.homeId),
+    index('alertHistory_triggeredAt_idx').on(t.triggeredAt),
+    index('alertHistory_severity_idx').on(t.severity),
+    index('alertHistory_acknowledged_idx').on(t.acknowledged),
+    index('alertHistory_resolvedAt_idx').on(t.resolvedAt),
+  ],
+);
+
+// ===================================
 // Relations
 // ===================================
 
 export const homeRelations = relations(homes, ({ many }) => ({
+  alertConfigs: many(alertConfigs),
+  alertHistory: many(alertHistory),
   devices: many(devices),
   entities: many(entities),
   rooms: many(rooms),
@@ -232,6 +317,8 @@ export const deviceRelations = relations(devices, ({ one, many }) => ({
 }));
 
 export const entityRelations = relations(entities, ({ one, many }) => ({
+  alertConfigs: many(alertConfigs),
+  alertHistory: many(alertHistory),
   device: one(devices, {
     fields: [entities.deviceId],
     references: [devices.id],
@@ -279,3 +366,33 @@ export const telemetryConfigRelations = relations(
     }),
   }),
 );
+
+export const alertConfigRelations = relations(
+  alertConfigs,
+  ({ one, many }) => ({
+    entity: one(entities, {
+      fields: [alertConfigs.entityId],
+      references: [entities.id],
+    }),
+    history: many(alertHistory),
+    home: one(homes, {
+      fields: [alertConfigs.homeId],
+      references: [homes.id],
+    }),
+  }),
+);
+
+export const alertHistoryRelations = relations(alertHistory, ({ one }) => ({
+  alertConfig: one(alertConfigs, {
+    fields: [alertHistory.alertConfigId],
+    references: [alertConfigs.id],
+  }),
+  entity: one(entities, {
+    fields: [alertHistory.entityId],
+    references: [entities.id],
+  }),
+  home: one(homes, {
+    fields: [alertHistory.homeId],
+    references: [homes.id],
+  }),
+}));

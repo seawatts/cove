@@ -7,6 +7,7 @@ import { debug, error, info } from '@cove/logger';
 import { and, desc, eq, gte } from 'drizzle-orm';
 import type { DatabaseClient } from '../db';
 import { entityState, telemetry } from '../db';
+import type { AlertService } from './alert-service';
 import type { EventBus } from './event-bus';
 import type { Registry } from './registry';
 
@@ -18,6 +19,7 @@ export interface StateStoreOptions {
   db: DatabaseClient;
   eventBus: EventBus;
   registry?: Registry; // Optional registry for telemetry config
+  alertService?: AlertService; // Optional alert service for alert evaluation
 }
 
 interface TelemetryBatchItem {
@@ -36,6 +38,7 @@ export class StateStore {
   private db: DatabaseClient;
   private eventBus: EventBus;
   private registry?: Registry;
+  private alertService?: AlertService;
   private telemetryQueue: TelemetryBatchItem[] = [];
   private telemetryTimer: ReturnType<typeof setInterval> | null = null;
   private readonly BATCH_SIZE = 500;
@@ -61,6 +64,7 @@ export class StateStore {
     this.db = options.db;
     this.eventBus = options.eventBus;
     this.registry = options.registry;
+    this.alertService = options.alertService;
   }
 
   /**
@@ -297,6 +301,16 @@ export class StateStore {
       unit,
       value,
     });
+
+    // Evaluate alerts for this telemetry value
+    if (this.alertService) {
+      try {
+        await this.alertService.evaluateAlerts(entityId, field, value, now);
+      } catch (err) {
+        // Don't fail telemetry recording if alert evaluation fails
+        logError('Failed to evaluate alerts:', err);
+      }
+    }
   }
 
   /**

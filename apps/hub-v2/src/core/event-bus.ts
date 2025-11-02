@@ -11,6 +11,9 @@ export type EventTopics =
   | `device/${string}/lifecycle`
   | `telemetry`
   | `command/${string}`
+  | `alert/triggered`
+  | `alert/resolved`
+  | `alert/${string}`
   | `error`;
 
 export interface EventMessage<T = unknown> {
@@ -55,6 +58,17 @@ export interface ErrorEvent {
   source: string;
   error: string;
   context?: Record<string, unknown>;
+}
+
+export interface AlertEvent {
+  alertId: string;
+  configId: string;
+  entityId: string;
+  severity: 'info' | 'warning' | 'critical';
+  message: string;
+  value: number;
+  threshold?: number;
+  triggeredAt: Date;
 }
 
 /**
@@ -208,6 +222,22 @@ export class EventBus {
    */
   publishError(event: ErrorEvent): void {
     this.publish('error', event);
+  }
+
+  /**
+   * Publish alert triggered event
+   */
+  publishAlertTriggered(event: AlertEvent): void {
+    this.publish('alert/triggered', event);
+    this.publish(`alert/${event.alertId}`, event);
+  }
+
+  /**
+   * Publish alert resolved event
+   */
+  publishAlertResolved(event: AlertEvent): void {
+    this.publish('alert/resolved', event);
+    this.publish(`alert/${event.alertId}`, event);
   }
 
   /**
