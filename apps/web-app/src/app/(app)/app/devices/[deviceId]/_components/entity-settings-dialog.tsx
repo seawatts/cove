@@ -31,7 +31,7 @@ import {
 } from '@cove/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
 import { getEntityDisplayName } from '@cove/utils';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { hubApi } from '~/lib/hub-trpc/client';
@@ -180,6 +180,26 @@ export function EntitySettingsDialog({
   const handleDeleteAlert = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this alert?')) {
       await deleteAlertMutation.mutateAsync({ id });
+    }
+  };
+
+  const handleToggleVisibility = async (
+    alert: AlertConfig,
+    event: React.MouseEvent,
+  ) => {
+    event.stopPropagation();
+    try {
+      await updateAlertMutation.mutateAsync({
+        id: alert.id,
+        showInGraph: !alert.showInGraph,
+      });
+      toast.success(
+        alert.showInGraph
+          ? 'Alert hidden from graph'
+          : 'Alert visible on graph',
+      );
+    } catch (error) {
+      // Error already handled by mutation's onError
     }
   };
 
@@ -440,6 +460,27 @@ export function EntitySettingsDialog({
                               </Text>
                             </div>
                             <div className="flex gap-1">
+                              <Button
+                                onClick={(e) =>
+                                  handleToggleVisibility(
+                                    alert as AlertConfig,
+                                    e,
+                                  )
+                                }
+                                size="sm"
+                                title={
+                                  alert.showInGraph
+                                    ? 'Hide from graph'
+                                    : 'Show on graph'
+                                }
+                                variant="ghost"
+                              >
+                                {alert.showInGraph ? (
+                                  <Eye className="h-4 w-4" />
+                                ) : (
+                                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </Button>
                               <Button
                                 onClick={() =>
                                   handleEditAlert(alert as AlertConfig)

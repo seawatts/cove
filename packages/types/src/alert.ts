@@ -16,6 +16,7 @@ export interface AlertConfig {
   severity: AlertSeverity;
   alertType: AlertType;
   field: string;
+  showInGraph: boolean;
 
   // Threshold config
   thresholdValue?: number;

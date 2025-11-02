@@ -96,6 +96,22 @@ export function ChartWidget({ sensor }: WidgetProps) {
     limit: 100,
   });
 
+  // Filter alerts to only show those marked as visible on graph
+  const visibleAlertConfigs = React.useMemo(
+    () => alertConfigs.filter((config) => config.showInGraph),
+    [alertConfigs],
+  );
+
+  // Filter alert history to only show events from visible alerts
+  const visibleAlertHistory = React.useMemo(() => {
+    const visibleConfigIds = new Set(
+      visibleAlertConfigs.map((config) => config.id),
+    );
+    return alertHistory.filter((event) =>
+      visibleConfigIds.has(event.alertConfigId),
+    );
+  }, [alertHistory, visibleAlertConfigs]);
+
   // Use latest telemetry value if available (most accurate), then latest state, then fall back to initial sensor value
   const currentValue =
     latestTelemetryValue !== undefined && latestTelemetryValue !== null
@@ -523,7 +539,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
             />
 
             {/* Alert threshold lines and shaded regions */}
-            {alertConfigs.map((config) => {
+            {visibleAlertConfigs.map((config) => {
               if (config.alertType === 'threshold' && config.thresholdValue) {
                 const color = getAlertSeverityColorValue(
                   config.severity as 'info' | 'warning' | 'critical',
@@ -613,7 +629,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
                 };
 
                 // Find if there's an alert event at this timestamp
-                const alertEvent = alertHistory.find((event) => {
+                const alertEvent = visibleAlertHistory.find((event) => {
                   const eventTime = new Date(event.triggeredAt).getTime();
                   const pointTime = dotProps.payload.timestamp;
                   // Allow 5 minute tolerance

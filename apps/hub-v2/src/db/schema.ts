@@ -222,6 +222,9 @@ export const alertConfigs = sqliteTable(
     rateThreshold: integer('rateThreshold'), // rate of change threshold
     rateWindow: integer('rateWindow'), // time window in ms
     severity: text('severity').notNull(), // 'info', 'warning', 'critical'
+    showInGraph: integer('showInGraph', { mode: 'boolean' })
+      .notNull()
+      .default(true), // whether to display this alert on the graph
     // Threshold config (for threshold alerts)
     thresholdOperator: text('thresholdOperator'), // 'gt', 'lt', 'gte', 'lte'
     thresholdValue: integer('thresholdValue'), // numeric threshold

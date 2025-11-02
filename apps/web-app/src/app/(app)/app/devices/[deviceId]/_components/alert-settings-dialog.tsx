@@ -20,7 +20,7 @@ import { ScrollArea } from '@cove/ui/scroll-area';
 import { Separator } from '@cove/ui/separator';
 import { toast } from '@cove/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
-import { Bell, Edit, Plus, Trash2 } from 'lucide-react';
+import { Bell, Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { hubApi } from '~/lib/hub-trpc/client';
 import { AlertConfigForm } from './alert-config-form';
@@ -94,17 +94,23 @@ export function AlertSettingsDialog({
   });
 
   const handleSubmit = async (data: Partial<AlertConfig>) => {
-    if (editingAlert) {
-      await updateMutation.mutateAsync({
-        id: editingAlert.id,
-        ...data,
-      });
-    } else {
-      await createMutation.mutateAsync({
-        entityId,
-        homeId,
-        ...data,
-      } as AlertConfig);
+    try {
+      if (editingAlert) {
+        await updateMutation.mutateAsync({
+          id: editingAlert.id,
+          ...data,
+        });
+      } else {
+        await createMutation.mutateAsync({
+          entityId,
+          homeId,
+          ...data,
+        } as AlertConfig);
+      }
+    } catch (error) {
+      // Error is already handled by mutation's onError callback
+      // Re-throw to propagate to form
+      throw error;
     }
   };
 
@@ -127,6 +133,26 @@ export function AlertSettingsDialog({
   const handleCancel = () => {
     setShowForm(false);
     setEditingAlert(null);
+  };
+
+  const handleToggleVisibility = async (
+    alert: AlertConfig,
+    event: React.MouseEvent,
+  ) => {
+    event.stopPropagation();
+    try {
+      await updateMutation.mutateAsync({
+        id: alert.id,
+        showInGraph: !alert.showInGraph,
+      });
+      toast.success(
+        alert.showInGraph
+          ? 'Alert hidden from graph'
+          : 'Alert visible on graph',
+      );
+    } catch (error) {
+      // Error already handled by mutation's onError
+    }
   };
 
   return (
@@ -227,6 +253,24 @@ export function AlertSettingsDialog({
                           </p>
                         </div>
                         <div className="flex gap-2">
+                          <Button
+                            onClick={(e) =>
+                              handleToggleVisibility(alert as AlertConfig, e)
+                            }
+                            size="sm"
+                            title={
+                              alert.showInGraph
+                                ? 'Hide from graph'
+                                : 'Show on graph'
+                            }
+                            variant="ghost"
+                          >
+                            {alert.showInGraph ? (
+                              <Eye className="h-4 w-4" />
+                            ) : (
+                              <EyeOff className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </Button>
                           <Button
                             onClick={() => handleEdit(alert as AlertConfig)}
                             size="sm"

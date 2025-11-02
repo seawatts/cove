@@ -28,6 +28,7 @@ interface AlertConfigData {
   severity: 'info' | 'warning' | 'critical';
   alertType: 'threshold' | 'range' | 'rate_of_change';
   field: string;
+  showInGraph: boolean;
   thresholdValue?: number | null;
   thresholdOperator?: string | null;
   rangeMin?: number | null;
@@ -562,6 +563,7 @@ export class AlertService {
     field: string;
     severity: 'info' | 'warning' | 'critical';
     enabled: boolean;
+    showInGraph: boolean;
     thresholdValue?: number | null;
     thresholdOperator?: string | null;
     rangeMin?: number | null;
@@ -587,6 +589,7 @@ export class AlertService {
           rateThreshold: config.rateThreshold ?? null,
           rateWindow: config.rateWindow ?? null,
           severity: config.severity,
+          showInGraph: config.showInGraph,
           thresholdOperator: config.thresholdOperator ?? null,
           thresholdValue: config.thresholdValue ?? null,
         })
@@ -614,6 +617,7 @@ export class AlertService {
       field?: string;
       severity?: 'info' | 'warning' | 'critical';
       enabled?: boolean;
+      showInGraph?: boolean;
       thresholdValue?: number | null;
       thresholdOperator?: string | null;
       rangeMin?: number | null;

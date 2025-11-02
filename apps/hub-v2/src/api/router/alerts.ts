@@ -37,6 +37,7 @@ export const alertsRouter = createTRPCRouter({
         rateThreshold: z.number().optional(),
         rateWindow: z.number().optional(),
         severity: z.enum(['info', 'warning', 'critical']),
+        showInGraph: z.boolean().optional(),
         // Optional threshold config
         thresholdOperator: z.enum(['gt', 'lt', 'gte', 'lte']).optional(),
         thresholdValue: z.number().optional(),
@@ -60,6 +61,7 @@ export const alertsRouter = createTRPCRouter({
         rateThreshold: input.rateThreshold ?? null,
         rateWindow: input.rateWindow ?? null,
         severity: input.severity,
+        showInGraph: input.showInGraph ?? true,
         thresholdOperator: input.thresholdOperator ?? null,
         thresholdValue: input.thresholdValue ?? null,
       });
@@ -210,6 +212,7 @@ export const alertsRouter = createTRPCRouter({
         rateThreshold: z.number().optional().nullable(),
         rateWindow: z.number().optional().nullable(),
         severity: z.enum(['info', 'warning', 'critical']).optional(),
+        showInGraph: z.boolean().optional(),
         thresholdOperator: z
           .enum(['gt', 'lt', 'gte', 'lte'])
           .optional()

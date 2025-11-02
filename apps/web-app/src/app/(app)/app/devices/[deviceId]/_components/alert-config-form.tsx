@@ -35,19 +35,20 @@ const alertConfigSchema = z
     enabled: z.boolean(),
     field: z.string().min(1, 'Field is required'),
     name: z.string().min(1, 'Name is required'),
-    rangeMax: z.number().optional(),
+    rangeMax: z.number().nullable().optional(),
 
     // Range config
-    rangeMin: z.number().optional(),
+    rangeMin: z.number().nullable().optional(),
 
     // Rate of change config
-    rateThreshold: z.number().optional(),
-    rateWindow: z.number().optional(),
+    rateThreshold: z.number().nullable().optional(),
+    rateWindow: z.number().nullable().optional(),
     severity: z.enum(['info', 'warning', 'critical']),
-    thresholdOperator: z.enum(['gt', 'lt', 'gte', 'lte']).optional(),
+    showInGraph: z.boolean(),
+    thresholdOperator: z.enum(['gt', 'lt', 'gte', 'lte']).nullable().optional(),
 
     // Threshold config
-    thresholdValue: z.number().optional(),
+    thresholdValue: z.number().nullable().optional(),
   })
   .superRefine((data, ctx) => {
     // Validate threshold config
@@ -86,7 +87,9 @@ const alertConfigSchema = z
       }
       if (
         data.rangeMin !== undefined &&
+        data.rangeMin !== null &&
         data.rangeMax !== undefined &&
+        data.rangeMax !== null &&
         data.rangeMin >= data.rangeMax
       ) {
         ctx.addIssue({
@@ -118,12 +121,30 @@ const alertConfigSchema = z
 
 type AlertConfigFormData = z.infer<typeof alertConfigSchema>;
 
+// Type for cleaned data (null converted to undefined)
+type CleanedAlertConfigData = Omit<
+  AlertConfigFormData,
+  | 'rangeMax'
+  | 'rangeMin'
+  | 'rateThreshold'
+  | 'rateWindow'
+  | 'thresholdOperator'
+  | 'thresholdValue'
+> & {
+  rangeMax?: number;
+  rangeMin?: number;
+  rateThreshold?: number;
+  rateWindow?: number;
+  thresholdOperator?: 'gt' | 'lt' | 'gte' | 'lte';
+  thresholdValue?: number;
+};
+
 interface AlertConfigFormProps {
   entityId: string;
   homeId: string;
   availableFields: string[];
   initialData?: Partial<AlertConfig>;
-  onSubmit: (data: AlertConfigFormData) => Promise<void>;
+  onSubmit: (data: CleanedAlertConfigData) => Promise<void>;
   onCancel?: () => void;
 }
 
@@ -146,6 +167,7 @@ export function AlertConfigForm({
       rateThreshold: initialData?.rateThreshold,
       rateWindow: initialData?.rateWindow || 60000, // default 1 minute
       severity: (initialData?.severity as AlertSeverity) || 'warning',
+      showInGraph: initialData?.showInGraph ?? true,
       thresholdOperator:
         (initialData?.thresholdOperator as ThresholdOperator) || 'gt',
       thresholdValue: initialData?.thresholdValue,
@@ -157,10 +179,22 @@ export function AlertConfigForm({
 
   const handleSubmit = async (data: AlertConfigFormData) => {
     try {
-      await onSubmit(data);
+      // Convert null values to undefined to match AlertConfig type
+      const cleanedData = {
+        ...data,
+        rangeMax: data.rangeMax ?? undefined,
+        rangeMin: data.rangeMin ?? undefined,
+        rateThreshold: data.rateThreshold ?? undefined,
+        rateWindow: data.rateWindow ?? undefined,
+        thresholdOperator: data.thresholdOperator ?? undefined,
+        thresholdValue: data.thresholdValue ?? undefined,
+      };
+      await onSubmit(cleanedData);
       form.reset();
     } catch (error) {
       console.error('Error submitting alert config:', error);
+      // Re-throw to let the form know submission failed
+      throw error;
     }
   };
 
@@ -280,7 +314,7 @@ export function AlertConfigForm({
                 <FormItem>
                   <FormLabel>Operator</FormLabel>
                   <Select
-                    defaultValue={field.value}
+                    defaultValue={field.value ?? undefined}
                     onValueChange={field.onChange}
                   >
                     <FormControl>
@@ -442,6 +476,27 @@ export function AlertConfigForm({
                 <FormLabel className="text-base">Enable Alert</FormLabel>
                 <FormDescription>
                   Alert will only trigger when enabled
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="showInGraph"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Show on Graph</FormLabel>
+                <FormDescription>
+                  Display alert thresholds and events on charts
                 </FormDescription>
               </div>
               <FormControl>
