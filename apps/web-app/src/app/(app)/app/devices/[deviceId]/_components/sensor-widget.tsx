@@ -20,6 +20,7 @@ import { useQueryState } from 'nuqs';
 import { lazy, Suspense, useState } from 'react';
 import { hubApi } from '~/lib/hub-trpc';
 import { EntitySettingsDialog } from './entity-settings-dialog';
+import { LazyChartWrapper } from './lazy-chart-wrapper';
 
 const ChartWidget = lazy(() =>
   import('./widgets/chart-widget').then((m) => ({ default: m.ChartWidget })),
@@ -188,21 +189,36 @@ export function SensorWidget({
           }
         />
 
-        <Suspense
-          fallback={
-            <div className="h-[250px] animate-pulse bg-muted rounded-lg" />
-          }
-        >
-          {widgetType === WidgetType.Chart && <ChartWidget {...widgetProps} />}
-          {widgetType === WidgetType.ValueCard && (
-            <ValueCardWidget {...widgetProps} />
-          )}
-          {widgetType === WidgetType.Gauge && <GaugeWidget {...widgetProps} />}
-          {widgetType === WidgetType.Radial && (
-            <RadialWidget {...widgetProps} />
-          )}
-          {widgetType === WidgetType.Table && <TableWidget {...widgetProps} />}
-        </Suspense>
+        {widgetType === WidgetType.Chart ? (
+          <LazyChartWrapper>
+            <Suspense
+              fallback={
+                <div className="h-[250px] animate-pulse bg-muted rounded-lg" />
+              }
+            >
+              <ChartWidget {...widgetProps} />
+            </Suspense>
+          </LazyChartWrapper>
+        ) : (
+          <Suspense
+            fallback={
+              <div className="h-[250px] animate-pulse bg-muted rounded-lg" />
+            }
+          >
+            {widgetType === WidgetType.ValueCard && (
+              <ValueCardWidget {...widgetProps} />
+            )}
+            {widgetType === WidgetType.Gauge && (
+              <GaugeWidget {...widgetProps} />
+            )}
+            {widgetType === WidgetType.Radial && (
+              <RadialWidget {...widgetProps} />
+            )}
+            {widgetType === WidgetType.Table && (
+              <TableWidget {...widgetProps} />
+            )}
+          </Suspense>
+        )}
       </div>
 
       {entity && (

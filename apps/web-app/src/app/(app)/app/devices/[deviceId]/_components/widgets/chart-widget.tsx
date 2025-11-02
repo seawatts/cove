@@ -84,9 +84,10 @@ export function ChartWidget({ sensor }: WidgetProps) {
     });
 
   // Fetch alert configurations for this entity
+  // Query by entityId only, not by field, since sensor.key is the entity key
+  // not the telemetry field name (like 'esp_temperature')
   const { data: alertConfigs = [] } = hubApi.alerts.list.useQuery({
     entityId: sensor.entityId,
-    field: sensor.key,
   });
 
   // Fetch alert history for marking on chart
@@ -282,10 +283,32 @@ export function ChartWidget({ sensor }: WidgetProps) {
     );
   }
 
-  // Calculate min and max for Y-axis domain
+  // Calculate min and max for Y-axis domain, including alert thresholds
   const values = chartData.map((d: ChartDataPoint) => d.value);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
+  const dataMinValue = Math.min(...values);
+  const dataMaxValue = Math.max(...values);
+
+  // Include alert thresholds in domain calculation
+  const alertThresholdValues: number[] = [];
+  for (const config of alertConfigs) {
+    if (config.alertType === 'threshold' && config.thresholdValue !== null) {
+      alertThresholdValues.push(config.thresholdValue);
+    }
+    if (config.alertType === 'range') {
+      if (config.rangeMin !== null) alertThresholdValues.push(config.rangeMin);
+      if (config.rangeMax !== null) alertThresholdValues.push(config.rangeMax);
+    }
+  }
+
+  const minValue =
+    alertThresholdValues.length > 0
+      ? Math.min(dataMinValue, ...alertThresholdValues)
+      : dataMinValue;
+  const maxValue =
+    alertThresholdValues.length > 0
+      ? Math.max(dataMaxValue, ...alertThresholdValues)
+      : dataMaxValue;
+
   const padding = (maxValue - minValue) * 0.1 || 1; // 10% padding or 1 if range is 0
   const yMin = Math.max(0, minValue - padding);
   const yMax = maxValue + padding;
@@ -481,6 +504,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
               dataKey="realValue"
               fill="var(--chart-1)"
               fillOpacity={0.4}
+              isAnimationActive={false}
               name={sensor.name}
               stroke="var(--chart-1)"
               strokeWidth={2}
@@ -501,20 +525,19 @@ export function ChartWidget({ sensor }: WidgetProps) {
             {/* Alert threshold lines and shaded regions */}
             {alertConfigs.map((config) => {
               if (config.alertType === 'threshold' && config.thresholdValue) {
+                const color = getAlertSeverityColor(
+                  config.severity as 'info' | 'warning' | 'critical',
+                );
                 return (
                   <ReferenceLine
                     key={config.id}
                     label={{
-                      fill: getAlertSeverityColor(
-                        config.severity as 'info' | 'warning' | 'critical',
-                      ),
+                      fill: color,
                       fontSize: 12,
                       position: 'insideTopRight',
                       value: config.name,
                     }}
-                    stroke={getAlertSeverityColor(
-                      config.severity as 'info' | 'warning' | 'critical',
-                    )}
+                    stroke={color}
                     strokeDasharray="3 3"
                     strokeWidth={2}
                     y={config.thresholdValue}

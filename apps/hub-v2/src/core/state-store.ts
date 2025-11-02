@@ -414,35 +414,35 @@ export class StateStore {
     try {
       const { field, timeRange = '24h' } = options;
 
-      // Calculate time range
+      // Calculate time range and bucket size
       const now = new Date();
       let since: Date;
-      let timeBucketMs: number;
+      let bucketSeconds: number;
 
       switch (timeRange) {
         case '1h':
           since = new Date(now.getTime() - 60 * 60 * 1000);
-          timeBucketMs = 5 * 60 * 1000; // 5 minutes
+          bucketSeconds = 5 * 60; // 5 minutes (12 points)
           break;
         case '24h':
           since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-          timeBucketMs = 30 * 60 * 1000; // 30 minutes
+          bucketSeconds = 60 * 60; // 1 hour (24 points) - optimized from 30 min
           break;
         case '7d':
           since = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          timeBucketMs = 6 * 60 * 60 * 1000; // 6 hours
+          bucketSeconds = 8 * 60 * 60; // 8 hours (21 points) - optimized from 6 hours
           break;
         case '30d':
           since = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          timeBucketMs = 24 * 60 * 60 * 1000; // 1 day
+          bucketSeconds = 24 * 60 * 60; // 1 day (30 points)
           break;
         case '90d':
           since = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-          timeBucketMs = 24 * 60 * 60 * 1000; // 1 day
+          bucketSeconds = 2 * 24 * 60 * 60; // 2 days (45 points) - optimized from 1 day
           break;
         default:
           since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-          timeBucketMs = 30 * 60 * 1000; // 30 minutes
+          bucketSeconds = 60 * 60; // 1 hour
       }
 
       const conditions = [
@@ -462,7 +462,9 @@ export class StateStore {
         where,
       });
 
-      // Aggregate by time buckets
+      // Aggregate by time buckets in memory
+      // Using optimized bucket sizes to reduce data points
+      const timeBucketMs = bucketSeconds * 1000;
       const aggregated = new Map<
         number,
         { values: number[]; timestamps: Date[] }
