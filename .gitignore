@@ -64,7 +64,13 @@ apps/cli/certificates
 *.log
 apps/hub-v2/logs/*.log
 
+# rust build artifacts
+target/
+
 # hub build artifacts
 apps/hub/cove-hub
 apps/hub-v2/cove-hub-v2
 apps/hub-v2/data/hub-v2.db
+
+# old directory (deprecated code)
+.old/
