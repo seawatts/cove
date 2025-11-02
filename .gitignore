@@ -61,4 +61,10 @@ apps/cli/certificates
 *.db
 
 # log files
-*.logapps/hub-v2/logs/*.log
+*.log
+apps/hub-v2/logs/*.log
+
+# hub build artifacts
+apps/hub/cove-hub
+apps/hub-v2/cove-hub-v2
+apps/hub-v2/data/hub-v2.db
