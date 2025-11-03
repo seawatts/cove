@@ -78,7 +78,17 @@ export function LightControlTile({
   // Toggle favorite mutation
   const utils = hubApi.useUtils();
   const toggleFavoriteMutation = hubApi.entity.toggleFavorite.useMutation({
-    onError: (_err, _variables, context) => {
+    onError: (
+      _err,
+      _variables,
+      context:
+        | {
+            previousEntities: Awaited<
+              ReturnType<typeof utils.device.getEntities.getData>
+            >;
+          }
+        | undefined,
+    ) => {
       // Rollback local state on error
       setIsFavorite((prev) => !prev);
       // Rollback cache on error

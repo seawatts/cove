@@ -73,7 +73,17 @@ export function ClimateControlTile({
   // Toggle favorite mutation
   const utils = hubApi.useUtils();
   const toggleFavoriteMutation = hubApi.entity.toggleFavorite.useMutation({
-    onError: (_err, _variables, context) => {
+    onError: (
+      _err,
+      _variables,
+      context:
+        | {
+            previousEntities: Awaited<
+              ReturnType<typeof utils.device.getEntities.getData>
+            >;
+          }
+        | undefined,
+    ) => {
       // Rollback on error
       if (context?.previousEntities) {
         utils.device.getEntities.setData(
