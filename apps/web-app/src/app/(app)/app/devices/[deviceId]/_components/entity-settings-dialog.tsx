@@ -69,6 +69,13 @@ export function EntitySettingsDialog({
       { enabled: open },
     );
 
+  // Fetch telemetry configuration (history thresholds)
+  const { data: telemetryConfigs = [], isLoading: isLoadingTelemetryConfig } =
+    hubApi.telemetry.getConfig.useQuery(
+      { entityId: entity.id },
+      { enabled: open },
+    );
+
   const updateEntity = hubApi.entity.update.useMutation({
     onError: (error) => {
       toast.error(`Failed to update entity: ${error.message}`);
@@ -312,7 +319,7 @@ export function EntitySettingsDialog({
             </div>
           </TabsContent>
 
-          <TabsContent value="config">
+          <TabsContent className="space-y-4" value="config">
             <div className="overflow-hidden rounded-md border">
               <Table>
                 <TableHeader>
@@ -391,6 +398,86 @@ export function EntitySettingsDialog({
                     )}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Telemetry Configuration (History Thresholds) Section */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Text className="font-medium">History Thresholds</Text>
+                  <Text className="text-xs text-muted-foreground">
+                    Controls how telemetry data is recorded and stored
+                  </Text>
+                </div>
+              </div>
+              {isLoadingTelemetryConfig ? (
+                <div className="flex items-center justify-center py-4">
+                  <Text className="text-muted-foreground">
+                    Loading configuration...
+                  </Text>
+                </div>
+              ) : telemetryConfigs.length === 0 ? (
+                <div className="rounded-md border p-4">
+                  <Text className="text-sm text-muted-foreground">
+                    No telemetry configuration set. Using default settings.
+                  </Text>
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Field</TableHead>
+                        <TableHead>Change Threshold</TableHead>
+                        <TableHead>Minimum Interval</TableHead>
+                        <TableHead>Updated</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {telemetryConfigs.map((config, index) => (
+                        <TableRow
+                          key={`${config.entityId}-${config.field}-${index}`}
+                        >
+                          <TableCell className="font-medium">
+                            {config.field || (
+                              <Badge variant="outline">All fields</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {config.changeThreshold !== null &&
+                            config.changeThreshold !== undefined ? (
+                              <span className="font-mono text-xs">
+                                {config.changeThreshold}
+                              </span>
+                            ) : (
+                              <Text className="text-muted-foreground">
+                                Default
+                              </Text>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {config.minimumInterval !== null &&
+                            config.minimumInterval !== undefined ? (
+                              <span className="font-mono text-xs">
+                                {config.minimumInterval}ms
+                              </span>
+                            ) : (
+                              <Text className="text-muted-foreground">
+                                Default
+                              </Text>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            {config.updatedAt
+                              ? new Date(config.updatedAt).toLocaleString()
+                              : 'N/A'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </div>
           </TabsContent>
 

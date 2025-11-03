@@ -68,6 +68,7 @@ export function useEntityData({
     {
       enabled, // Only run query when enabled
       refetchInterval: enabled ? 60000 : false, // 1 minute when enabled, disabled otherwise
+      staleTime: 0, // Always use fresh data from polling
     },
   );
 
@@ -85,6 +86,7 @@ export function useEntityData({
     {
       enabled, // Only run query when enabled
       refetchInterval: enabled ? 60000 : false, // 1 minute when enabled, disabled otherwise
+      staleTime: 0, // Always use fresh data from polling
     },
   );
 
@@ -102,6 +104,7 @@ export function useEntityData({
     {
       enabled, // Only run query when enabled
       refetchInterval: enabled ? 60000 : false, // 1 minute when enabled, disabled otherwise
+      staleTime: 0, // Always use fresh data from polling
     },
   );
 

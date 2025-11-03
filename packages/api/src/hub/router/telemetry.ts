@@ -4,7 +4,7 @@
  */
 
 import type { TimeRange } from '@cove/db/graph-queries';
-import { telemetry } from '@cove/db/hub';
+import { telemetry, telemetryConfig } from '@cove/db/hub';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { createHubRouter, publicProcedure } from '../trpc';
@@ -61,6 +61,33 @@ export const telemetryRouter = createHubRouter({
       );
 
       return aggregated;
+    }),
+
+  /**
+   * Get telemetry configuration (history thresholds) for an entity
+   */
+  getConfig: publicProcedure
+    .input(
+      z.object({
+        entityId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { entityId } = input;
+
+      const db = ctx.daemon.getDb();
+
+      if (!db) {
+        throw new Error('Database not available');
+      }
+
+      // Get telemetry config for this entity
+      const configs = await db
+        .select()
+        .from(telemetryConfig)
+        .where(eq(telemetryConfig.entityId, entityId));
+
+      return configs;
     }),
 
   /**

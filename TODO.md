@@ -8,4 +8,4 @@ Cove TODO:
 - [ ] add custom sql queries
 - [ ] add overlay graphs
 - [ ] i think we can get rid of the graph-queries or somthing
-- [ ]
+- [ ] button to track event like opened the door

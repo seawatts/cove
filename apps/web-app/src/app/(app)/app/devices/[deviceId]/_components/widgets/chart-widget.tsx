@@ -95,6 +95,8 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
     },
     {
       enabled: isVisible, // Only fetch when visible
+      refetchInterval: isVisible ? 60000 : false, // 1 minute when visible, disabled otherwise
+      staleTime: 0, // Always use fresh data from polling
     },
   );
 
@@ -106,6 +108,8 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
     },
     {
       enabled: isVisible, // Only fetch when visible
+      refetchInterval: isVisible ? 60000 : false, // 1 minute when visible, disabled otherwise
+      staleTime: 0, // Always use fresh data from polling
     },
   );
 

@@ -140,6 +140,8 @@ const SensorWidgetComponent = ({
     },
     {
       enabled: shouldFetch,
+      refetchInterval: shouldFetch ? 60000 : false, // 1 minute when enabled, disabled otherwise
+      staleTime: 0, // Always use fresh data from polling
     },
   );
 
