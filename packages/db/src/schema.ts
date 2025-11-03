@@ -182,6 +182,7 @@ export const entities = pgTable(
       .$defaultFn(() => createId({ prefix: 'entity' }))
       .notNull()
       .primaryKey(),
+    isFavorite: boolean('isFavorite').notNull().default(false), // User favorite flag
     key: text('key').notNull().unique(), // e.g. 'light.kitchen'
     kind: entityKind('kind').notNull(), // 'light','sensor','lock',...
     name: text('name'), // Friendly display name from protocol adapters
@@ -190,6 +191,7 @@ export const entities = pgTable(
     index('entities_deviceId_idx').on(t.deviceId),
     index('entities_kind_idx').on(t.kind),
     index('entities_deviceClass_idx').on(t.deviceClass), // NEW index
+    index('entities_isFavorite_idx').on(t.isFavorite),
   ],
 );
 
