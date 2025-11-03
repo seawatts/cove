@@ -17,6 +17,7 @@ interface UseEntityDataProps {
   entityId: string;
   timeRange?: TimeRange;
   onStateChange?: (newState: EntityState) => void;
+  enabled?: boolean; // Control whether queries should run
 }
 
 interface AggregatedDataPoint {
@@ -45,6 +46,7 @@ export function useEntityData({
   entityId,
   timeRange = '24h',
   onStateChange,
+  enabled = true, // Default to true for backward compatibility
 }: UseEntityDataProps): UseEntityDataReturn {
   const [latestState, setLatestState] = useState<EntityState | null>(null);
   const onStateChangeRef = useRef(onStateChange);
@@ -64,7 +66,8 @@ export function useEntityData({
   } = hubApi.entity.get.useQuery(
     { entityId },
     {
-      refetchInterval: 60000, // 1 minute
+      enabled, // Only run query when enabled
+      refetchInterval: enabled ? 60000 : false, // 1 minute when enabled, disabled otherwise
     },
   );
 
@@ -80,7 +83,8 @@ export function useEntityData({
       timeRange,
     },
     {
-      refetchInterval: 60000, // 1 minute
+      enabled, // Only run query when enabled
+      refetchInterval: enabled ? 60000 : false, // 1 minute when enabled, disabled otherwise
     },
   );
 
@@ -96,7 +100,8 @@ export function useEntityData({
       limit: 100,
     },
     {
-      refetchInterval: 60000, // 1 minute
+      enabled, // Only run query when enabled
+      refetchInterval: enabled ? 60000 : false, // 1 minute when enabled, disabled otherwise
     },
   );
 

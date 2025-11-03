@@ -1,7 +1,6 @@
 'use client';
 
 import { hubApi } from '@cove/api/hub/react';
-import { api } from '@cove/api/react';
 import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
 import type { AlertConfig, AlertSeverity, AlertType } from '@cove/types/alert';
 import {
@@ -23,6 +22,7 @@ import { Input } from '@cove/ui/input';
 import { Label } from '@cove/ui/label';
 import { ScrollArea } from '@cove/ui/scroll-area';
 import { Separator } from '@cove/ui/separator';
+import { Switch } from '@cove/ui/switch';
 import {
   Table,
   TableBody,
@@ -34,6 +34,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@cove/ui/tabs';
 import { getEntityDisplayName } from '@cove/utils';
 import { Edit, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AlertConfigForm } from './alert-config-form';
@@ -49,7 +50,9 @@ export function EntitySettingsDialog({
   open,
   onOpenChange,
 }: EntitySettingsDialogProps) {
+  const router = useRouter();
   const [displayName, setDisplayName] = useState(entity.displayName || '');
+  const [isFavorite, setIsFavorite] = useState(entity.isFavorite || false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingAlert, setEditingAlert] = useState<AlertConfig | null>(null);
   const [showAlertForm, setShowAlertForm] = useState(false);
@@ -66,13 +69,47 @@ export function EntitySettingsDialog({
       { enabled: open },
     );
 
-  const updateEntity = api.entity.update.useMutation({
+  const updateEntity = hubApi.entity.update.useMutation({
     onError: (error) => {
       toast.error(`Failed to update entity: ${error.message}`);
       setIsSaving(false);
+      // Invalidate to refetch and get the correct state
+      utils.device.getEntities.invalidate({ deviceId: entity.deviceId });
+    },
+    onMutate: async ({ entityId, displayName, isFavorite }) => {
+      // Cancel any outgoing refetches
+      await utils.device.getEntities.cancel({ deviceId: entity.deviceId });
+
+      // Snapshot the previous value
+      const previousEntities = utils.device.getEntities.getData({
+        deviceId: entity.deviceId,
+      });
+
+      // Optimistically update the cache
+      utils.device.getEntities.setData({ deviceId: entity.deviceId }, (old) => {
+        if (!old) return old;
+        return old.map((e) => {
+          if (e.id === entityId) {
+            return {
+              ...e,
+              ...(displayName !== undefined && { displayName }),
+              ...(isFavorite !== undefined && { isFavorite }),
+            };
+          }
+          return e;
+        });
+      });
+
+      return { previousEntities };
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      utils.device.getEntities.invalidate({ deviceId: entity.deviceId });
+      router.refresh();
+      setIsSaving(false);
     },
     onSuccess: () => {
-      toast.success('Entity display name updated');
+      toast.success('Entity settings updated');
       onOpenChange(false);
     },
   });
@@ -82,6 +119,7 @@ export function EntitySettingsDialog({
     updateEntity.mutate({
       displayName: displayName.trim() || undefined,
       entityId: entity.id,
+      isFavorite,
     });
   };
 
@@ -247,6 +285,22 @@ export function EntitySettingsDialog({
                 Custom name to display for this entity. Leave empty to use the
                 default name from the device.
               </Text>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="favorite">Favorite</Label>
+                  <Text className="text-xs text-muted-foreground">
+                    Mark as favorite to pin this entity to the top of the device
+                    page
+                  </Text>
+                </div>
+                <Switch
+                  checked={isFavorite}
+                  id="favorite"
+                  onCheckedChange={setIsFavorite}
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2 pt-4">
               <Button onClick={() => onOpenChange(false)} variant="outline">

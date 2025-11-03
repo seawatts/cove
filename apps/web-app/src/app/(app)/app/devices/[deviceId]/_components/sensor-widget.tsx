@@ -17,12 +17,13 @@ import {
 } from '@cove/ui/dropdown-menu';
 import { getAvailableWidgetTypes } from '@cove/utils/detect-widget-type';
 import { formatSensorValue } from '@cove/utils/format-sensor-value';
+import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 // Lazy load widget components to reduce bundle size
-import { lazy, Suspense, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { timeRangeParser } from '../_lib/query-parsers';
 import { EntitySettingsDialog } from './entity-settings-dialog';
-import { LazyChartWrapper } from './lazy-chart-wrapper';
+import { LazyChartWrapper, useChartVisibility } from './lazy-chart-wrapper';
 
 const ChartWidget = lazy(() =>
   import('./widgets/chart-widget').then((m) => ({ default: m.ChartWidget })),
@@ -54,11 +55,15 @@ function WidgetTypeSelector({
   availableTypes,
   onChange,
   onEntitySettingsClick,
+  onFavoriteToggle,
+  isFavorite,
 }: {
   currentType: WidgetType;
   availableTypes: WidgetType[];
   onChange: (type: WidgetType) => void;
   onEntitySettingsClick?: () => void;
+  onFavoriteToggle?: () => void;
+  isFavorite?: boolean;
 }) {
   const typeLabels: Record<WidgetType, string> = {
     [WidgetType.Chart]: 'Chart',
@@ -70,6 +75,19 @@ function WidgetTypeSelector({
 
   return (
     <div className="absolute top-2 right-2 z-10 flex gap-1">
+      {onFavoriteToggle && (
+        <Button
+          onClick={onFavoriteToggle}
+          size="sm"
+          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          variant="ghost"
+        >
+          <Icons.Star
+            className={isFavorite ? 'fill-yellow-500 text-yellow-500' : ''}
+            size="sm"
+          />
+        </Button>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="sm" variant="ghost">
@@ -97,31 +115,95 @@ function WidgetTypeSelector({
   );
 }
 
-export function SensorWidget({
+const SensorWidgetComponent = ({
   deviceId,
   sensor,
   mode = 'full',
   entity,
-}: SensorWidgetProps) {
+}: SensorWidgetProps) => {
+  const router = useRouter();
   const [timeRange] = useQueryState('timeRange', timeRangeParser);
 
+  // Check if widget is visible to defer API calls (only works when wrapped in LazyChartWrapper)
+  const isVisible = useChartVisibility();
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Only fetch data when widget is visible (for full mode wrapped in LazyChartWrapper)
+  // For embedded mode, always fetch since it's typically visible immediately
+  const shouldFetch = mode === 'embedded' || isVisible;
 
   const { data: aggregatedData = [] } = hubApi.telemetry.getAggregated.useQuery(
     {
       entityId: sensor.entityId, // Use entityId instead of key
       timeRange,
     },
+    {
+      enabled: shouldFetch,
+    },
   );
 
   // Use local state for widget preferences instead of backend storage
   const [widgetType, setWidgetType] = useState<WidgetType>(WidgetType.Chart);
+  const [isFavorite, setIsFavorite] = useState(entity?.isFavorite || false);
+
+  // Sync favorite state with prop changes
+  useEffect(() => {
+    setIsFavorite(entity?.isFavorite || false);
+  }, [entity?.isFavorite]);
 
   // Get available widget types for this sensor
   const availableTypes = getAvailableWidgetTypes(sensor.key, sensor.type);
 
   const handleWidgetTypeChange = (newType: WidgetType) => {
     setWidgetType(newType);
+  };
+
+  // Toggle favorite mutation
+  const utils = hubApi.useUtils();
+  const toggleFavoriteMutation = hubApi.entity.toggleFavorite.useMutation({
+    onError: (_err, _variables, context) => {
+      // Rollback local state on error
+      setIsFavorite((prev) => !prev);
+      // Rollback cache on error
+      if (context?.previousEntities) {
+        utils.device.getEntities.setData(
+          { deviceId },
+          context.previousEntities,
+        );
+      }
+    },
+    onMutate: async ({ entityId }) => {
+      // Optimistically update local state immediately
+      setIsFavorite((prev) => !prev);
+
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await utils.device.getEntities.cancel({ deviceId });
+
+      // Snapshot the previous value
+      const previousEntities = utils.device.getEntities.getData({ deviceId });
+
+      // Optimistically update the cache
+      utils.device.getEntities.setData({ deviceId }, (old) => {
+        if (!old) return old;
+        return old.map((e) =>
+          e.id === entityId ? { ...e, isFavorite: !e.isFavorite } : e,
+        );
+      });
+
+      return { previousEntities };
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      utils.device.getEntities.invalidate({ deviceId });
+      router.refresh();
+    },
+  });
+
+  const handleFavoriteToggle = () => {
+    if (entity) {
+      toggleFavoriteMutation.mutate({ entityId: entity.id });
+    }
   };
 
   const widgetProps: WidgetProps = {
@@ -167,10 +249,12 @@ export function SensorWidget({
         <WidgetTypeSelector
           availableTypes={availableTypes}
           currentType={widgetType}
+          isFavorite={isFavorite}
           onChange={handleWidgetTypeChange}
           onEntitySettingsClick={
             entity ? () => setIsSettingsOpen(true) : undefined
           }
+          onFavoriteToggle={entity ? handleFavoriteToggle : undefined}
         />
 
         {widgetType === WidgetType.Chart ? (
@@ -214,4 +298,18 @@ export function SensorWidget({
       )}
     </>
   );
-}
+};
+
+// Memoize to prevent re-renders when parent components update due to sidebar toggles
+export const SensorWidget = React.memo(
+  SensorWidgetComponent,
+  (prevProps, nextProps) => {
+    // Only re-render if the sensor entityId, key, or mode changes
+    return (
+      prevProps.sensor.entityId === nextProps.sensor.entityId &&
+      prevProps.sensor.key === nextProps.sensor.key &&
+      prevProps.mode === nextProps.mode &&
+      prevProps.deviceId === nextProps.deviceId
+    );
+  },
+);

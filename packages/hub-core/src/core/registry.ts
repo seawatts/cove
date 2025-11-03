@@ -604,4 +604,69 @@ export class Registry {
       throw err;
     }
   }
+
+  /**
+   * Toggle favorite status for an entity
+   */
+  async toggleEntityFavorite(entityId: string) {
+    try {
+      // Get current entity state
+      const entity = await this.db.query.entities.findFirst({
+        columns: { isFavorite: true },
+        where: eq(entities.id, entityId),
+      });
+
+      if (!entity) {
+        throw new Error(`Entity not found: ${entityId}`);
+      }
+
+      // Toggle the favorite status
+      const newFavoriteStatus = !entity.isFavorite;
+
+      await this.db
+        .update(entities)
+        .set({ isFavorite: newFavoriteStatus })
+        .where(eq(entities.id, entityId));
+
+      logInfo(
+        `Toggled entity favorite status: ${entityId} -> ${newFavoriteStatus}`,
+      );
+    } catch (err) {
+      logError('Failed to toggle entity favorite:', err);
+      throw err;
+    }
+  }
+
+  /**
+   * Update an entity
+   */
+  async updateEntity(
+    entityId: string,
+    updates: {
+      displayName?: string;
+      isFavorite?: boolean;
+    },
+  ) {
+    try {
+      // Verify entity exists
+      const entity = await this.db.query.entities.findFirst({
+        where: eq(entities.id, entityId),
+      });
+
+      if (!entity) {
+        throw new Error(`Entity not found: ${entityId}`);
+      }
+
+      // Update entity with provided fields
+      await this.db
+        .update(entities)
+        .set(updates)
+        .where(eq(entities.id, entityId));
+
+      logInfo(`Updated entity ${entityId}:`, updates);
+    } catch (err) {
+      logError('Failed to update entity:', err);
+      throw err;
+    }
+  }
 }

@@ -31,27 +31,43 @@ export function ControlGrid({
     );
   }
 
-  // Group entities by type for better organization
+  // Helper function to sort entities by favorite status and name
+  const sortByFavorite = (
+    a: EntityWithStateAndCapabilities,
+    b: EntityWithStateAndCapabilities,
+  ) => {
+    // First sort by favorite status (favorites first)
+    if (a.isFavorite && !b.isFavorite) return -1;
+    if (!a.isFavorite && b.isFavorite) return 1;
+    // Then sort by name or key
+    const aName = a.displayName || a.name || a.key || '';
+    const bName = b.displayName || b.name || b.key || '';
+    return aName.localeCompare(bName);
+  };
+
+  // Group entities by type for better organization and sort each group by favorite status
   const entityGroups = {
-    climate: entities.filter((e) => e.kind === 'climate'),
-    covers: entities.filter((e) => e.kind === 'cover'),
-    lights: entities.filter((e) => e.kind === 'light'),
-    other: entities.filter(
-      (e) =>
-        ![
-          'light',
-          'switch',
-          'climate',
-          'cover',
-          'sensor',
-          'binary_sensor',
-          'button',
-        ].includes(e.kind) && !e.key?.toLowerCase().includes('calibrate'),
-    ),
-    sensors: entities.filter(
-      (e) => e.kind === 'sensor' || e.kind === 'binary_sensor',
-    ),
-    switches: entities.filter((e) => e.kind === 'switch'),
+    climate: entities.filter((e) => e.kind === 'climate').sort(sortByFavorite),
+    covers: entities.filter((e) => e.kind === 'cover').sort(sortByFavorite),
+    lights: entities.filter((e) => e.kind === 'light').sort(sortByFavorite),
+    other: entities
+      .filter(
+        (e) =>
+          ![
+            'light',
+            'switch',
+            'climate',
+            'cover',
+            'sensor',
+            'binary_sensor',
+            'button',
+          ].includes(e.kind) && !e.key?.toLowerCase().includes('calibrate'),
+      )
+      .sort(sortByFavorite),
+    sensors: entities
+      .filter((e) => e.kind === 'sensor' || e.kind === 'binary_sensor')
+      .sort(sortByFavorite),
+    switches: entities.filter((e) => e.kind === 'switch').sort(sortByFavorite),
   };
 
   return (

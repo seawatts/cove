@@ -7,6 +7,13 @@
       "tag": "0000_flippant_chat",
       "version": "6",
       "when": 1762124795674
+    },
+    {
+      "breakpoints": true,
+      "idx": 1,
+      "tag": "0001_yellow_vulture",
+      "version": "6",
+      "when": 1762127246608
     }
   ],
   "version": "7"

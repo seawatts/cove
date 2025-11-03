@@ -172,4 +172,43 @@ export const entityRouter = createHubRouter({
 
       return { success: true };
     }),
+
+  /**
+   * Toggle favorite status for an entity
+   */
+  toggleFavorite: publicProcedure
+    .input(z.object({ entityId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const registry = ctx.daemon.getRegistry();
+      if (!registry) {
+        throw new Error('Registry not available');
+      }
+
+      await registry.toggleEntityFavorite(input.entityId);
+
+      return { success: true };
+    }),
+
+  /**
+   * Update an entity
+   */
+  update: publicProcedure
+    .input(
+      z.object({
+        displayName: z.string().optional(),
+        entityId: z.string(),
+        isFavorite: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const registry = ctx.daemon.getRegistry();
+      if (!registry) {
+        throw new Error('Registry not available');
+      }
+
+      const { entityId, ...updates } = input;
+      await registry.updateEntity(entityId, updates);
+
+      return { success: true };
+    }),
 });

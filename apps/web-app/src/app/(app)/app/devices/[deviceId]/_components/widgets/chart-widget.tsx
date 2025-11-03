@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { timeRangeParser } from '../../_lib/query-parsers';
 import { useEntityData } from '../hooks/use-entity-data';
+import { useChartVisibility } from '../lazy-chart-wrapper';
 
 function calculateStats(
   aggregatedData: Array<{
@@ -65,8 +66,11 @@ interface ChartDataPoint {
   [key: string]: unknown;
 }
 
-export function ChartWidget({ sensor }: WidgetProps) {
+const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
   const [timeRange] = useQueryState('timeRange', timeRangeParser);
+
+  // Check if chart is visible to defer API calls
+  const isVisible = useChartVisibility();
 
   // Use the unified data hook with polling only
   // Memoize the callback to prevent infinite loops
@@ -76,6 +80,7 @@ export function ChartWidget({ sensor }: WidgetProps) {
 
   const { aggregatedData, isLoading, latestTelemetryValue, latestState } =
     useEntityData({
+      enabled: isVisible, // Only fetch when visible
       entityId: sensor.entityId,
       onStateChange: onStateChangeCallback,
       timeRange,
@@ -84,15 +89,25 @@ export function ChartWidget({ sensor }: WidgetProps) {
   // Fetch alert configurations for this entity
   // Query by entityId only, not by field, since sensor.key is the entity key
   // not the telemetry field name (like 'esp_temperature')
-  const { data: alertConfigs = [] } = hubApi.alerts.list.useQuery({
-    entityId: sensor.entityId,
-  });
+  const { data: alertConfigs = [] } = hubApi.alerts.list.useQuery(
+    {
+      entityId: sensor.entityId,
+    },
+    {
+      enabled: isVisible, // Only fetch when visible
+    },
+  );
 
   // Fetch alert history for marking on chart
-  const { data: alertHistory = [] } = hubApi.alerts.getHistory.useQuery({
-    entityId: sensor.entityId,
-    limit: 100,
-  });
+  const { data: alertHistory = [] } = hubApi.alerts.getHistory.useQuery(
+    {
+      entityId: sensor.entityId,
+      limit: 100,
+    },
+    {
+      enabled: isVisible, // Only fetch when visible
+    },
+  );
 
   // Filter alerts to only show those marked as visible on graph
   const visibleAlertConfigs = React.useMemo(
@@ -259,7 +274,12 @@ export function ChartWidget({ sensor }: WidgetProps) {
 
   if (isLoading) {
     return (
-      <Card className="@container/card">
+      <Card
+        style={{
+          contain: 'layout style paint',
+          contentVisibility: 'auto',
+        }}
+      >
         <CardHeader className="pb-2">
           <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             {sensor.name}
@@ -277,7 +297,12 @@ export function ChartWidget({ sensor }: WidgetProps) {
 
   if (chartData.length === 0) {
     return (
-      <Card className="@container/card">
+      <Card
+        style={{
+          contain: 'layout style paint',
+          contentVisibility: 'auto',
+        }}
+      >
         <CardHeader className="pb-2">
           <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
             {sensor.name}
@@ -326,7 +351,13 @@ export function ChartWidget({ sensor }: WidgetProps) {
   const yMax = maxValue + padding;
 
   return (
-    <Card className="@container/card">
+    <Card
+      style={{
+        contain: 'layout style paint',
+        // Let browser skip rendering off-screen charts
+        contentVisibility: 'auto',
+      }}
+    >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -358,6 +389,12 @@ export function ChartWidget({ sensor }: WidgetProps) {
         <ChartContainer
           className="aspect-auto h-[250px] w-full"
           config={chartConfig}
+          style={{
+            // GPU acceleration for smoother animations
+            transform: 'translateZ(0)',
+            // Hint to browser about what will change
+            willChange: 'auto',
+          }}
         >
           <ComposedChart data={chartData}>
             <defs>
@@ -669,4 +706,16 @@ export function ChartWidget({ sensor }: WidgetProps) {
       </CardContent>
     </Card>
   );
-}
+};
+
+// Memoize to prevent re-renders when parent components update due to sidebar toggles
+export const ChartWidget = React.memo(
+  ChartWidgetComponent,
+  (prevProps, nextProps) => {
+    // Only re-render if the sensor entityId or key changes
+    return (
+      prevProps.sensor.entityId === nextProps.sensor.entityId &&
+      prevProps.sensor.key === nextProps.sensor.key
+    );
+  },
+);

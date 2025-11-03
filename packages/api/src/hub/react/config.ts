@@ -24,6 +24,20 @@ export function createHubLinks() {
         (op.direction === 'down' && op.result instanceof Error),
     }),
     httpBatchLink({
+      /**
+       * Maximum number of requests to batch in a single HTTP call
+       * Default is unlimited, but we set a reasonable limit to prevent
+       * extremely large payloads. Adjust if needed.
+       */
+      maxBatchSize: 50,
+
+      /**
+       * Maximum time to wait (in ms) before sending a batch
+       * This allows more requests to be batched together
+       * Default is 0 (immediate), but 10ms helps batch more queries
+       */
+      maxURLLength: 2083, // Max URL length for GET requests
+
       transformer: superjson,
       url: `${getHubUrl()}/trpc`,
     }),

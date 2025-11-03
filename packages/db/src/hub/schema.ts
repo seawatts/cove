@@ -127,6 +127,9 @@ export const entities = sqliteTable(
       .$defaultFn(() => createId({ prefix: 'entity' }))
       .notNull()
       .primaryKey(),
+    isFavorite: integer('isFavorite', { mode: 'boolean' })
+      .notNull()
+      .default(false), // User favorite flag
     key: text('key'), // driver-specific identifier (e.g., ESPHome key)
     kind: text('kind').notNull(), // "light", "switch", "sensor", "button", ...
     name: text('name'),
@@ -137,6 +140,7 @@ export const entities = sqliteTable(
     index('entities_homeId_idx').on(t.homeId),
     index('entities_key_idx').on(t.key),
     index('entities_kind_idx').on(t.kind),
+    index('entities_isFavorite_idx').on(t.isFavorite),
   ],
 );
 

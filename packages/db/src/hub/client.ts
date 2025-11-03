@@ -6,10 +6,15 @@
 import { Database } from 'bun:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { debug, error, warn } from '@cove/logger';
 import type { BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
 import * as schema from './schema';
+
+const log = debug('cove:db:hub:client');
+const logError = error('cove:db:hub:client');
+const logWarn = warn('cove:db:hub:client');
 
 // Export the database client type
 export type HubDatabaseClient = BunSQLiteDatabase<typeof schema>;
@@ -56,27 +61,25 @@ export class HubDatabaseWrapper {
       migrationsFolder || join(import.meta.dir, '../../drizzle/hub');
 
     try {
-      console.log(`[Hub DB] Running migrations from: ${folder}`);
+      log('Running migrations from:', folder);
       await migrate(this.client, { migrationsFolder: folder });
       this.initialized = true;
-      console.log('[Hub DB] Migrations completed successfully');
-    } catch (error) {
-      console.error('[Hub DB] Migration failed:', error);
+      log('Migrations completed successfully');
+    } catch (err) {
+      logError('Migration failed:', err);
 
       // Check if it's a "table already exists" error
-      if (error instanceof Error && error.message.includes('already exists')) {
-        console.error('[Hub DB] Tables already exist. You may need to:');
-        console.error('  1. Delete the database file to start fresh, or');
-        console.error(
+      if (err instanceof Error && err.message.includes('already exists')) {
+        logError('Tables already exist. You may need to:');
+        logError('  1. Delete the database file to start fresh, or');
+        logError(
           '  2. Run migrations manually to sync the migration tracking table',
         );
-        throw error; // Re-throw to prevent silent failures
+        throw err; // Re-throw to prevent silent failures
       }
 
       // For other errors, log but don't throw (for development)
-      console.warn(
-        '[Hub DB] Continuing without migrations - this may cause issues',
-      );
+      logWarn('Continuing without migrations - this may cause issues');
     }
   }
 

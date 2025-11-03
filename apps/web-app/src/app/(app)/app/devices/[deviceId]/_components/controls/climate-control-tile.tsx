@@ -1,5 +1,6 @@
 'use client';
 
+import { hubApi } from '@cove/api/hub/react';
 import type { EntityWithStateAndCapabilities } from '@cove/db/hub';
 import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
@@ -14,6 +15,7 @@ import { Label } from '@cove/ui/label';
 import { Slider } from '@cove/ui/slider';
 import { getEntityDisplayName } from '@cove/utils';
 import { ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { EntitySettingsDialog } from '../entity-settings-dialog';
@@ -34,9 +36,12 @@ interface ClimateState {
 export function ClimateControlTile({
   entity,
   showChart = false,
+  deviceId,
 }: ClimateControlTileProps) {
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(entity.isFavorite || false);
   const [climateState, setClimateState] = useState<ClimateState>({
     fanMode: 'auto',
     mode: 'heat',
@@ -59,6 +64,51 @@ export function ClimateControlTile({
   useEffect(() => {
     setClimateState(climateAttrs);
   }, [climateAttrs]);
+
+  // Sync favorite state with prop changes
+  useEffect(() => {
+    setIsFavorite(entity.isFavorite || false);
+  }, [entity.isFavorite]);
+
+  // Toggle favorite mutation
+  const utils = hubApi.useUtils();
+  const toggleFavoriteMutation = hubApi.entity.toggleFavorite.useMutation({
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousEntities) {
+        utils.device.getEntities.setData(
+          { deviceId },
+          context.previousEntities,
+        );
+      }
+    },
+    onMutate: async ({ entityId }) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await utils.device.getEntities.cancel({ deviceId });
+
+      // Snapshot the previous value
+      const previousEntities = utils.device.getEntities.getData({ deviceId });
+
+      // Optimistically update the cache
+      utils.device.getEntities.setData({ deviceId }, (old) => {
+        if (!old) return old;
+        return old.map((e) =>
+          e.id === entityId ? { ...e, isFavorite: !e.isFavorite } : e,
+        );
+      });
+
+      return { previousEntities };
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      utils.device.getEntities.invalidate({ deviceId });
+      router.refresh();
+    },
+  });
+
+  const handleFavoriteToggle = () => {
+    toggleFavoriteMutation.mutate({ entityId: entity.id });
+  };
 
   const handleTemperatureChange = async (temp: number) => {
     setClimateState((prev) => ({ ...prev, targetTemperature: temp }));
@@ -94,13 +144,30 @@ export function ClimateControlTile({
                 })}
               </Text>
             </div>
-            <Button
-              onClick={() => setIsSettingsOpen(true)}
-              size="sm"
-              variant="ghost"
-            >
-              <Icons.Settings size="sm" />
-            </Button>
+            <div className="flex gap-1">
+              <Button
+                onClick={handleFavoriteToggle}
+                size="sm"
+                title={
+                  isFavorite ? 'Remove from favorites' : 'Add to favorites'
+                }
+                variant="ghost"
+              >
+                <Icons.Star
+                  className={
+                    isFavorite ? 'fill-yellow-500 text-yellow-500' : ''
+                  }
+                  size="sm"
+                />
+              </Button>
+              <Button
+                onClick={() => setIsSettingsOpen(true)}
+                size="sm"
+                variant="ghost"
+              >
+                <Icons.Settings size="sm" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
 

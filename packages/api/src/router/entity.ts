@@ -429,6 +429,36 @@ export const entitiesRouter = createTRPCRouter({
     }),
 
   /**
+   * Toggle favorite status for an entity
+   */
+  toggleFavorite: protectedProcedure
+    .input(z.object({ entityId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { entityId } = input;
+
+      // Get current entity to toggle favorite status
+      const currentEntity = await ctx.db
+        .select({ isFavorite: entities.isFavorite })
+        .from(entities)
+        .where(eq(entities.id, entityId))
+        .limit(1);
+
+      if (currentEntity.length === 0) {
+        throw new Error('Entity not found');
+      }
+
+      const newFavoriteStatus = !currentEntity[0]?.isFavorite;
+
+      const result = await ctx.db
+        .update(entities)
+        .set({ isFavorite: newFavoriteStatus })
+        .where(eq(entities.id, entityId))
+        .returning();
+
+      return result[0];
+    }),
+
+  /**
    * Update an entity
    */
   update: protectedProcedure
@@ -436,14 +466,15 @@ export const entitiesRouter = createTRPCRouter({
       z.object({
         displayName: z.string().optional(),
         entityId: z.string(),
+        isFavorite: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { entityId, displayName } = input;
+      const { entityId, ...updates } = input;
 
       const result = await ctx.db
         .update(entities)
-        .set({ displayName })
+        .set(updates)
         .where(eq(entities.id, entityId))
         .returning();
 

@@ -1,7 +1,8 @@
 'use client';
 
 import { Card, CardContent } from '@cove/ui/card';
-import { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface LazyChartWrapperProps {
   children: React.ReactNode;
@@ -9,9 +10,20 @@ interface LazyChartWrapperProps {
   rootMargin?: string;
 }
 
+// Context to provide visibility state to child components
+const VisibilityContext = createContext<boolean>(false);
+
+/**
+ * Hook to check if the chart is visible (for deferring API calls)
+ */
+export function useChartVisibility() {
+  return useContext(VisibilityContext);
+}
+
 /**
  * LazyChartWrapper - Lazy loads charts using IntersectionObserver
  * Only renders children when the component is visible or near the viewport
+ * Also defers API calls until the chart is about to be visible
  */
 export function LazyChartWrapper({
   children,
@@ -51,19 +63,21 @@ export function LazyChartWrapper({
   }, [rootMargin]);
 
   return (
-    <div ref={containerRef}>
-      {hasBeenVisible ? (
-        children
-      ) : (
-        <Card className="@container/card">
-          <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-            <div
-              className="w-full animate-pulse bg-muted rounded"
-              style={{ height }}
-            />
-          </CardContent>
-        </Card>
-      )}
-    </div>
+    <VisibilityContext.Provider value={hasBeenVisible}>
+      <div ref={containerRef} style={{ contain: 'layout style' }}>
+        {hasBeenVisible ? (
+          children
+        ) : (
+          <Card style={{ contain: 'layout style paint' }}>
+            <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+              <div
+                className="w-full animate-pulse bg-muted rounded"
+                style={{ height }}
+              />
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </VisibilityContext.Provider>
   );
 }
