@@ -52,7 +52,6 @@ export function createTestDatabase(dbPath?: string): TestDatabase {
     const tableNames = [
       'homes',
       'rooms',
-      'users',
       'devices',
       'entities',
       'entityState',

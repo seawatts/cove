@@ -49,4 +49,5 @@ export interface WidgetProps {
   sensor: SensorMetadata;
   config: WidgetConfig;
   timeRange?: '1h' | '24h' | '7d' | '30d' | '90d';
+  syncId?: string; // For synchronizing tooltips across multiple charts
 }

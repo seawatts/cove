@@ -6,6 +6,11 @@ import { usePathname } from 'next/navigation';
 
 const settingsTabs = [
   {
+    href: '/app/settings/preferences',
+    label: 'Preferences',
+    value: 'preferences',
+  },
+  {
     href: '/app/settings/organization',
     label: 'Organization',
     value: 'organization',
@@ -33,14 +38,14 @@ export default function SettingsLayout({
   const activeTab =
     settingsTabs.find(
       (tab) => pathname === tab.href || pathname.startsWith(`${tab.href}/`),
-    )?.value || 'team';
+    )?.value || 'preferences';
 
   return (
     <div className="flex flex-col gap-6">
       <div className="space-y-2">
         <div className="text-2xl font-bold">Settings</div>
         <div className="text-sm text-muted-foreground">
-          Manage your team plan, billing, and referrals.
+          Manage your preferences, team plan, billing, and referrals.
         </div>
       </div>
 

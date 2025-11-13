@@ -17,7 +17,6 @@ import type {
   rooms as RoomTable,
   telemetryConfig as TelemetryConfigTable,
   telemetry as TelemetryTable,
-  users as UsersTable,
 } from './schema';
 
 // ===================================
@@ -29,9 +28,6 @@ export type HomeInsert = typeof HomeTable.$inferInsert;
 
 export type Room = typeof RoomTable.$inferSelect;
 export type RoomInsert = typeof RoomTable.$inferInsert;
-
-export type User = typeof UsersTable.$inferSelect;
-export type UserInsert = typeof UsersTable.$inferInsert;
 
 export type Device = typeof DeviceTable.$inferSelect;
 export type DeviceInsert = typeof DeviceTable.$inferInsert;

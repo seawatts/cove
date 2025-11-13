@@ -2,9 +2,12 @@
 
 import { hubApi } from '@cove/api/hub/react';
 import { getAlertSeverityColorValue } from '@cove/types';
+import type { AlertSeverity } from '@cove/types/alert';
 import type { WidgetProps } from '@cove/types/widget';
+import { Button } from '@cove/ui/button';
 import { Card, CardContent, CardHeader } from '@cove/ui/card';
 import { type ChartConfig, ChartContainer, ChartTooltip } from '@cove/ui/chart';
+import { Icons } from '@cove/ui/custom/icons';
 import {
   fillTimeSeriesGaps,
   formatSensorValueForChart,
@@ -17,16 +20,21 @@ import { useQueryState } from 'nuqs';
 import * as React from 'react';
 import {
   Area,
+  Brush,
   CartesianGrid,
   ComposedChart,
-  Dot,
   Line,
   ReferenceArea,
   ReferenceLine,
   XAxis,
   YAxis,
 } from 'recharts';
-import { timeRangeParser } from '../../_lib/query-parsers';
+import { useUserPreferences } from '../../../_components/user-preferences-provider';
+import {
+  timeRangeParser,
+  zoomEndParser,
+  zoomStartParser,
+} from '../../_lib/query-parsers';
 import { useEntityData } from '../hooks/use-entity-data';
 import { useChartVisibility } from '../lazy-chart-wrapper';
 
@@ -66,11 +74,52 @@ interface ChartDataPoint {
   [key: string]: unknown;
 }
 
-const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
+// Custom shape for ultra-thin vertical alert indicator bars
+const ThinVerticalBar = ({
+  x,
+  y,
+  height,
+  fill,
+  fillOpacity,
+}: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  fillOpacity: number;
+}) => {
+  // Override width to be exactly 3 pixels for a very thin bar
+  const thinWidth = 3;
+  return (
+    <rect
+      fill={fill}
+      fillOpacity={fillOpacity}
+      height={height}
+      width={thinWidth}
+      x={x}
+      y={y}
+    />
+  );
+};
+
+const ChartWidgetComponent = ({ sensor, syncId }: WidgetProps) => {
   const [timeRange] = useQueryState('timeRange', timeRangeParser);
+
+  // Get user preferences for tooltip sync
+  const { preferences } = useUserPreferences();
+  const shouldSyncTooltips = preferences.syncTooltips ?? true;
+
+  // Zoom state - stored in URL for persistence across page refreshes
+  const [zoomStart, setZoomStart] = useQueryState('zoomStart', zoomStartParser);
+  const [zoomEnd, setZoomEnd] = useQueryState('zoomEnd', zoomEndParser);
 
   // Check if chart is visible to defer API calls
   const isVisible = useChartVisibility();
+
+  // Temporary drag selection state (not persisted)
+  const [refAreaLeft, setRefAreaLeft] = React.useState<string | null>(null);
+  const [refAreaRight, setRefAreaRight] = React.useState<string | null>(null);
 
   // Use the unified data hook with polling only
   // Memoize the callback to prevent infinite loops
@@ -84,6 +133,8 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
       entityId: sensor.entityId,
       onStateChange: onStateChangeCallback,
       timeRange,
+      zoomEnd, // Pass zoom end from URL
+      zoomStart, // Pass zoom start from URL
     });
 
   // Fetch alert configurations for this entity
@@ -100,34 +151,11 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
     },
   );
 
-  // Fetch alert history for marking on chart
-  const { data: alertHistory = [] } = hubApi.alerts.getHistory.useQuery(
-    {
-      entityId: sensor.entityId,
-      limit: 100,
-    },
-    {
-      enabled: isVisible, // Only fetch when visible
-      refetchInterval: isVisible ? 60000 : false, // 1 minute when visible, disabled otherwise
-      staleTime: 0, // Always use fresh data from polling
-    },
-  );
-
   // Filter alerts to only show those marked as visible on graph
   const visibleAlertConfigs = React.useMemo(
     () => alertConfigs.filter((config) => config.showInGraph),
     [alertConfigs],
   );
-
-  // Filter alert history to only show events from visible alerts
-  const visibleAlertHistory = React.useMemo(() => {
-    const visibleConfigIds = new Set(
-      visibleAlertConfigs.map((config) => config.id),
-    );
-    return alertHistory.filter((event) =>
-      visibleConfigIds.has(event.alertConfigId),
-    );
-  }, [alertHistory, visibleAlertConfigs]);
 
   // Use latest telemetry value if available (most accurate), then latest state, then fall back to initial sensor value
   const currentValue =
@@ -229,6 +257,149 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
     return finalChartData;
   }, [aggregatedData, timeRange]);
 
+  // Calculate X-axis domain based on zoom (using label values, not indices)
+  const xAxisDomain = React.useMemo(():
+    | [string, string]
+    | ['auto', 'auto']
+    | ['dataMin', 'dataMax'] => {
+    if (zoomStart && zoomEnd) {
+      // Find the actual data labels for the zoom domain
+      const leftPoint = chartData.find(
+        (d: ChartDataPoint) => d.timestamp >= zoomStart,
+      );
+      const rightPoint = chartData.find(
+        (d: ChartDataPoint) => d.timestamp >= zoomEnd,
+      );
+      if (leftPoint && rightPoint) {
+        return [leftPoint.label, rightPoint.label];
+      }
+    }
+    return ['dataMin', 'dataMax'];
+  }, [chartData, zoomStart, zoomEnd]);
+
+  // Filter data for Y-axis domain calculation (only the visible range)
+  const displayData = React.useMemo(() => {
+    if (zoomStart && zoomEnd) {
+      return chartData.filter(
+        (d: ChartDataPoint) =>
+          d.timestamp >= zoomStart && d.timestamp <= zoomEnd,
+      );
+    }
+    return chartData;
+  }, [chartData, zoomStart, zoomEnd]);
+
+  // Track if we're currently updating zoom to prevent cascading updates
+  // Use a timestamp-based debounce to prevent rapid successive updates
+  const isZoomingRef = React.useRef(false);
+  const lastZoomUpdateRef = React.useRef(0);
+  const chartDataRef = React.useRef(chartData);
+  const zoomStartRef = React.useRef(zoomStart);
+  const zoomEndRef = React.useRef(zoomEnd);
+
+  // Keep refs up to date
+  React.useEffect(() => {
+    chartDataRef.current = chartData;
+  }, [chartData]);
+
+  React.useEffect(() => {
+    zoomStartRef.current = zoomStart;
+    zoomEndRef.current = zoomEnd;
+  }, [zoomStart, zoomEnd]);
+
+  // Zoom handlers - update URL params so all charts zoom together
+  // Use refs to completely break dependency cycles
+  const zoom = React.useCallback(() => {
+    const now = Date.now();
+
+    // Prevent re-entrant calls and debounce rapid updates
+    if (isZoomingRef.current || now - lastZoomUpdateRef.current < 200) {
+      return;
+    }
+
+    if (refAreaLeft === refAreaRight || !refAreaRight) {
+      setRefAreaLeft(null);
+      setRefAreaRight(null);
+      return;
+    }
+
+    // Ensure left is before right
+    const [left, right] =
+      refAreaLeft && refAreaRight && refAreaLeft > refAreaRight
+        ? [refAreaRight, refAreaLeft]
+        : [refAreaLeft, refAreaRight];
+
+    // Use refs to access current values without adding them as dependencies
+    const leftPoint = chartDataRef.current.find(
+      (d: ChartDataPoint) => d.label === left,
+    );
+    const rightPoint = chartDataRef.current.find(
+      (d: ChartDataPoint) => d.label === right,
+    );
+
+    // Only update if we have valid points and values are actually different
+    if (
+      leftPoint &&
+      rightPoint &&
+      (leftPoint.timestamp !== zoomStartRef.current ||
+        rightPoint.timestamp !== zoomEndRef.current)
+    ) {
+      isZoomingRef.current = true;
+      lastZoomUpdateRef.current = now;
+
+      // Update URL params - this will apply to all charts on the page
+      void setZoomStart(leftPoint.timestamp);
+      void setZoomEnd(rightPoint.timestamp);
+
+      // Reset flag after a delay to allow state to settle
+      setTimeout(() => {
+        isZoomingRef.current = false;
+      }, 250);
+    }
+
+    setRefAreaLeft(null);
+    setRefAreaRight(null);
+  }, [refAreaLeft, refAreaRight, setZoomStart, setZoomEnd]);
+
+  const resetZoom = React.useCallback(() => {
+    const now = Date.now();
+
+    // Prevent re-entrant calls and debounce
+    if (isZoomingRef.current || now - lastZoomUpdateRef.current < 200) {
+      return;
+    }
+
+    isZoomingRef.current = true;
+    lastZoomUpdateRef.current = now;
+
+    void setZoomStart(null);
+    void setZoomEnd(null);
+    setRefAreaLeft(null);
+    setRefAreaRight(null);
+
+    setTimeout(() => {
+      isZoomingRef.current = false;
+    }, 250);
+  }, [setZoomStart, setZoomEnd]);
+
+  // Calculate brush indices based on URL zoom state (purely visual - no onChange)
+  const brushIndices = React.useMemo(() => {
+    if (!zoomStart || !zoomEnd || chartData.length === 0) {
+      return { endIndex: chartData.length - 1, startIndex: 0 };
+    }
+
+    const startIndex = chartData.findIndex(
+      (d: ChartDataPoint) => d.timestamp >= zoomStart,
+    );
+    const endIndex = chartData.findIndex(
+      (d: ChartDataPoint) => d.timestamp >= zoomEnd,
+    );
+
+    return {
+      endIndex: endIndex === -1 ? chartData.length - 1 : endIndex,
+      startIndex: startIndex === -1 ? 0 : startIndex,
+    };
+  }, [chartData, zoomStart, zoomEnd]);
+
   // Calculate statistics for the current time range
   const stats = React.useMemo(() => {
     return calculateStats(
@@ -293,7 +464,7 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
           </div>
         </CardHeader>
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-          <div className="aspect-auto h-[250px] w-full animate-pulse bg-muted" />
+          <div className="aspect-auto h-[340px] w-full animate-pulse bg-muted" />
         </CardContent>
       </Card>
     );
@@ -316,7 +487,7 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
           </div>
         </CardHeader>
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-          <div className="flex h-[250px] w-full items-center justify-center text-muted-foreground">
+          <div className="flex h-[340px] w-full items-center justify-center text-muted-foreground">
             No data available for this time range
           </div>
         </CardContent>
@@ -325,7 +496,7 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
   }
 
   // Calculate min and max for Y-axis domain, including alert thresholds
-  const values = chartData.map((d: ChartDataPoint) => d.value);
+  const values = displayData.map((d: ChartDataPoint) => d.value);
   const dataMinValue = Math.min(...values);
   const dataMaxValue = Math.max(...values);
 
@@ -364,9 +535,22 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
     >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            {sensor.name}
+          <div className="flex flex-col gap-1">
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              {sensor.name}
+            </div>
+            {!zoomStart && !zoomEnd && (
+              <div className="text-xs text-muted-foreground/50">
+                Click and drag to zoom
+              </div>
+            )}
           </div>
+          {(zoomStart || zoomEnd) && (
+            <Button onClick={resetZoom} size="sm" variant="outline">
+              <Icons.Maximize size="sm" />
+              <span className="ml-1">Reset Zoom</span>
+            </Button>
+          )}
         </div>
         {/* Current Value and Statistics */}
         <div className="flex items-center justify-between mt-3">
@@ -391,7 +575,7 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-[340px] w-full"
           config={chartConfig}
           style={{
             // GPU acceleration for smoother animations
@@ -400,7 +584,22 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
             willChange: 'auto',
           }}
         >
-          <ComposedChart data={chartData}>
+          <ComposedChart
+            data={chartData}
+            onMouseDown={(e: { activeLabel?: string }) => {
+              if (!isZoomingRef.current && e?.activeLabel) {
+                setRefAreaLeft(e.activeLabel);
+              }
+            }}
+            onMouseMove={(e: { activeLabel?: string }) => {
+              if (!isZoomingRef.current && refAreaLeft && e?.activeLabel) {
+                setRefAreaRight(e.activeLabel);
+              }
+            }}
+            onMouseUp={zoom}
+            style={{ cursor: refAreaLeft ? 'col-resize' : 'crosshair' }}
+            syncId={shouldSyncTooltips ? syncId : undefined}
+          >
             <defs>
               <linearGradient
                 id={`fill-${sensor.key}`}
@@ -444,6 +643,7 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
             <XAxis
               axisLine={false}
               dataKey="label"
+              domain={xAxisDomain}
               tickFormatter={(value: string) => {
                 // Format based on time range
                 if (timeRange === '1h') {
@@ -576,23 +776,25 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
             />
 
             {/* Alert threshold lines and shaded regions */}
-            {visibleAlertConfigs.map((config) => {
+            {visibleAlertConfigs.map((config, index) => {
               if (config.alertType === 'threshold' && config.thresholdValue) {
                 const color = getAlertSeverityColorValue(
-                  config.severity as 'info' | 'warning' | 'critical',
+                  config.severity as AlertSeverity,
                 );
                 return (
                   <ReferenceLine
                     key={config.id}
                     label={{
                       fill: color,
-                      fontSize: 12,
-                      position: 'insideTopRight',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      position: 'right',
                       value: config.name,
                     }}
                     stroke={color}
-                    strokeDasharray="3 3"
-                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    strokeOpacity={0.7}
+                    strokeWidth={1.5}
                     y={config.thresholdValue}
                   />
                 );
@@ -604,47 +806,101 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
                 config.rangeMax !== null
               ) {
                 const color = getAlertSeverityColorValue(
-                  config.severity as 'info' | 'warning' | 'critical',
+                  config.severity as AlertSeverity,
                 );
+
+                // Calculate left-side indicator position using array indices
+                // Use displayData (visible data) not chartData to avoid NaN when zoomed
+                const visibleData =
+                  displayData.length > 0 ? displayData : chartData;
+                const firstLabel = visibleData[0]?.label;
+                const secondLabel =
+                  visibleData[1]?.label || visibleData[0]?.label;
+
+                // Only show label on the first range config to avoid clutter
+                const showLabel = index === 0;
+
+                // Skip rendering if we don't have valid labels
+                if (!firstLabel || !secondLabel) {
+                  return null;
+                }
+
                 return (
                   <React.Fragment key={config.id}>
-                    {/* Shaded area above max */}
+                    {/* Left-side vertical bar above max (problem zone) - with custom thin shape */}
                     {config.rangeMax < yMax && (
                       <ReferenceArea
                         fill={color}
-                        fillOpacity={0.1}
-                        strokeOpacity={0.3}
+                        fillOpacity={0.15}
+                        ifOverflow="extendDomain"
+                        shape={(props: unknown) => (
+                          <ThinVerticalBar
+                            fill={color}
+                            fillOpacity={0.6}
+                            {...(props as {
+                              x: number;
+                              y: number;
+                              width: number;
+                              height: number;
+                            })}
+                          />
+                        )}
+                        strokeOpacity={0}
+                        x1={firstLabel}
+                        x2={secondLabel}
                         y1={config.rangeMax}
                         y2={yMax}
                       />
                     )}
-                    {/* Shaded area below min */}
+                    {/* Left-side vertical bar below min (problem zone) - with custom thin shape */}
                     {config.rangeMin > yMin && (
                       <ReferenceArea
                         fill={color}
-                        fillOpacity={0.1}
-                        strokeOpacity={0.3}
+                        fillOpacity={0.15}
+                        ifOverflow="extendDomain"
+                        shape={(props: unknown) => (
+                          <ThinVerticalBar
+                            fill={color}
+                            fillOpacity={0.6}
+                            {...(props as {
+                              x: number;
+                              y: number;
+                              width: number;
+                              height: number;
+                            })}
+                          />
+                        )}
+                        strokeOpacity={0}
+                        x1={firstLabel}
+                        x2={secondLabel}
                         y1={yMin}
                         y2={config.rangeMin}
                       />
                     )}
-                    {/* Threshold lines */}
+                    {/* Threshold lines - subtle horizontal lines */}
                     <ReferenceLine
                       stroke={color}
-                      strokeDasharray="3 3"
-                      strokeWidth={1.5}
+                      strokeDasharray="5 5"
+                      strokeOpacity={0.3}
+                      strokeWidth={1}
                       y={config.rangeMax}
                     />
                     <ReferenceLine
-                      label={{
-                        fill: color,
-                        fontSize: 12,
-                        position: 'insideTopRight',
-                        value: config.name,
-                      }}
+                      label={
+                        showLabel
+                          ? {
+                              fill: color,
+                              fontSize: 11,
+                              fontWeight: 500,
+                              position: 'right',
+                              value: config.name,
+                            }
+                          : undefined
+                      }
                       stroke={color}
-                      strokeDasharray="3 3"
-                      strokeWidth={1.5}
+                      strokeDasharray="5 5"
+                      strokeOpacity={0.3}
+                      strokeWidth={1}
                       y={config.rangeMin}
                     />
                   </React.Fragment>
@@ -654,57 +910,110 @@ const ChartWidgetComponent = ({ sensor }: WidgetProps) => {
               return null;
             })}
 
-            {/* Custom dots for alert events */}
-            <Line
-              dataKey="realValue"
-              dot={(props: unknown) => {
-                const dotProps = props as {
-                  cx: number;
-                  cy: number;
-                  payload: ChartDataPoint;
-                  index: number;
-                };
+            {/* Zoom selection area - show while dragging */}
+            {refAreaLeft && refAreaRight && (
+              <ReferenceArea
+                fill="hsl(var(--primary) / 0.2)"
+                fillOpacity={1}
+                stroke="hsl(var(--primary))"
+                strokeDasharray="5 3"
+                strokeOpacity={0.8}
+                strokeWidth={2}
+                x1={refAreaLeft}
+                x2={refAreaRight}
+                yAxisId="0"
+              />
+            )}
 
-                // Find if there's an alert event at this timestamp
-                const alertEvent = visibleAlertHistory.find((event) => {
-                  const eventTime = new Date(event.triggeredAt).getTime();
-                  const pointTime = dotProps.payload.timestamp;
-                  // Allow 5 minute tolerance
-                  return Math.abs(eventTime - pointTime) < 5 * 60 * 1000;
-                });
+            {/* Brush sparkline - shows overview and current zoom position */}
+            <Brush
+              dataKey="label"
+              endIndex={brushIndices.endIndex}
+              height={48}
+              onChange={(brushData: {
+                startIndex?: number;
+                endIndex?: number;
+              }) => {
+                const now = Date.now();
 
-                if (alertEvent) {
-                  const color = getAlertSeverityColorValue(
-                    alertEvent.severity as 'info' | 'warning' | 'critical',
-                  );
-                  return (
-                    <Dot
-                      cx={dotProps.cx}
-                      cy={dotProps.cy}
-                      fill={color}
-                      key={`alert-dot-${dotProps.payload.timestamp}-${dotProps.index}`}
-                      r={6}
-                      stroke="#fff"
-                      strokeWidth={2}
-                    />
-                  );
+                // Prevent updates during active zoom operations
+                if (
+                  isZoomingRef.current ||
+                  now - lastZoomUpdateRef.current < 200
+                ) {
+                  return;
                 }
 
-                // Return transparent dot to satisfy type requirements
-                return (
-                  <Dot
-                    cx={dotProps.cx}
-                    cy={dotProps.cy}
-                    fill="transparent"
-                    key={`transparent-dot-${dotProps.payload.timestamp}-${dotProps.index}`}
-                    r={0}
-                  />
-                );
+                if (
+                  brushData.startIndex === undefined ||
+                  brushData.endIndex === undefined ||
+                  chartData.length === 0
+                ) {
+                  return;
+                }
+
+                const startPoint = chartData[brushData.startIndex];
+                const endPoint = chartData[brushData.endIndex];
+
+                if (!startPoint || !endPoint) {
+                  return;
+                }
+
+                // Check if this represents the full range (reset zoom)
+                const isFullRange =
+                  brushData.startIndex === 0 &&
+                  brushData.endIndex === chartData.length - 1;
+
+                if (isFullRange) {
+                  // Only reset if currently zoomed
+                  if (zoomStartRef.current || zoomEndRef.current) {
+                    isZoomingRef.current = true;
+                    lastZoomUpdateRef.current = now;
+                    void setZoomStart(null);
+                    void setZoomEnd(null);
+                    setTimeout(() => {
+                      isZoomingRef.current = false;
+                    }, 250);
+                  }
+                } else {
+                  // Only update if actually different
+                  if (
+                    startPoint.timestamp !== zoomStartRef.current ||
+                    endPoint.timestamp !== zoomEndRef.current
+                  ) {
+                    isZoomingRef.current = true;
+                    lastZoomUpdateRef.current = now;
+                    void setZoomStart(startPoint.timestamp);
+                    void setZoomEnd(endPoint.timestamp);
+                    setTimeout(() => {
+                      isZoomingRef.current = false;
+                    }, 250);
+                  }
+                }
               }}
-              isAnimationActive={false}
-              stroke="transparent"
-              strokeWidth={0}
-            />
+              startIndex={brushIndices.startIndex}
+              stroke="hsl(var(--border))"
+              tickFormatter={(value: string) => {
+                const point = chartData.find(
+                  (d: ChartDataPoint) => d.label === value,
+                );
+                if (!point) return '';
+                if (timeRange === '1h' || timeRange === '24h') {
+                  return format(new Date(point.timestamp), 'HH:mm');
+                }
+                return format(new Date(point.timestamp), 'MMM dd');
+              }}
+              travellerWidth={10}
+            >
+              <Line
+                dataKey="realValue"
+                dot={false}
+                isAnimationActive={false}
+                stroke="hsl(var(--muted-foreground))"
+                strokeWidth={1}
+                type="monotone"
+              />
+            </Brush>
           </ComposedChart>
         </ChartContainer>
       </CardContent>

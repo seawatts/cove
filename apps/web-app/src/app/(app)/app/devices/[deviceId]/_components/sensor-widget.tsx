@@ -222,6 +222,7 @@ const SensorWidgetComponent = ({
     config: {}, // No backend config storage
     deviceId,
     sensor,
+    syncId: deviceId, // Synchronize tooltips across all charts for this device
   };
 
   // For embedded mode, always show a simple value card or mini chart

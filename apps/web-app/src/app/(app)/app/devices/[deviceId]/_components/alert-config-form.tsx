@@ -6,6 +6,11 @@ import type {
   AlertType,
   ThresholdOperator,
 } from '@cove/types/alert';
+import {
+  getAlertSeverityColor,
+  getAlertSeverityLabel,
+  getAlertSeverityLevel,
+} from '@cove/types/alert';
 import { Button } from '@cove/ui/button';
 import {
   Form,
@@ -43,7 +48,7 @@ const alertConfigSchema = z
     // Rate of change config
     rateThreshold: z.number().nullable().optional(),
     rateWindow: z.number().nullable().optional(),
-    severity: z.enum(['info', 'warning', 'critical']),
+    severity: z.enum(['level1', 'level2', 'level3', 'level4', 'level5']),
     showInGraph: z.boolean(),
     thresholdOperator: z.enum(['gt', 'lt', 'gte', 'lte']).nullable().optional(),
 
@@ -166,7 +171,7 @@ export function AlertConfigForm({
       rangeMin: initialData?.rangeMin,
       rateThreshold: initialData?.rateThreshold,
       rateWindow: initialData?.rateWindow || 60000, // default 1 minute
-      severity: (initialData?.severity as AlertSeverity) || 'warning',
+      severity: (initialData?.severity as AlertSeverity) || 'level3',
       showInGraph: initialData?.showInGraph ?? true,
       thresholdOperator:
         (initialData?.thresholdOperator as ThresholdOperator) || 'gt',
@@ -259,13 +264,61 @@ export function AlertConfigForm({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select severity" />
+                      <SelectValue placeholder="Select severity">
+                        {field.value && (
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="size-3 rounded-full"
+                              style={{
+                                backgroundColor: getAlertSeverityColor(
+                                  field.value as AlertSeverity,
+                                ),
+                              }}
+                            />
+                            <span className="font-medium">
+                              {getAlertSeverityLevel(
+                                field.value as AlertSeverity,
+                              )}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {
+                                getAlertSeverityLabel(
+                                  field.value as AlertSeverity,
+                                ).split(' - ')[1]
+                              }
+                            </span>
+                          </div>
+                        )}
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="info">Info</SelectItem>
-                    <SelectItem value="warning">Warning</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
+                    {(
+                      [
+                        'level1',
+                        'level2',
+                        'level3',
+                        'level4',
+                        'level5',
+                      ] as const
+                    ).map((severity) => (
+                      <SelectItem key={severity} value={severity}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="size-3 rounded-full"
+                            style={{
+                              backgroundColor: getAlertSeverityColor(severity),
+                            }}
+                          />
+                          <span className="font-medium">
+                            {getAlertSeverityLevel(severity)}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {getAlertSeverityLabel(severity).split(' - ')[1]}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />

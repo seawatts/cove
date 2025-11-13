@@ -68,3 +68,11 @@ export type EntityCapability =
   | ColorTempCapability
   | RGBCapability
   | OnOffCapability;
+
+// ===================================
+// User Preferences Types
+// ===================================
+
+export interface UserPreferences {
+  syncTooltips?: boolean; // Sync tooltips across device charts
+}

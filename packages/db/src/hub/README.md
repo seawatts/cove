@@ -2,6 +2,13 @@
 
 This module provides a SQLite database for the home automation hub using Drizzle ORM with Bun's native SQLite driver.
 
+## Architecture Note
+
+The hub database contains **device-centric data only**. User accounts, preferences, and authentication are managed in the cloud Postgres database (see `@cove/db/schema`), not in the hub. This allows:
+- Multiple cloud users to access the same hub
+- Hub to operate independently without user identity concerns
+- User preferences to remain UI-only without affecting hub behavior
+
 ## Import Structure
 
 The hub database module is split into two main exports to prevent bundling server-only code (like migrations and Node.js APIs) into client-side bundles:

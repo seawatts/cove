@@ -18,6 +18,9 @@ interface UseEntityDataProps {
   timeRange?: TimeRange;
   onStateChange?: (newState: EntityState) => void;
   enabled?: boolean; // Control whether queries should run
+  // Custom time range for zoom functionality
+  zoomStart?: number | null; // Unix timestamp in ms
+  zoomEnd?: number | null; // Unix timestamp in ms
 }
 
 interface AggregatedDataPoint {
@@ -47,6 +50,8 @@ export function useEntityData({
   timeRange = '24h',
   onStateChange,
   enabled = true, // Default to true for backward compatibility
+  zoomStart,
+  zoomEnd,
 }: UseEntityDataProps): UseEntityDataReturn {
   const [latestState, setLatestState] = useState<EntityState | null>(null);
   const onStateChangeRef = useRef(onStateChange);
@@ -73,6 +78,7 @@ export function useEntityData({
   );
 
   // Get aggregated telemetry data from hub
+  // Use custom zoom range if provided, otherwise use preset timeRange
   const {
     data: aggregatedData = [],
     isLoading: isLoadingAggregated,
@@ -80,7 +86,9 @@ export function useEntityData({
     error: aggregatedError,
   } = hubApi.telemetry.getAggregated.useQuery(
     {
+      endTime: zoomEnd || undefined,
       entityId,
+      startTime: zoomStart || undefined,
       timeRange,
     },
     {

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { AppSidebar } from './_components/app-sidebar/app-sidebar';
 import { SidebarStateProvider } from './_components/sidebar-state-provider';
 import { SiteHeader } from './_components/site-header';
+import { UserPreferencesProvider } from './_components/user-preferences-provider';
 
 export default async function Layout({
   children,
@@ -14,15 +15,17 @@ export default async function Layout({
 
   return (
     <SidebarStateProvider defaultOpen={defaultOpen ?? true}>
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2 p-4 md:p-6">
-            {children}
+      <UserPreferencesProvider>
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2 p-4 md:p-6">
+              {children}
+            </div>
           </div>
-        </div>
-      </SidebarInset>
+        </SidebarInset>
+      </UserPreferencesProvider>
     </SidebarStateProvider>
   );
 }

@@ -15,7 +15,7 @@ import {
   timestamp,
   unique,
 } from 'drizzle-orm/pg-core';
-import type { EntityCapability } from './types';
+import type { EntityCapability, UserPreferences } from './types';
 
 // ===================================
 // Enums
@@ -81,6 +81,40 @@ export const homes = pgTable('homes', {
 });
 
 // ===================================
+// Hub Registry (Physical Hubs)
+// ===================================
+
+export const hubs = pgTable(
+  'hubs',
+  {
+    cloudUrl: text('cloudUrl'), // CloudFlare Tunnel or public URL
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    id: text('id')
+      .$defaultFn(() => createId({ prefix: 'hub' }))
+      .notNull()
+      .primaryKey(),
+    lastSeen: timestamp('lastSeen', { withTimezone: true }),
+    localUrl: text('localUrl').notNull(), // Local network URL (e.g., http://192.168.1.100:3200)
+    name: text('name').notNull(),
+    online: boolean('online').notNull().default(false),
+    ownerId: text('ownerId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    updatedAt: timestamp('updatedAt', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    version: text('version'), // Hub software version
+  },
+  (t) => [
+    index('hubs_ownerId_idx').on(t.ownerId),
+    index('hubs_online_idx').on(t.online),
+    index('hubs_lastSeen_idx').on(t.lastSeen),
+  ],
+);
+
+// ===================================
 // Topology: floors / rooms / devices / entities
 // ===================================
 
@@ -91,13 +125,17 @@ export const rooms = pgTable(
     homeId: text('homeId')
       .notNull()
       .references(() => homes.id, { onDelete: 'cascade' }),
+    hubId: text('hubId').references(() => hubs.id, { onDelete: 'cascade' }),
     id: text('id')
       .$defaultFn(() => createId({ prefix: 'room' }))
       .notNull()
       .primaryKey(),
     name: text('name').notNull(),
   },
-  (t) => [unique('roomUnique').on(t.homeId, t.name)],
+  (t) => [
+    unique('roomUnique').on(t.homeId, t.name),
+    index('rooms_hubId_idx').on(t.hubId),
+  ],
 );
 
 export const devices = pgTable(
@@ -119,6 +157,7 @@ export const devices = pgTable(
       .notNull()
       .references(() => homes.id, { onDelete: 'cascade' }),
     hostname: text('hostname'),
+    hubId: text('hubId').references(() => hubs.id, { onDelete: 'cascade' }),
 
     // Hardware/software versions
     hwVersion: text('hwVersion'),
@@ -154,6 +193,7 @@ export const devices = pgTable(
   },
   (t) => [
     index('devices_homeId_idx').on(t.homeId),
+    index('devices_hubId_idx').on(t.hubId),
     index('devices_roomId_idx').on(t.roomId),
     index('devices_matterNodeId_idx').on(t.matterNodeId),
     index('devices_updatedAt_idx').on(t.updatedAt),
@@ -178,6 +218,7 @@ export const entities = pgTable(
       .notNull()
       .references(() => devices.id, { onDelete: 'cascade' }),
     displayName: text('displayName'), // Custom user-defined display name
+    hubId: text('hubId').references(() => hubs.id, { onDelete: 'cascade' }),
     id: text('id')
       .$defaultFn(() => createId({ prefix: 'entity' }))
       .notNull()
@@ -189,6 +230,7 @@ export const entities = pgTable(
   },
   (t) => [
     index('entities_deviceId_idx').on(t.deviceId),
+    index('entities_hubId_idx').on(t.hubId),
     index('entities_kind_idx').on(t.kind),
     index('entities_deviceClass_idx').on(t.deviceClass), // NEW index
     index('entities_isFavorite_idx').on(t.isFavorite),
@@ -285,6 +327,9 @@ export const users = pgTable('users', {
     .primaryKey(),
   imageUrl: text('imageUrl'),
   lastName: text('lastName'),
+  preferences: jsonb('preferences')
+    .$type<UserPreferences>()
+    .default({ syncTooltips: true }),
   role: userRole('role').notNull().default('ADULT'),
   updatedAt: timestamp('updatedAt', { withTimezone: true })
     .notNull()
@@ -302,10 +347,18 @@ export const homeRelations = relations(homes, ({ many }) => ({
   users: many(users),
 }));
 
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   home: one(homes, {
     fields: [users.homeId],
     references: [homes.id],
+  }),
+  hubs: many(hubs),
+}));
+
+export const hubRelations = relations(hubs, ({ one }) => ({
+  owner: one(users, {
+    fields: [hubs.ownerId],
+    references: [users.id],
   }),
 }));
 
@@ -315,6 +368,10 @@ export const roomRelations = relations(rooms, ({ one, many }) => ({
     fields: [rooms.homeId],
     references: [homes.id],
   }),
+  hub: one(hubs, {
+    fields: [rooms.hubId],
+    references: [hubs.id],
+  }),
 }));
 
 export const deviceRelations = relations(devices, ({ one, many }) => ({
@@ -322,6 +379,10 @@ export const deviceRelations = relations(devices, ({ one, many }) => ({
   home: one(homes, {
     fields: [devices.homeId],
     references: [homes.id],
+  }),
+  hub: one(hubs, {
+    fields: [devices.hubId],
+    references: [hubs.id],
   }),
   room: one(rooms, {
     fields: [devices.roomId],
@@ -338,6 +399,10 @@ export const entityRelations = relations(entities, ({ one, many }) => ({
   device: one(devices, {
     fields: [entities.deviceId],
     references: [devices.id],
+  }),
+  hub: one(hubs, {
+    fields: [entities.hubId],
+    references: [hubs.id],
   }),
   state: one(entityStates),
   stateHistory: many(entityStateHistories),

@@ -1,5 +1,6 @@
 'use client';
 
+import type { AlertSeverity } from '@cove/types/alert';
 import {
   getAlertSeverityColor,
   getAlertSeverityLabel,
@@ -13,7 +14,7 @@ interface AlertEvent {
   alertId: string;
   configId: string;
   entityId: string;
-  severity: 'info' | 'warning' | 'critical';
+  severity: AlertSeverity;
   message: string;
   value: number;
   threshold?: number;
@@ -30,11 +31,13 @@ export function AlertNotificationProvider({
 
     const getSeverityIcon = (severity: string) => {
       switch (severity) {
-        case 'info':
+        case 'level1':
+        case 'level2':
+        case 'level3':
           return Bell;
-        case 'warning':
+        case 'level4':
           return AlertTriangle;
-        case 'critical':
+        case 'level5':
           return AlertCircle;
         default:
           return Bell;
@@ -46,10 +49,10 @@ export function AlertNotificationProvider({
     const label = getAlertSeverityLabel(event.severity);
 
     // Show toast notification with appropriate styling
-    if (event.severity === 'critical') {
+    if (event.severity === 'level5') {
       toast.error(
         <div className="flex items-start gap-3">
-          <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color }} />
+          <Icon className="h-5 w-5 mt-0.5 shrink-0" style={{ color }} />
           <div className="flex-1 space-y-1">
             <div className="font-semibold">{label} Alert</div>
             <div className="text-sm">{event.message}</div>
@@ -70,10 +73,10 @@ export function AlertNotificationProvider({
           duration: 10000,
         },
       );
-    } else if (event.severity === 'warning') {
+    } else if (event.severity === 'level4') {
       toast.warning(
         <div className="flex items-start gap-3">
-          <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color }} />
+          <Icon className="h-5 w-5 mt-0.5 shrink-0" style={{ color }} />
           <div className="flex-1 space-y-1">
             <div className="font-semibold">{label} Alert</div>
             <div className="text-sm">{event.message}</div>
@@ -90,7 +93,7 @@ export function AlertNotificationProvider({
     } else {
       toast.info(
         <div className="flex items-start gap-3">
-          <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color }} />
+          <Icon className="h-5 w-5 mt-0.5 shrink-0" style={{ color }} />
           <div className="flex-1 space-y-1">
             <div className="font-semibold">{label} Alert</div>
             <div className="text-sm">{event.message}</div>
@@ -112,7 +115,7 @@ export function AlertNotificationProvider({
 
     toast.success(
       <div className="flex items-start gap-3">
-        <CheckCircle2 className="h-5 w-5 mt-0.5 flex-shrink-0 text-green-600" />
+        <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-green-600" />
         <div className="flex-1 space-y-1">
           <div className="font-semibold">Alert Resolved</div>
           <div className="text-sm">{event.message}</div>

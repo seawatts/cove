@@ -1,5 +1,6 @@
 import { createUserSchema, eq } from '@cove/db';
 import { users } from '@cove/db/schema';
+import type { UserPreferences } from '@cove/db/types';
 import { createId } from '@cove/id';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
@@ -47,4 +48,44 @@ export const userRouter = createTRPCRouter({
     }
     return user;
   }),
+  getPreferences: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      columns: {
+        preferences: true,
+      },
+      where: eq(users.id, ctx.auth.userId),
+    });
+
+    // Return default preferences if user not found or preferences are null
+    return (user?.preferences ?? { syncTooltips: true }) as UserPreferences;
+  }),
+  updatePreferences: protectedProcedure
+    .input(
+      z.object({
+        syncTooltips: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Get current preferences
+      const currentUser = await ctx.db.query.users.findFirst({
+        columns: {
+          preferences: true,
+        },
+        where: eq(users.id, ctx.auth.userId),
+      });
+
+      // Merge with existing preferences
+      const updatedPreferences: UserPreferences = {
+        ...(currentUser?.preferences as UserPreferences | null),
+        ...input,
+      };
+
+      const [user] = await ctx.db
+        .update(users)
+        .set({ preferences: updatedPreferences })
+        .where(eq(users.id, ctx.auth.userId))
+        .returning({ preferences: users.preferences });
+
+      return user?.preferences as UserPreferences;
+    }),
 });

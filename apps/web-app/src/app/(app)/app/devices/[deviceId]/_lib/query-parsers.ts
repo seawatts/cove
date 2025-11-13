@@ -1,5 +1,5 @@
 import type { TimeRange } from '@cove/db/graph-queries';
-import { createParser } from 'nuqs';
+import { createParser, parseAsInteger } from 'nuqs';
 
 // Re-export TimeRange for convenience
 export type { TimeRange };
@@ -24,3 +24,8 @@ export const timeRangeParser = createParser({
   },
   serialize: (value: TimeRange) => value,
 }).withDefault('24h' as TimeRange);
+
+// Zoom range parsers for custom time ranges
+// These allow users to zoom into specific time windows that persist across page refreshes
+export const zoomStartParser = parseAsInteger.withDefault(null);
+export const zoomEndParser = parseAsInteger.withDefault(null);

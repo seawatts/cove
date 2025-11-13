@@ -1,7 +1,7 @@
 import { eq } from '@cove/db';
 import { rooms } from '@cove/db/schema';
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const roomRouter = createTRPCRouter({
   // Create a new room
@@ -65,6 +65,49 @@ export const roomRouter = createTRPCRouter({
           },
         },
       });
+    }),
+
+  /**
+   * Sync room from hub to cloud
+   * Called by hub's CloudSyncService
+   */
+  sync: publicProcedure
+    .input(
+      z.object({
+        hubId: z.string(),
+        room: z.object({
+          floor: z.number().optional(),
+          homeId: z.string(),
+          hubId: z.string(),
+          id: z.string(),
+          name: z.string(),
+        }),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { room, hubId } = input;
+
+      // Upsert room
+      const existing = await ctx.db.query.rooms.findFirst({
+        where: eq(rooms.id, room.id),
+      });
+
+      if (existing) {
+        await ctx.db
+          .update(rooms)
+          .set({
+            ...room,
+            hubId,
+          })
+          .where(eq(rooms.id, room.id));
+      } else {
+        await ctx.db.insert(rooms).values({
+          ...room,
+          hubId,
+        });
+      }
+
+      return { success: true };
     }),
 
   // Update a room

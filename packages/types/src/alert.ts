@@ -3,7 +3,12 @@
  * Shared types for alert configuration and history
  */
 
-export type AlertSeverity = 'info' | 'warning' | 'critical';
+export type AlertSeverity =
+  | 'level1'
+  | 'level2'
+  | 'level3'
+  | 'level4'
+  | 'level5';
 export type AlertType = 'threshold' | 'range' | 'rate_of_change';
 export type ThresholdOperator = 'gt' | 'lt' | 'gte' | 'lte';
 
@@ -62,36 +67,45 @@ export interface AlertNotification {
 
 /**
  * Helper to get severity color for UI (CSS variable format)
+ * Uses oklch colors defined in globals.css with light/dark mode support
  */
 export function getAlertSeverityColor(severity: AlertSeverity): string {
   switch (severity) {
-    case 'info':
-      return 'hsl(var(--chart-3))'; // Blue
-    case 'warning':
-      return 'hsl(var(--chart-5))'; // Orange/Yellow
-    case 'critical':
-      return 'hsl(var(--destructive))'; // Red
+    case 'level1':
+      return 'var(--severity-1)'; // Dark Green (Excellent)
+    case 'level2':
+      return 'var(--severity-2)'; // Teal (Good)
+    case 'level3':
+      return 'var(--severity-3)'; // Blue (Normal)
+    case 'level4':
+      return 'var(--severity-4)'; // Orange (Warning)
+    case 'level5':
+      return 'var(--severity-5)'; // Red (Critical)
     default:
-      return 'hsl(var(--muted))';
+      return 'var(--muted)'; // Gray
   }
 }
 
 /**
  * Helper to get resolved severity color value for chart libraries
- * This resolves CSS variables to actual color values that libraries like Recharts can render
+ * Resolves CSS variables to actual color values that libraries like Recharts can render
  * by creating a temporary element and reading its computed color
  */
 export function getAlertSeverityColorValue(severity: AlertSeverity): string {
   // Only resolve in browser environment
   if (typeof window === 'undefined' || typeof document === 'undefined') {
-    // Fallback colors for SSR/Node
+    // Fallback colors for SSR/Node (approximate oklch values as rgb)
     switch (severity) {
-      case 'info':
-        return 'rgb(59, 130, 246)'; // Blue
-      case 'warning':
-        return 'rgb(245, 158, 11)'; // Orange
-      case 'critical':
-        return 'rgb(239, 68, 68)'; // Red
+      case 'level1':
+        return 'rgb(22, 163, 74)'; // Green (Excellent)
+      case 'level2':
+        return 'rgb(20, 184, 166)'; // Teal (Good)
+      case 'level3':
+        return 'rgb(59, 130, 246)'; // Blue (Normal)
+      case 'level4':
+        return 'rgb(251, 146, 60)'; // Orange (Warning)
+      case 'level5':
+        return 'rgb(239, 68, 68)'; // Red (Critical)
       default:
         return 'rgb(107, 114, 128)'; // Gray
     }
@@ -106,14 +120,20 @@ export function getAlertSeverityColorValue(severity: AlertSeverity): string {
   // Map severity to CSS variable
   let colorVar: string;
   switch (severity) {
-    case 'info':
-      colorVar = 'var(--chart-3)';
+    case 'level1':
+      colorVar = 'var(--severity-1)';
       break;
-    case 'warning':
-      colorVar = 'var(--chart-5)';
+    case 'level2':
+      colorVar = 'var(--severity-2)';
       break;
-    case 'critical':
-      colorVar = 'var(--destructive)';
+    case 'level3':
+      colorVar = 'var(--severity-3)';
+      break;
+    case 'level4':
+      colorVar = 'var(--severity-4)';
+      break;
+    case 'level5':
+      colorVar = 'var(--severity-5)';
       break;
     default:
       colorVar = 'var(--muted)';
@@ -137,13 +157,17 @@ export function getAlertSeverityColorValue(severity: AlertSeverity): string {
     return computedColor;
   }
 
-  // Fallback colors
+  // Fallback colors if computation fails
   switch (severity) {
-    case 'info':
+    case 'level1':
+      return 'rgb(22, 163, 74)';
+    case 'level2':
+      return 'rgb(20, 184, 166)';
+    case 'level3':
       return 'rgb(59, 130, 246)';
-    case 'warning':
-      return 'rgb(245, 158, 11)';
-    case 'critical':
+    case 'level4':
+      return 'rgb(251, 146, 60)';
+    case 'level5':
       return 'rgb(239, 68, 68)';
     default:
       return 'rgb(107, 114, 128)';
@@ -155,14 +179,38 @@ export function getAlertSeverityColorValue(severity: AlertSeverity): string {
  */
 export function getAlertSeverityLabel(severity: AlertSeverity): string {
   switch (severity) {
-    case 'info':
-      return 'Info';
-    case 'warning':
-      return 'Warning';
-    case 'critical':
-      return 'Critical';
+    case 'level1':
+      return 'Level 1 - Excellent';
+    case 'level2':
+      return 'Level 2 - Good';
+    case 'level3':
+      return 'Level 3 - Normal';
+    case 'level4':
+      return 'Level 4 - Warning';
+    case 'level5':
+      return 'Level 5 - Critical';
     default:
       return 'Unknown';
+  }
+}
+
+/**
+ * Helper to get severity level number
+ */
+export function getAlertSeverityLevel(severity: AlertSeverity): number {
+  switch (severity) {
+    case 'level1':
+      return 1;
+    case 'level2':
+      return 2;
+    case 'level3':
+      return 3;
+    case 'level4':
+      return 4;
+    case 'level5':
+      return 5;
+    default:
+      return 0;
   }
 }
 

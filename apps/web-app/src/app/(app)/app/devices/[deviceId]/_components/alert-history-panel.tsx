@@ -1,6 +1,7 @@
 'use client';
 
 import { hubApi } from '@cove/api/hub/react';
+import type { AlertSeverity } from '@cove/types/alert';
 import {
   getAlertSeverityColor,
   getAlertSeverityLabel,
@@ -81,11 +82,13 @@ export function AlertHistoryPanel({
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'info':
+      case 'level1':
+      case 'level2':
+      case 'level3':
         return Bell;
-      case 'warning':
+      case 'level4':
         return AlertTriangle;
-      case 'critical':
+      case 'level5':
         return AlertCircle;
       default:
         return Bell;
@@ -123,14 +126,16 @@ export function AlertHistoryPanel({
           </div>
 
           <Select onValueChange={setSeverityFilter} value={severityFilter}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="All severities" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Severities</SelectItem>
-              <SelectItem value="info">Info</SelectItem>
-              <SelectItem value="warning">Warning</SelectItem>
-              <SelectItem value="critical">Critical</SelectItem>
+              <SelectItem value="level1">Level 1 - Excellent</SelectItem>
+              <SelectItem value="level2">Level 2 - Good</SelectItem>
+              <SelectItem value="level3">Level 3 - Normal</SelectItem>
+              <SelectItem value="level4">Level 4 - Warning</SelectItem>
+              <SelectItem value="level5">Level 5 - Critical</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -152,7 +157,7 @@ export function AlertHistoryPanel({
               {filteredHistory.map((event, index) => {
                 const Icon = getSeverityIcon(event.severity);
                 const color = getAlertSeverityColor(
-                  event.severity as 'info' | 'warning' | 'critical',
+                  event.severity as AlertSeverity,
                 );
                 const isResolved = Boolean(event.resolvedAt);
 

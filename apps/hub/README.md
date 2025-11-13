@@ -24,6 +24,8 @@ A modern, high-performance home automation hub daemon built with TypeScript, Bun
 
 ### Database Schema
 
+The hub uses a local SQLite database for device-centric data only:
+
 - **homes**: Home records with timezone and address
 - **rooms**: Room organization within homes
 - **devices**: Device records with protocol, vendor, and connection info
@@ -31,6 +33,10 @@ A modern, high-performance home automation hub daemon built with TypeScript, Bun
 - **entity_state**: Latest state snapshots for fast UI updates
 - **telemetry**: Timeseries data for sensors and analytics
 - **credentials**: Encrypted device pairing credentials
+- **alertConfigs**: Alert configuration for entity monitoring
+- **alertHistory**: Alert trigger history
+
+**Note:** User accounts and preferences are managed in the cloud Postgres database, not in the hub. The hub operates as a stateless device controller that can be accessed by multiple cloud users.
 
 ## Getting Started
 
@@ -148,10 +154,33 @@ bun test --coverage
 - **Memory Usage**: <100MB typical footprint
 - **Database**: SQLite WAL mode for concurrent reads/writes
 
+## User Management & Authentication
+
+### Cloud vs Hub Architecture
+
+The Cove system uses a hybrid architecture where user management happens entirely in the cloud:
+
+**Cloud (Postgres):**
+- User accounts (synced from Clerk authentication)
+- User preferences (UI settings, tooltips, etc.)
+- Home ownership and access control
+- Multi-user access to hubs
+
+**Hub (SQLite):**
+- Device-centric data only
+- No user accounts or authentication
+- Can be accessed by multiple cloud users
+- Authentication handled via API keys/tokens (when accessing directly)
+
+This separation allows:
+- Multiple cloud users to control the same hub (family sharing)
+- Hub to operate independently without user identity concerns
+- User preferences to be UI-only without affecting hub behavior
+
 ## Differences from Hub V1
 
 1. **Simplified Driver Interface**: Single `Driver` interface replaces complex adapter hierarchy
-2. **SQLite Schema**: New schema with homes/rooms/users preserved, device/entity tables redesigned
+2. **SQLite Schema**: Device/entity tables redesigned; users removed (managed in cloud only)
 3. **EventBus Pattern**: Explicit pub/sub instead of StateManager broadcasts
 4. **Bun 1.3 Routes**: Type-safe route objects instead of manual path matching
 5. **No Discovery Package**: Manual device pairing for better control

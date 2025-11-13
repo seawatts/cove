@@ -36,7 +36,7 @@ export const alertsRouter = createHubRouter({
         // Optional rate of change config
         rateThreshold: z.number().optional(),
         rateWindow: z.number().optional(),
-        severity: z.enum(['info', 'warning', 'critical']),
+        severity: z.enum(['level1', 'level2', 'level3', 'level4', 'level5']),
         showInGraph: z.boolean().optional(),
         // Optional threshold config
         thresholdOperator: z.enum(['gt', 'lt', 'gte', 'lte']).optional(),
@@ -211,7 +211,9 @@ export const alertsRouter = createHubRouter({
         rangeMin: z.number().optional().nullable(),
         rateThreshold: z.number().optional().nullable(),
         rateWindow: z.number().optional().nullable(),
-        severity: z.enum(['info', 'warning', 'critical']).optional(),
+        severity: z
+          .enum(['level1', 'level2', 'level3', 'level4', 'level5'])
+          .optional(),
         showInGraph: z.boolean().optional(),
         thresholdOperator: z
           .enum(['gt', 'lt', 'gte', 'lte'])

@@ -40,24 +40,38 @@ export const telemetryRouter = createHubRouter({
   /**
    * Get aggregated entity telemetry data for charts/graphs
    * Aggregates telemetry by time buckets (mean, min, max)
+   * Supports either preset timeRange or custom start/end timestamps for zoom
    */
   getAggregated: publicProcedure
     .input(
       z.object({
+        endTime: z.number().optional(), // Unix timestamp in ms
         entityId: z.string(),
         field: z.string().optional(),
+        // Custom time range for zoom - overrides timeRange if provided
+        startTime: z.number().optional(), // Unix timestamp in ms
         timeRange: timeRangeSchema.optional().default('24h'),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { entityId, field, timeRange } = input;
+      const { entityId, field, timeRange, startTime, endTime } = input;
+
+      // Use custom time range if both start and end are provided
+      const options =
+        startTime && endTime
+          ? {
+              endTime: new Date(endTime),
+              field,
+              startTime: new Date(startTime),
+            }
+          : {
+              field,
+              timeRange: timeRange as TimeRange,
+            };
 
       const aggregated = await ctx.daemon.getEntityTelemetryAggregated(
         entityId,
-        {
-          field,
-          timeRange: timeRange as TimeRange,
-        },
+        options,
       );
 
       return aggregated;

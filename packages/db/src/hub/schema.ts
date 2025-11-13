@@ -54,27 +54,6 @@ export const rooms = sqliteTable(
   (t) => [unique('roomUnique').on(t.homeId, t.name)],
 );
 
-export const users = sqliteTable('users', {
-  createdAt: integer('createdAt', { mode: 'timestamp' })
-    .notNull()
-    .$defaultFn(() => new Date()),
-  email: text('email').notNull().unique(),
-  firstName: text('firstName'),
-  homeId: text('homeId').references(() => homes.id, {
-    onDelete: 'set null',
-  }),
-  id: text('id')
-    .$defaultFn(() => createId({ prefix: 'user' }))
-    .notNull()
-    .primaryKey(),
-  imageUrl: text('imageUrl'),
-  lastName: text('lastName'),
-  role: text('role').notNull().default('ADULT'),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' })
-    .notNull()
-    .$defaultFn(() => new Date()),
-});
-
 // ===================================
 // Core Home Automation Schema (from ha-pro.md)
 // ===================================
@@ -233,7 +212,7 @@ export const alertConfigs = sqliteTable(
     // Rate of change config (for rate_of_change alerts)
     rateThreshold: integer('rateThreshold'), // rate of change threshold
     rateWindow: integer('rateWindow'), // time window in ms
-    severity: text('severity').notNull(), // 'info', 'warning', 'critical'
+    severity: text('severity').notNull(), // 'level1', 'level2', 'level3', 'level4', 'level5'
     showInGraph: integer('showInGraph', { mode: 'boolean' })
       .notNull()
       .default(true), // whether to display this alert on the graph
@@ -300,20 +279,12 @@ export const homeRelations = relations(homes, ({ many }) => ({
   entities: many(entities),
   rooms: many(rooms),
   telemetry: many(telemetry),
-  users: many(users),
 }));
 
 export const roomRelations = relations(rooms, ({ one, many }) => ({
   devices: many(devices),
   home: one(homes, {
     fields: [rooms.homeId],
-    references: [homes.id],
-  }),
-}));
-
-export const userRelations = relations(users, ({ one }) => ({
-  home: one(homes, {
-    fields: [users.homeId],
     references: [homes.id],
   }),
 }));
