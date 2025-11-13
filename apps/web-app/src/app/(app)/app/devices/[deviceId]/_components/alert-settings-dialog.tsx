@@ -1,8 +1,9 @@
 'use client';
 
 import { hubApi } from '@cove/api/hub/react';
-import type { AlertConfig } from '@cove/types/alert';
 import {
+  type AlertConfig,
+  type AlertSeverity,
   getAlertSeverityColor,
   getAlertSeverityLabel,
   getAlertTypeLabel,
@@ -211,25 +212,16 @@ export function AlertSettingsDialog({
                             <Badge
                               style={{
                                 borderColor: getAlertSeverityColor(
-                                  alert.severity as
-                                    | 'info'
-                                    | 'warning'
-                                    | 'critical',
+                                  alert.severity as AlertSeverity,
                                 ),
                                 color: getAlertSeverityColor(
-                                  alert.severity as
-                                    | 'info'
-                                    | 'warning'
-                                    | 'critical',
+                                  alert.severity as AlertSeverity,
                                 ),
                               }}
                               variant="outline"
                             >
                               {getAlertSeverityLabel(
-                                alert.severity as
-                                  | 'info'
-                                  | 'warning'
-                                  | 'critical',
+                                alert.severity as AlertSeverity,
                               )}
                             </Badge>
                             {!alert.enabled && (

@@ -41,6 +41,8 @@ import {
   IconCirclePlus,
   IconCircleX,
   IconClock,
+  IconCloud,
+  IconCloudOff,
   IconCommand,
   IconCopy,
   IconCornerDownLeft,
@@ -92,6 +94,8 @@ import {
   IconUpload,
   IconUser,
   IconUsers,
+  IconWifi,
+  IconWifiOff,
   IconX,
 } from '@tabler/icons-react';
 import type { VariantProps } from 'class-variance-authority';
@@ -258,6 +262,12 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   Clock: twx(IconClock).transientProps(['size', 'variant'])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  Cloud: twx(IconCloud).transientProps(['size', 'variant'])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  CloudOff: twx(IconCloudOff).transientProps(['size', 'variant'])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   Command: twx(IconCommand).transientProps(['size', 'variant'])<IconProps>(
@@ -497,6 +507,12 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   UsersRound: twx(IconUsers).transientProps(['size', 'variant'])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  Wifi: twx(IconWifi).transientProps(['size', 'variant'])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  WifiOff: twx(IconWifiOff).transientProps(['size', 'variant'])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   X: twx(IconX).transientProps(['size', 'variant'])<IconProps>(

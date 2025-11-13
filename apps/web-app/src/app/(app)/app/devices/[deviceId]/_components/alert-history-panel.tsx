@@ -187,12 +187,7 @@ export function AlertHistoryPanel({
                                   }}
                                   variant="outline"
                                 >
-                                  {getAlertSeverityLabel(
-                                    event.severity as
-                                      | 'info'
-                                      | 'warning'
-                                      | 'critical',
-                                  )}
+                                  {getAlertSeverityLabel(event.severity)}
                                 </Badge>
                                 {isResolved && (
                                   <Badge variant="secondary">Resolved</Badge>

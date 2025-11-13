@@ -27,5 +27,5 @@ export const timeRangeParser = createParser({
 
 // Zoom range parsers for custom time ranges
 // These allow users to zoom into specific time windows that persist across page refreshes
-export const zoomStartParser = parseAsInteger.withDefault(null);
-export const zoomEndParser = parseAsInteger.withDefault(null);
+export const zoomStartParser = parseAsInteger;
+export const zoomEndParser = parseAsInteger;

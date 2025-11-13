@@ -44,7 +44,7 @@ export interface AlertHistoryEvent {
   alertConfigId: string;
   entityId: string;
   homeId: string;
-  severity: AlertSeverity;
+  severity: AlertSeverity | string;
   message: string;
   value: number;
   threshold?: number;
@@ -69,7 +69,9 @@ export interface AlertNotification {
  * Helper to get severity color for UI (CSS variable format)
  * Uses oklch colors defined in globals.css with light/dark mode support
  */
-export function getAlertSeverityColor(severity: AlertSeverity): string {
+export function getAlertSeverityColor(
+  severity: AlertSeverity | string,
+): string {
   switch (severity) {
     case 'level1':
       return 'var(--severity-1)'; // Dark Green (Excellent)
@@ -91,7 +93,9 @@ export function getAlertSeverityColor(severity: AlertSeverity): string {
  * Resolves CSS variables to actual color values that libraries like Recharts can render
  * by creating a temporary element and reading its computed color
  */
-export function getAlertSeverityColorValue(severity: AlertSeverity): string {
+export function getAlertSeverityColorValue(
+  severity: AlertSeverity | string,
+): string {
   // Only resolve in browser environment
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     // Fallback colors for SSR/Node (approximate oklch values as rgb)
@@ -177,7 +181,9 @@ export function getAlertSeverityColorValue(severity: AlertSeverity): string {
 /**
  * Helper to get severity label for UI
  */
-export function getAlertSeverityLabel(severity: AlertSeverity): string {
+export function getAlertSeverityLabel(
+  severity: AlertSeverity | string,
+): string {
   switch (severity) {
     case 'level1':
       return 'Level 1 - Excellent';

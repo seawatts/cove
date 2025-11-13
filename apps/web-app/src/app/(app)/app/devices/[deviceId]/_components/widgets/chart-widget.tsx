@@ -29,7 +29,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useUserPreferences } from '../../../_components/user-preferences-provider';
+import { useUserPreferences } from '../../../../_components/user-preferences-provider';
 import {
   timeRangeParser,
   zoomEndParser,
