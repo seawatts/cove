@@ -25,7 +25,7 @@ interface AlertConfigData {
   homeId: string;
   name: string;
   enabled: boolean;
-  severity: 'info' | 'warning' | 'critical';
+  severity: 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
   alertType: 'threshold' | 'range' | 'rate_of_change';
   field: string;
   showInGraph: boolean;
@@ -384,7 +384,12 @@ export class AlertService {
           configId: alert.configId,
           entityId: alert.entityId,
           message: `${alertRecord.message} (Resolved)`,
-          severity: alertRecord.severity as 'info' | 'warning' | 'critical',
+          severity: alertRecord.severity as
+            | 'level1'
+            | 'level2'
+            | 'level3'
+            | 'level4'
+            | 'level5',
           threshold: alertRecord.threshold ?? undefined,
           triggeredAt: alertRecord.triggeredAt,
           value: alertRecord.value,
@@ -561,7 +566,7 @@ export class AlertService {
     name: string;
     alertType: 'threshold' | 'range' | 'rate_of_change';
     field: string;
-    severity: 'info' | 'warning' | 'critical';
+    severity: 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
     enabled: boolean;
     showInGraph: boolean;
     thresholdValue?: number | null;
@@ -615,7 +620,7 @@ export class AlertService {
       name?: string;
       alertType?: 'threshold' | 'range' | 'rate_of_change';
       field?: string;
-      severity?: 'info' | 'warning' | 'critical';
+      severity?: 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
       enabled?: boolean;
       showInGraph?: boolean;
       thresholdValue?: number | null;

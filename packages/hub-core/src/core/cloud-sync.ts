@@ -105,8 +105,8 @@ export class CloudSyncService {
       throw new Error(`API call failed: ${response.statusText}`);
     }
 
-    const result = await response.json();
-    return result.result.data as T;
+    const result = (await response.json()) as { result: { data: T } };
+    return result.result.data;
   }
 
   /**
@@ -178,7 +178,7 @@ export class CloudSyncService {
     try {
       logDebug('Registering hub with cloud');
 
-      const result = await this.apiClient.hubRegistry.register.mutate({
+      const result = await this.callCloudApi('hubRegistry.register', {
         cloudUrl: undefined, // Will be set when CloudFlare Tunnel is configured
         hubId: this.config.hubId,
         localUrl: this.config.localUrl,

@@ -84,7 +84,7 @@ export const userRouter = createTRPCRouter({
         .update(users)
         .set({ preferences: updatedPreferences })
         .where(eq(users.id, ctx.auth.userId))
-        .returning({ preferences: users.preferences });
+        .returning();
 
       return user?.preferences as UserPreferences;
     }),

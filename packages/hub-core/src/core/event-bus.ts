@@ -64,7 +64,7 @@ export interface AlertEvent {
   alertId: string;
   configId: string;
   entityId: string;
-  severity: 'info' | 'warning' | 'critical';
+  severity: 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
   message: string;
   value: number;
   threshold?: number;

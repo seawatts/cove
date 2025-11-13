@@ -116,13 +116,14 @@ export const cloudEntitiesRouter = createTRPCRouter({
       if (input.hubId) conditions.push(eq(entities.hubId, input.hubId));
       if (input.deviceId)
         conditions.push(eq(entities.deviceId, input.deviceId));
-      if (input.kind) conditions.push(eq(entities.kind, input.kind));
+      // biome-ignore lint/suspicious/noExplicitAny: Drizzle enum type requires casting
+      if (input.kind) conditions.push(eq(entities.kind, input.kind as any));
 
       const entityList = await ctx.db.query.entities.findMany({
         where: conditions.length > 0 ? and(...conditions) : undefined,
         with: {
           device: input.deviceId
-            ? false
+            ? undefined
             : {
                 with: {
                   room: true,
@@ -188,14 +189,29 @@ export const cloudEntitiesRouter = createTRPCRouter({
         await ctx.db
           .update(entities)
           .set({
-            ...entity,
+            deviceClass: entity.deviceClass || null,
+            deviceId: entity.deviceId,
+            displayName: entity.displayName || null,
             hubId,
+            isFavorite: entity.isFavorite ?? false,
+            key: entity.key,
+            // biome-ignore lint/suspicious/noExplicitAny: Drizzle enum type requires casting
+            kind: entity.kind as any,
+            name: entity.name || null,
           })
           .where(eq(entities.id, entity.id));
       } else {
         await ctx.db.insert(entities).values({
-          ...entity,
+          deviceClass: entity.deviceClass || null,
+          deviceId: entity.deviceId,
+          displayName: entity.displayName || null,
           hubId,
+          id: entity.id,
+          isFavorite: entity.isFavorite ?? false,
+          key: entity.key,
+          // biome-ignore lint/suspicious/noExplicitAny: Drizzle enum type requires casting
+          kind: entity.kind as any,
+          name: entity.name || null,
         });
       }
 
@@ -212,7 +228,7 @@ export const cloudEntitiesRouter = createTRPCRouter({
         entityId: z.string(),
         hubId: z.string(),
         state: z.object({
-          attrs: z.record(z.unknown()).optional(),
+          attrs: z.record(z.string(), z.unknown()).optional(),
           state: z.unknown(),
           updatedAt: z.date().optional(),
         }),
@@ -248,16 +264,16 @@ export const cloudEntitiesRouter = createTRPCRouter({
         await ctx.db
           .update(entityStates)
           .set({
-            attrs: state.attrs || null,
-            state: state.state,
+            attrs: (state.attrs as Record<string, unknown>) || null,
+            state: state.state as string,
             updatedAt: state.updatedAt || new Date(),
           })
           .where(eq(entityStates.entityId, entityId));
       } else {
         await ctx.db.insert(entityStates).values({
-          attrs: state.attrs || null,
+          attrs: (state.attrs as Record<string, unknown>) || null,
           entityId,
-          state: state.state,
+          state: state.state as string,
           updatedAt: state.updatedAt || new Date(),
         });
       }

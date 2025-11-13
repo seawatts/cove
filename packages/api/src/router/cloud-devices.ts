@@ -4,7 +4,7 @@
  * Mirrors hub API structure for seamless fallback
  */
 
-import { devices, hubs } from '@cove/db/schema';
+import { devices, entities, hubs } from '@cove/db/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
