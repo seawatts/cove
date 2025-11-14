@@ -1,0 +1,25 @@
+[Unit]
+Description=Cove Hub - Home Automation Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=cove
+WorkingDirectory=/opt/cove-hub
+ExecStart=/usr/bin/env bun src/index.ts
+Restart=always
+RestartSec=2
+
+# Environment variables
+Environment="NODE_ENV=production"
+Environment="DB_PATH=/var/lib/cove-hub/hub.db"
+Environment="PORT=3200"
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cove-hub
+
+[Install]
+WantedBy=multi-user.target
+

@@ -45,7 +45,7 @@ try {
   const trpcHandler = createTRPCHandler(daemon);
 
   // Graceful shutdown handler
-  const shutdown = async (signal: string) => {
+  const shutdown = async (signal: string, exitCode = 0) => {
     logInfo(`Received ${signal} signal, shutting down gracefully...`);
 
     try {
@@ -53,7 +53,7 @@ try {
       await daemon.stop();
 
       logInfo('Hub shutdown complete');
-      process.exit(0);
+      process.exit(exitCode);
     } catch (err) {
       logError('Error during shutdown:', err);
       process.exit(1);
@@ -62,6 +62,14 @@ try {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
+
+  // Handle upgrade restart (exit code 42)
+  // This allows a process manager or systemd to detect and restart the hub
+  process.on('exit', (code) => {
+    if (code === 42) {
+      logInfo('Hub upgrade detected, exiting for restart...');
+    }
+  });
 
   // Start the hub
   async function start() {

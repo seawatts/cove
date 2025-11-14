@@ -47,6 +47,16 @@ The hub uses a local SQLite database for device-centric data only:
 
 ### Installation
 
+#### Quick Start with bunx
+
+The easiest way to run the hub:
+
+```bash
+bunx @cove/hub start
+```
+
+#### Development Installation
+
 ```bash
 # Install dependencies
 bun install
@@ -56,6 +66,31 @@ bun run dev
 
 # Build production binary
 bun run build
+```
+
+#### Production Deployment
+
+For production, use the provided wrapper script or systemd service:
+
+**Using the wrapper script (auto-restart on upgrade):**
+
+```bash
+chmod +x start-hub.sh
+./start-hub.sh
+```
+
+**Using systemd:**
+
+```bash
+# Copy the service file
+sudo cp cove-hub.service /etc/systemd/system/
+
+# Edit paths and user as needed
+sudo nano /etc/systemd/system/cove-hub.service
+
+# Enable and start
+sudo systemctl enable cove-hub
+sudo systemctl start cove-hub
 ```
 
 ### Configuration
@@ -153,6 +188,42 @@ bun test --coverage
 - **Telemetry Throughput**: 1000+ records/second with batching
 - **Memory Usage**: <100MB typical footprint
 - **Database**: SQLite WAL mode for concurrent reads/writes
+
+## Auto-Upgrade System
+
+The hub includes a built-in auto-upgrade system that allows updating from the web UI.
+
+### Features
+
+- **Version Check**: Check for updates from npm registry
+- **One-Click Upgrade**: Upgrade to latest version with automatic restart
+- **Web UI Integration**: Version display and upgrade buttons in Hub Management page
+
+### How It Works
+
+1. Navigate to the Hub Management page in the web app
+2. Click "Check for Updates" to see if a newer version is available
+3. If an update is available, click "Upgrade to vX.X.X"
+4. The hub will:
+   - Download and install the latest version via `bun update @cove/hub`
+   - Exit with code 42 to signal restart needed
+   - Automatically restart (if using wrapper script or systemd with `Restart=always`)
+
+### API Endpoints
+
+The system router provides:
+
+- `system.getCurrentVersion` - Get current hub version
+- `system.checkForUpdates` - Check npm registry for updates
+- `system.upgradeHub` - Trigger upgrade and restart
+
+### Deployment Considerations
+
+For automatic restart after upgrade, use one of:
+
+1. **Wrapper Script**: The `start-hub.sh` script monitors exit code 42 and restarts
+2. **Systemd**: Configure with `Restart=always` in the service file
+3. **Process Manager**: Use PM2, supervisor, or similar with auto-restart enabled
 
 ## User Management & Authentication
 

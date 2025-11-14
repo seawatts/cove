@@ -8,6 +8,7 @@ import { deviceRouter } from './router/device';
 import { entityRouter } from './router/entity';
 import { healthRouter } from './router/health';
 import { homeRouter } from './router/home';
+import { systemRouter } from './router/system';
 import { telemetryRouter } from './router/telemetry';
 import { createHubRouter } from './trpc';
 
@@ -17,6 +18,7 @@ export const hubAppRouter = createHubRouter({
   entity: entityRouter,
   health: healthRouter,
   home: homeRouter,
+  system: systemRouter,
   telemetry: telemetryRouter,
 });
 
